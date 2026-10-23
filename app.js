@@ -10,6 +10,7 @@
   let caseIndex = 0;
   let scene;
   let narrator;
+  let cursor;
   let toastTimer;
   const cleanups = [];
   function element(tag, className, text) { const e = document.createElement(tag); if (className) e.className = className; if (text !== undefined) e.textContent = text; return e; }
@@ -137,6 +138,8 @@
 
   try { if (window.KineticScene) scene = window.KineticScene.mount($('#kinetic-canvas'), {reducedMotion: media.matches}); }
   catch { $('.art-hint').textContent = 'BİR FİKRİN FARKLI BİÇİMLERİ.'; }
+  try { if (window.SymbioteCursor) cursor = window.SymbioteCursor.mount({reducedMotion:media.matches}); }
+  catch { /* Native pointer remains available if the decorative layer fails. */ }
   $('#shape-reset').addEventListener('click', () => { if (scene && scene.resetShape) scene.resetShape(); });
   document.querySelectorAll('[data-scene]').forEach(button => button.addEventListener('click', () => {
     document.querySelectorAll('[data-scene]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
@@ -149,6 +152,7 @@
     document.body.classList.toggle('surface-covered', covered);
     if (scene) scene.setPaused(!moving || covered);
     if (narrator) narrator.setPaused(!moving || covered);
+    if (cursor) cursor.setPaused(!moving);
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
@@ -234,5 +238,5 @@
     if(visible.length) { $('#rhythm-summary').textContent = `${active} üretim günü / son 364 gün`; $('#rhythm-detail').textContent='Yoğunluk kayıtlı etkinlik sayısıdır; süre veya iş kalitesi ölçümü değildir.'; }
   }
   renderRhythm();
-  addEventListener('pagehide', () => { cleanups.forEach(cleanup=>{ if(typeof cleanup==='function') cleanup(); }); if(scene) scene.destroy(); if(narrator) narrator.destroy(); removeEventListener('scroll',onScroll); if(scrollFrame) cancelAnimationFrame(scrollFrame); }, {once:true});
+  addEventListener('pagehide', () => { cleanups.forEach(cleanup=>{ if(typeof cleanup==='function') cleanup(); }); if(scene) scene.destroy(); if(narrator) narrator.destroy(); if(cursor) cursor.destroy(); removeEventListener('scroll',onScroll); if(scrollFrame) cancelAnimationFrame(scrollFrame); }, {once:true});
 })();

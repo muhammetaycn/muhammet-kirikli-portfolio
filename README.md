@@ -34,6 +34,7 @@ Ardından [localhost:8000](http://localhost:8000) adresine git. Windows’ta Pyt
 - `app.js`: gezinme, proje ayrıntıları, hareket kontrolü ve takvim.
 - `kinetic.js`: imleç çekimi, yerel bükülme ve kalıcı biçim vermeyi destekleyen Canvas şerit; dönüş sürer, sıfırlama düğmesi biçimi geri alır.
 - `narrator.js` ve `narrator.css`: takvimin üzerinde zıplayan Luci yorumu ve yavaş yazılan terminal düşünceleri. Balona tıkla veya Enter ile ilerlet.
+- `cursor.js` ve `cursor.css`: beş parmaklı dikişli eldiven, yakınlaşınca açılan eklem ve butonlardan uzanan siyah lifler. Dokunma, metin girişi, hareket duraklatma ve azaltılmış harekette normal imleç korunur.
 - `system-lab.js`: projelerin adımlarını gösteren etkileşimli akış alanı.
 - `ARASTIRMA.md`: sekiz tasarım kaynağı, gözlem sınırları ve özgün uygulama kararları.
 

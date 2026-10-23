@@ -1,0 +1,16 @@
+/* The real pointer remains in charge; this layer never receives a hit. */
+.symbiote-cursor{position:fixed;inset:0;z-index:2147483647;pointer-events:none!important;overflow:visible;contain:layout style;opacity:0;isolation:isolate;transition:opacity .12s linear}
+.symbiote-cursor.is-visible{opacity:1}
+.symbiote-cursor *{pointer-events:none!important}
+.symbiote-webs{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.symbiote-webs path{fill:none;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.symbiote-web-edge{stroke:#d0c5b5;opacity:.22}
+.symbiote-web-core{stroke:#08090a}
+.symbiote-web-shine{stroke:#91887c;opacity:.31}
+.symbiote-glove{position:absolute;left:0;top:0;width:64px;height:78px;overflow:visible;transform-origin:0 0;will-change:transform;filter:drop-shadow(1px 3px 2px #0005)}
+.symbiote-glove .glove-outline{stroke:#383431;stroke-width:1.55;stroke-linejoin:round;stroke-linecap:round}
+.symbiote-glove .glove-crease{fill:none;stroke:#ada391;stroke-width:1.15;stroke-linecap:round}
+.symbiote-glove .glove-stitch{fill:none;stroke:#7d7164;stroke-width:.9;stroke-dasharray:1.1 2.05;stroke-linecap:round}
+.symbiote-glove .glove-highlight{fill:none;stroke:#fffdf5;stroke-width:1.8;stroke-linecap:round;opacity:.83}
+html.symbiote-cursor-active,html.symbiote-cursor-active *{cursor:none!important}
+@media (pointer:coarse),(hover:none),(prefers-reduced-motion:reduce){.symbiote-cursor{display:none!important}html.symbiote-cursor-active,html.symbiote-cursor-active *{cursor:revert!important}}
