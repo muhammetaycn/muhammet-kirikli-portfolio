@@ -41,9 +41,9 @@ Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. B
 
 ## GitHub Pages
 
-Hedef depo: [muhammetaycn/muhammet-kirikli-portfolio](https://github.com/muhammetaycn/muhammet-kirikli-portfolio). Hedef yayın adresi: [muhammetaycn.github.io/muhammet-kirikli-portfolio](https://muhammetaycn.github.io/muhammet-kirikli-portfolio/).
+Kaynak depo: [muhammetaycn/muhammet-kirikli-portfolio](https://github.com/muhammetaycn/muhammet-kirikli-portfolio). Canlı yayın: [muhammetaycn.github.io/muhammet-kirikli-portfolio](https://muhammetaycn.github.io/muhammet-kirikli-portfolio/).
 
-Statik dosyaları depo kökünde tut. GitHub Pages, kök dizindeki `index.html` dosyasını doğrudan sunabilir; `.nojekyll` bu yapı için ek Jekyll işlemini kapatır. Varsa statik yayımlama Actions akışı da aynı klasörü kullanabilir. Bağlantılar göreli olduğundan depo alt yolunda çalışır. Bu adresler yayın hedefidir; dağıtımın tamamlandığını göstermez.
+Statik dosyaları depo kökünde tut. GitHub Pages, kök dizindeki `index.html` dosyasını doğrudan sunabilir; `.nojekyll` bu yapı için ek Jekyll işlemini kapatır. Varsa statik yayımlama Actions akışı da aynı klasörü kullanabilir. Bağlantılar göreli olduğundan depo alt yolunda çalışır. GitHub Pages, `main` dalının kök dizininden yayımlanır. Değişiklikleri bu dala göndermek siteyi günceller. İlk yayın 23 Ekim 2026’da tarayıcıda doğrulandı.
 
 ## Bağlantılar ve lisans
 
@@ -58,4 +58,4 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 
 ## Luci’nin piksel sahnesi
 
-52 × 7 hücrenin tamamı hareket alanıdır. `MUHAMMET` ve `KIRIKLI`, iki 60 saniyelik sahnede iniş izleriyle yazılır. Yazım yaklaşık 33–34 saniye, tam yazının okunması yaklaşık 18–19 saniye, kademeli silinme 7,8 saniyedir. Sayfa görünmüyorken süre ilerlemez. Genel hareket kontrolü sahneyi durdurur; azaltılmış harekette okunur sabit yazı gösterilir. Turuncu animasyon katmanı gerçek üretim verilerini değiştirmez.
+52 × 7 hücrenin tamamı hareket alanıdır. Siyah, Discord mavisi, turkuaz, kehribar ve gül renkli Luci yorumları sırayla bütün kelimeler yazar. Yazım 3,4–7,8 saniye, okunur bekleme 2,4–3,5 saniye sürer; eski kelime 1,6 saniyede arkadan silinirken yeni karakter girer. Aynı anda en fazla iki karakter görünür. Proje içeriklerinden türetilen 896 kısa düşünce tekrar sırasını değiştirir. Sayfa görünmüyorken süre ilerlemez. Genel hareket kontrolü sahneyi durdurur; azaltılmış harekette okunur sabit yazı gösterilir. Renkli animasyon katmanı gerçek üretim verilerini değiştirmez.

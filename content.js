@@ -559,6 +559,12 @@
   ],
   "experience": [
     {
+      "organization": "Bağımsız ürün ve sistem çalışmaları",
+      "role": "Yazılım · AI otomasyonu · Tasarım",
+      "duration": "Devam eden projeler",
+      "description": "Web ve mobil ürünler, AI otomasyonları, arayüzler ve etkileşimli deneyimler. IDOLOG, Acıktınmı, GÖRGEZ ve diğer projelerde ürün, yazılım ve tasarım katmanlarını birlikte ele alıyorum."
+    },
+    {
       "organization": "Altınbaşak Tekstil",
       "role": "Baskı üretimi",
       "duration": "11 ay",

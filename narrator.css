@@ -2,7 +2,7 @@
 .has-activity-narrator .rhythm-scroll{padding-top:186px;overflow-x:clip;overflow-y:visible}
 .has-activity-narrator .rhythm-grid{min-width:0;width:100%;grid-template-rows:repeat(7,minmax(0,1fr));grid-template-columns:repeat(52,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);aspect-ratio:52 / 7;gap:clamp(2px,.3vw,4px)}
 .has-activity-narrator .rhythm-cell{position:relative;height:auto;min-width:0;min-height:0;aspect-ratio:1;border-radius:2px;isolation:isolate}
-.has-activity-narrator .rhythm-cell.narrator-ink:after{content:"";position:absolute;inset:0;z-index:1;border-radius:inherit;background:#ff6a35;box-shadow:0 0 7px #ff6a3520;opacity:var(--narrator-ink-opacity,1);pointer-events:none}
+.has-activity-narrator .rhythm-cell .narrator-ink-layer{position:absolute;inset:0;z-index:1;border-radius:inherit;pointer-events:none;opacity:1}
 .activity-narrator{position:absolute;inset:0;z-index:3;pointer-events:none;--narrator-ink:#e7e3db;--narrator-accent:#ff6a35}
 .activity-narrator[data-ready=false]{visibility:hidden}
 .narrator-character{position:absolute;left:0;top:0;width:44px;height:44px;pointer-events:none;will-change:transform}
@@ -10,13 +10,13 @@
 .narrator-tether{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .narrator-tether path{stroke:#e7e3db24;stroke-width:1.2;stroke-dasharray:1 9;stroke-linecap:round}
 .narrator-luci{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 94%;filter:drop-shadow(0 2px 1px #0009)}
-.luci-outline{fill:#050506;stroke:#8b8781;stroke-opacity:.7;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.luci-outline{fill:var(--luci-body,#050506);stroke:#8b8781;stroke-opacity:.7;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .luci-tail{transform-box:fill-box;transform-origin:90% 70%;animation:narrator-tail 3.7s ease-in-out infinite}
 .luci-eye{transform-box:fill-box;transform-origin:50% 50%;animation:narrator-blink 6.7s linear infinite}
 .luci-arm{transform-box:fill-box;transform-origin:10% 30%;transition:transform .1s ease}
 .luci-legs{transform-box:fill-box;transform-origin:70% 0;transition:transform .1s ease}
-.activity-narrator.is-airborne .luci-arm{transform:rotate(-28deg)}
-.activity-narrator.is-airborne .luci-legs{transform:translateY(-3px) rotate(-7deg)}
+.narrator-character.is-airborne .luci-arm{transform:rotate(-28deg)}
+.narrator-character.is-airborne .luci-legs{transform:translateY(-3px) rotate(-7deg)}
 .activity-narrator.is-curious .luci-arm{transform:rotate(-43deg)}
 .activity-narrator.is-curious .luci-pupil{ry:10}
 .narrator-thought{position:absolute;left:0;top:0;width:250px;max-width:calc(100% - 24px);padding:0;text-align:left;background:#090b0f;color:var(--narrator-ink);border:1px solid #e7e3db30;border-radius:9px;pointer-events:auto;cursor:pointer;box-shadow:0 8px 24px #0003;will-change:transform;font:11px/1.5 Consolas,"Courier New",monospace;letter-spacing:0;overflow:visible}
@@ -42,3 +42,6 @@
 @keyframes narrator-caret{0%,49%{opacity:1}50%,100%{opacity:0}}
 @media(max-width:760px){.has-activity-narrator .rhythm-scroll{padding-top:176px}.has-activity-narrator .rhythm-grid{gap:1px}.has-activity-narrator .rhythm-cell{border-radius:.7px}.narrator-character{width:28px;height:28px}.narrator-shadow{left:-5px;width:10px;height:2px}.narrator-thought{width:226px;font-size:10px}.narrator-line{min-height:46px}.narrator-terminal{padding-left:10px;padding-right:10px}.narrator-tether path{stroke-width:1;stroke-dasharray:1 7}}
 @media(prefers-reduced-motion:reduce){.activity-narrator *{animation:none!important;transition:none!important}.narrator-caret{visibility:hidden}}
+
+.luci-tail>path:nth-child(2){stroke:var(--luci-body,#050506)}
+.narrator-character.is-retiring{pointer-events:none}

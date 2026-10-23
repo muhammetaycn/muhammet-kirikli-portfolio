@@ -2,16 +2,6 @@
   'use strict';
   const NS = 'http://www.w3.org/2000/svg';
   const mounted = new WeakMap();
-  const thoughts = [
-    'ben Muhammet. Bir saniye… önce ismimi yazayım.',
-    'İlk harf tamam. Şimdi diğer karelere geçiyorum.',
-    'QR’dan gelen bir fotoğrafı, onaydan sahneye taşıyorum.',
-    'Bir olay geliyor. Bot doğru kuralı ve rolü buluyor.',
-    'Tekstil sahasındaki işleri dijital sistemlere bağlıyorum.',
-    'Bir fikri parçalara ayırıyorum. Sonra tekrar bağlıyorum.',
-    'Turuncu izler birazdan silinecek. Alttaki günlük ayrı.',
-    'Kodu yazmak kadar, parçaların birlikte çalışması da güzel.'
-  ];
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
   function element(name, className, text) {
@@ -51,410 +41,271 @@
 
 
 
-  // A 5×7 font uses the same column-major indices as the real activity grid.
-  // These temporary footprints never change a cell's recorded activity level.
-  const FONT = Object.freeze({
-    A: ['01110','10001','10001','11111','10001','10001','10001'],
-    B: ['11110','10001','10001','11110','10001','10001','11110'],
-    C: ['01111','10000','10000','10000','10000','10000','01111'],
-    D: ['11110','10001','10001','10001','10001','10001','11110'],
-    E: ['11111','10000','10000','11110','10000','10000','11111'],
-    I: ['11111','00100','00100','00100','00100','00100','11111'],
-    K: ['10001','10010','10100','11000','10100','10010','10001'],
-    N: ['10001','11001','11001','10101','10011','10011','10001'],
-    O: ['01110','10001','10001','10001','10001','10001','01110'],
-    S: ['01111','10000','10000','01110','00001','00001','11110'],
-    Y: ['10001','10001','01010','00100','00100','00100','00100'],
-    H: ['10001','10001','10001','11111','10001','10001','10001'],
-    L: ['10000','10000','10000','10000','10000','10000','11111'],
-    M: ['10001','11011','10101','10101','10001','10001','10001'],
-    R: ['11110','10001','10001','11110','10100','10010','10001'],
-    T: ['11111','00100','00100','00100','00100','00100','00100'],
-    U: ['10001','10001','10001','10001','10001','10001','01110'],
-    '+': ['00000','00100','00100','11111','00100','00100','00000']
-  });
-  const SCENE_LENGTH = 60000;
-  const DRAW_END = 34400;
-  const FADE_START = 52200;
-  const FADE_LENGTH = 7200;
-  const FADE_SPREAD = 600;
 
-  function compileMessage(text) {
-    const width = [...text].reduce((sum, letter) => sum + (letter === ' ' ? 3 : 6), 0) - 1;
-    let column = Math.floor((52 - width) / 2);
-    const route = [];
-    let letterNumber = 0;
-    for (const letter of text) {
-      if (letter === ' ') { column += 3; continue; }
-      const glyph = FONT[letter];
-      const glyphRoute = [];
-      // Alternate top-to-bottom and bottom-to-top writing. Luci crosses the
-      // depth of the panel instead of moving along a single horizontal rail.
-      for (let line = 0; line < 7; line++) {
-        const row = letterNumber % 2 ? 6 - line : line;
-        const columns = Array.from({length: 5}, (_, index) => index);
-        if ((line + letterNumber) % 2) columns.reverse();
-        for (const offset of columns) {
-          if (glyph[row][offset] === '1') glyphRoute.push({column: column + offset, row, letter});
-        }
-      }
-      glyphRoute.forEach((point, index) => route.push({...point, index: point.column * 7 + point.row, beat: index === 0 && route.length ? 110 : 0}));
-      column += 6;
-      letterNumber++;
-    }
-    let previous = {column: 0, row: 6};
-    route.forEach(point => {
-      const distance = Math.hypot(point.column - previous.column, point.row - previous.row);
-      point.duration = clamp(190 + Math.sqrt(distance) * 25, 180, 310);
-      previous = point;
-    });
-    const beatTime = route.reduce((sum, point) => sum + point.beat, 0);
-    const target = DRAW_END - 500 - beatTime;
-    // Fit the drawing to its score while keeping each individual jump visible.
-    for (let pass = 0; pass < 8; pass++) {
-      const difference = target - route.reduce((sum, point) => sum + point.duration, 0);
-      const adjustable = route.filter(point => difference > 0 ? point.duration < 310 : point.duration > 180);
-      if (!adjustable.length || Math.abs(difference) < .01) break;
-      adjustable.forEach(point => { point.duration = clamp(point.duration + difference / adjustable.length, 180, 310); });
-    }
-    let cursor = 500;
-    route.forEach(point => {
-      cursor += point.beat;
-      point.start = cursor;
-      point.end = cursor + point.duration;
-      cursor = point.end;
-    });
-    return Object.freeze({text, width, route, end: cursor});
+  const GLYPHS = {
+    A:['01110','10001','10001','11111','10001','10001','10001'], B:['11110','10001','10001','11110','10001','10001','11110'],
+    C:['01111','10000','10000','10000','10000','10000','01111'], D:['11110','10001','10001','10001','10001','10001','11110'],
+    E:['11111','10000','10000','11110','10000','10000','11111'], F:['11111','10000','10000','11110','10000','10000','10000'],
+    G:['01111','10000','10000','10111','10001','10001','01111'], H:['10001','10001','10001','11111','10001','10001','10001'],
+    I:['11111','00100','00100','00100','00100','00100','11111'], J:['00111','00010','00010','00010','10010','10010','01100'],
+    K:['10001','10010','10100','11000','10100','10010','10001'], L:['10000','10000','10000','10000','10000','10000','11111'],
+    M:['10001','11011','10101','10101','10001','10001','10001'], N:['10001','11001','11001','10101','10011','10011','10001'],
+    O:['01110','10001','10001','10001','10001','10001','01110'], P:['11110','10001','10001','11110','10000','10000','10000'],
+    Q:['01110','10001','10001','10001','10101','10010','01101'], R:['11110','10001','10001','11110','10100','10010','10001'],
+    S:['01111','10000','10000','01110','00001','00001','11110'], T:['11111','00100','00100','00100','00100','00100','00100'],
+    U:['10001','10001','10001','10001','10001','10001','01110'], V:['10001','10001','10001','10001','10001','01010','00100'],
+    W:['10001','10001','10001','10101','10101','11011','10001'], X:['10001','10001','01010','00100','01010','10001','10001'],
+    Y:['10001','10001','01010','00100','00100','00100','00100'], Z:['11111','00001','00010','00100','01000','10000','11111'],
+    '0':['01110','10011','10101','10101','11001','10001','01110'],'1':['00100','01100','00100','00100','00100','00100','01110'],
+    '2':['01110','10001','00001','00010','00100','01000','11111'],'3':['11110','00001','00001','01110','00001','00001','11110'],
+    '4':['00010','00110','01010','10010','11111','00010','00010'],'5':['11111','10000','10000','11110','00001','00001','11110'],
+    '6':['01111','10000','10000','11110','10001','10001','01110'],'7':['11111','00001','00010','00100','01000','01000','01000'],
+    '8':['01110','10001','10001','01110','10001','10001','01110'],'9':['01110','10001','10001','01111','00001','00001','11110'],
+    '+':['00000','00100','00100','11111','00100','00100','00000']
+  };
+  const COMPACT = {
+    A:['010','101','111','101','101'],B:['110','101','110','101','110'],C:['011','100','100','100','011'],D:['110','101','101','101','110'],
+    E:['111','100','110','100','111'],F:['111','100','110','100','100'],G:['011','100','101','101','011'],H:['101','101','111','101','101'],
+    I:['111','010','010','010','111'],J:['011','001','001','101','010'],K:['101','101','110','101','101'],L:['100','100','100','100','111'],
+    M:['101','111','111','101','101'],N:['101','111','111','111','101'],O:['010','101','101','101','010'],P:['110','101','110','100','100'],
+    Q:['010','101','101','111','011'],R:['110','101','110','101','101'],S:['011','100','010','001','110'],T:['111','010','010','010','010'],
+    U:['101','101','101','101','111'],V:['101','101','101','101','010'],W:['101','101','111','111','101'],X:['101','101','010','101','101'],
+    Y:['101','101','010','010','010'],Z:['111','001','010','100','111']
+  };
+  const COLORS = [
+    {body:'#050506',ink:'#ff6a35',name:'siyah'}, {body:'#5865F2',ink:'#5865F2',name:'mavi'},
+    {body:'#3c9b94',ink:'#4eb6aa',name:'teal'}, {body:'#b88432',ink:'#d4a34f',name:'amber'}, {body:'#b46a87',ink:'#ca819d',name:'rose'}
+  ];
+  const FADE_MS = 1600;
+  const transliterate = value => String(value).replace(/[ıİ]/g,'I').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+  const STOP = new Set(['VE','BIR','BU','ICIN','ILE','DA','DE','DAHA','SONRA','GIBI','OLAN','AYNI','BUNU','ADIMINI','ADIMI','UZERINDE','ICINDE','CALISMASINDA']);
+  function keywords(value) {
+    const separated=String(value).replace(/([a-z])([A-Z])/g,'$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g,'$1 $2');
+    const words = transliterate(separated).match(/[A-Z0-9+]+/g) || [];
+    return words.filter((word,index) => word.length>1 && word.length<=13 && !STOP.has(word) && words.indexOf(word)===index).slice(0,4);
   }
-  const scores = [compileMessage('MUHAMMET'), compileMessage('KIRIKLI')];
-
+  function narrativeBank() {
+    const portfolio = window.PORTFOLIO || {};
+    const bank = [
+      {text:'ben Muhammet Kırıklı. Önce tanışalım.', words:['BEN','MUHAMMET','KIRIKLI']},
+      {text:'Tekstil sahasındaki deneyimimi dijital sistemlere bağlıyorum.', words:['TEKSTIL','DIJITAL','SISTEM']},
+      {text:'Bir fotoğraf QR ile geliyor; onaydan sonra sahneye ulaşıyor.', words:['QR','FOTOGRAF','ONAY','SAHNE']},
+      {text:'Topluluk botunda bir olay, doğru kuraldan geçip role bağlanıyor.',words:['OLAY','KURAL','ROL']},
+      {text:'İçerik otomasyonunda araştırma, taslak ve zamanlamayı aynı akışta tutuyorum.',words:['ARASTIRMA','TASLAK','ZAMANLAMA']},
+      {text:'TekstilOS prototipinde sipariş formundan panoya uzanan akışı deniyorum.',words:['TEKSTILOS','SIPARIS','PANO']},
+      {text:'GÖRGEZ’de yer ve rota verileri, doğrulamadan sonra haritaya ulaşıyor.',words:['GORGEZ','VERI','HARITA']},
+      {text:'Bu yüzeyi tutup bükerken, hareketi arayüzün parçası olarak deniyorum.',words:['DOKUN','SEKIL','HAREKET']}
+    ];
+    // Source facts stay attached to their project and stage. These are varied
+    // viewpoints on actual content, rather than a generated list of new claims.
+    const views = [
+      (p,s,n)=>`${p}: ${n}. adım «${s}».`,
+      (p,s)=>`${p} akışında şimdi «${s}» var.`,
+      (p,s)=>`${p} için notum: «${s}».`,
+      (p,s)=>`${p} çalışmasında «${s}» adımını inceliyorum.`,
+      (p,s)=>`${p} üzerinde «${s}» bağlantısına dönüyorum.`,
+      (p,s)=>`${p} akışını «${s}» üzerinden okuyorum.`,
+      (p,s)=>`${p} içinde bugün odak noktam «${s}».`,
+      (p,s)=>`${p} için «${s}» adımının yerini düşünüyorum.`,
+      (p,s)=>`${p}: bu kez «${s}» bölümüne bakıyorum.`,
+      (p,s)=>`${p} notlarımda sıradaki başlık «${s}».`,
+      (p,s)=>`${p} çalışmasını «${s}» noktasında durdurup inceliyorum.`,
+      (p,s)=>`${p} içinde «${s}» adımına biraz daha yakından bakıyorum.`,
+      (p,s)=>`${p}: «${s}» ile akışın bir parçasını takip ediyorum.`,
+      (p,s)=>`${p} üzerinde düşünürken «${s}» adımına geliyorum.`,
+      (p,s)=>`${p} taslağında «${s}» başlığını açıyorum.`,
+      (p,s)=>`${p} için önümdeki adım «${s}».`,
+      (p,s)=>`${p} akışının bu durağı: «${s}».`,
+      (p,s)=>`${p} notu — şu an «${s}» bölümündeyim.`,
+      (p,s)=>`${p} çalışmasında «${s}» aklımda.`,
+      (p,s)=>`${p} üzerinde «${s}» adımını tekrar gözden geçiriyorum.`
+    ];
+    (portfolio.projects || []).forEach(project => {
+      const title=project.title.split(' — ')[0];
+      (project.flow || []).forEach((stage,index) => views.forEach(view => {
+        const text=view(title,stage,index+1);
+        const words=keywords(title+' '+stage);
+        if(words.length) bank.push({text,words});
+      }));
+      [project.summary,...(project.features || [])].filter(Boolean).forEach(text=>{
+        const words=keywords(title+' '+text); if(words.length) bank.push({text,words});
+      });
+    });
+    (portfolio.capabilities || []).forEach(capability=>{
+      bank.push({text:capability.description,words:keywords(capability.title)});
+      (capability.tools||[]).forEach(tool=>bank.push({text:`${capability.title} çalışmalarımda kullandığım araçlardan biri: ${tool}.`,words:keywords(tool+' '+capability.title)}));
+    });
+    const unique=new Map();bank.forEach(entry=>{if(entry.text && entry.text.length<=112 && entry.words.length && !unique.has(entry.text))unique.set(entry.text,entry)});
+    return [...unique.values()];
+  }
+  function compileWord(word, overlapping) {
+    const compact=word.length>8, font=compact?COMPACT:GLYPHS, glyphWidth=compact?3:5, glyphHeight=compact?5:7;
+    const width=word.length*(glyphWidth+1)-1;
+    const left=Math.floor((52-width)/2), route=[];
+    [...word].forEach((letter,letterIndex)=>{
+      let glyph=font[letter];
+      if(!glyph) glyph=compact?['111','101','010','000','010']:GLYPHS.O;
+      for(let line=0;line<glyphHeight;line++) {
+        const rowIndex=letterIndex%2?glyphHeight-1-line:line;
+        const row=compact?1+rowIndex:rowIndex;
+        const offsets=Array.from({length:glyphWidth},(_,i)=>i);if((line+letterIndex)%2)offsets.reverse();
+        offsets.forEach(offset=>{if(glyph[rowIndex][offset]==='1')route.push({column:left+letterIndex*(glyphWidth+1)+offset,row,index:(left+letterIndex*(glyphWidth+1)+offset)*7+row,letter:letterIndex});});
+      }
+    });
+    const intro=overlapping?400:350;
+    const duration=clamp(1800+word.length*650,3400,7800);
+    const firstCount=route.filter(point=>point.letter===0).length;
+    const firstDuration=Math.max(1300,(duration-intro)*firstCount/route.length);
+    const remaining=duration-intro-firstDuration;
+    let cursor=intro;
+    route.forEach((point,index)=>{
+      point.start=cursor;
+      point.duration=point.letter===0?firstDuration/firstCount:remaining/(route.length-firstCount || 1);
+      point.end=cursor+point.duration;cursor=point.end;
+    });
+    return {word,width,route,end:cursor,hold:clamp(2200+word.length*110,2400,3500)};
+  }
   function mount(options) {
-    const {panel, grid, scroll} = options || {};
-    if (!panel || !grid || !scroll) throw new Error('ActivityNarrator: panel, grid ve scroll gerekli.');
-    if (mounted.has(panel)) mounted.get(panel).destroy();
-    const hadClass = panel.classList.contains('has-activity-narrator');
-    panel.classList.add('has-activity-narrator');
-    const root = element('div', 'activity-narrator');
-    root.dataset.ready = 'false';
-    root.dataset.active = 'false';
-    root.dataset.duration = String(SCENE_LENGTH * scores.length);
-    const shadow = element('span', 'narrator-shadow');
-    const tether = vector('svg', {class: 'narrator-tether', 'aria-hidden': 'true'});
-    const tetherPath = vector('path', {fill: 'none'});
-    tether.append(tetherPath);
-    const character = element('div', 'narrator-character');
-    character.setAttribute('aria-hidden', 'true');
-    const drawing = luci();
-    character.append(drawing.svg);
-    const bubble = element('button', 'narrator-thought');
-    bubble.type = 'button';
-    const terminal = element('span', 'narrator-terminal');
-    terminal.setAttribute('aria-hidden', 'true');
-    const header = element('span', 'narrator-terminal-bar');
-    header.append(element('i', 'narrator-led'), element('span', '', 'iç ses'), element('span', 'narrator-counter'));
-    const line = element('span', 'narrator-line');
-    const copy = element('span', 'narrator-copy');
-    line.append(copy, element('span', 'narrator-caret', '▍'));
-    terminal.append(header, line, element('span', 'narrator-tip', 'sonraki düşünce ↵'));
-    bubble.append(terminal);
-    const helper = element('span', 'narrator-sr', 'Luci bütün kareler arasında zıplayarak geçici turuncu izlerle MUHAMMET ve KIRIKLI yazar. Her yazı tamamlandıktan sonra okunabilmesi için bekler ve yavaşça silinir. İki dakikalık döngü etkinlik kayıtlarını değiştirmez. Balona tıklayarak veya Enter tuşuyla sonraki düşünceyi okuyabilirsin.');
-    const announcement = element('span', 'narrator-sr');
-    announcement.setAttribute('role', 'status');
-    announcement.setAttribute('aria-live', 'polite');
-    announcement.setAttribute('aria-atomic', 'true');
-    root.append(shadow, tether, character, bubble, helper, announcement);
-    panel.append(root);
-    const counter = header.querySelector('.narrator-counter');
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let reduced = Boolean(options.reducedMotion) || media.matches;
-    let paused = false;
-    let visible = false;
-    let destroyed = false;
-    let frame = 0;
-    let layoutFrame = 0;
-    let previous = 0;
-    let time = 0;
-    let sceneTime = 0;
-    let scene = 0;
-    let routeIndex = 0;
-    let dirty = true;
-    let points = [];
-    let currentIndex = 6;
-    let currentPhase = '';
-    let direction = 1;
-    let box = {width: 0, bubbleWidth: 250, bubbleHeight: 108, size: 44, gridTop: 180, pitch: 16};
-    let thought = 0;
-    let letters = 0;
-    let typingPhase = 'type';
-    let nextLetter = 100;
-    let holdUntil = 0;
-    let curiousUntil = 0;
-    let lastPose = '';
-    const ink = new Map();
-    const cleanups = [];
-
-    function listen(target, type, handler, settings) {
-      target.addEventListener(type, handler, settings);
-      cleanups.push(() => target.removeEventListener(type, handler, settings));
+    const {panel,grid,scroll}=options||{};
+    if(!panel||!grid||!scroll)throw new Error('ActivityNarrator: panel, grid ve scroll gerekli.');
+    if(mounted.has(panel))mounted.get(panel).destroy();
+    const hadClass=panel.classList.contains('has-activity-narrator');panel.classList.add('has-activity-narrator');
+    const root=element('div','activity-narrator');root.dataset.ready='false';root.dataset.active='false';
+    const bubble=element('button','narrator-thought');bubble.type='button';
+    const terminal=element('span','narrator-terminal');terminal.setAttribute('aria-hidden','true');
+    const header=element('span','narrator-terminal-bar');const counter=element('span','narrator-counter');
+    header.append(element('i','narrator-led'),element('span','','iç ses'),counter);
+    const copy=element('span','narrator-copy'),line=element('span','narrator-line');line.append(copy,element('span','narrator-caret','▍'));
+    terminal.append(header,line,element('span','narrator-tip','sonraki düşünce ↵'));bubble.append(terminal);
+    const helper=element('span','narrator-sr','Renkli Luciler kelimeleri sırayla yazar. Önceki kelime arkadan silinirken yeni yazar gelir. Geçici renkli izler gerçek etkinlik kayıtlarını değiştirmez. Balon bir sonraki düşünceye geçer.');
+    const announcement=element('span','narrator-sr');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');
+    root.append(bubble,helper,announcement);panel.append(root);
+    const media=window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reduced=Boolean(options.reducedMotion)||media.matches,paused=false,visible=false,destroyed=false;
+    let frame=0,layoutFrame=0,previous=0,time=0,dirty=true,points=[],actors=[],active=null,actorNumber=0;
+    let box={width:0,size:44,bubbleWidth:250,bubbleHeight:100,gridTop:180,pitch:16};
+    let sentenceIndex=0,wordIndex=0,thoughtLetters=0,nextLetter=0,deck=[],deckCursor=0,cycle=0;
+    const bank=narrativeBank(),cleanups=[];
+    const data=(name,value)=>{const next=String(value);if(root.dataset[name]!==next)root.dataset[name]=next};
+    data('bankSize',bank.length);data('fadeMs',FADE_MS);data('actors',0);
+    function listen(target,type,fn,settings){target.addEventListener(type,fn,settings);cleanups.push(()=>target.removeEventListener(type,fn,settings));}
+    function shuffleDeck(){
+      deck=Array.from({length:Math.max(0,bank.length-8)},(_,i)=>i+8);let seed=28711+(cycle++*7919);
+      for(let i=deck.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const j=seed%(i+1);[deck[i],deck[j]]=[deck[j],deck[i]];}deckCursor=0;
     }
-    function data(name, value) {
-      const next = String(value);
-      if (root.dataset[name] !== next) root.dataset[name] = next;
+    function setSentence(index,instant){
+      sentenceIndex=index;wordIndex=0;thoughtLetters=instant?bank[index].text.length:0;
+      copy.textContent=bank[index].text.slice(0,thoughtLetters);nextLetter=time+80;
+      counter.textContent=String(index+1).padStart(3,'0')+' / '+bank.length;
+      bubble.setAttribute('aria-label','İç ses: '+bank[index].text+' Sonraki düşünce için tıkla.');announcement.textContent=bank[index].text;
+      data('thought',index);root.classList.toggle('is-typing',!instant);
     }
-    function setPhase(value) {
-      currentPhase = value;
-      data('phase', value);
+    function nextSentence(){
+      let next;
+      if(sentenceIndex<7&&cycle===0)next=sentenceIndex+1;
+      else {if(!deck.length||deckCursor>=deck.length)shuffleDeck();next=deck[deckCursor++];}
+      setSentence(next===undefined?0:next,reduced);
     }
-    function clearInk() {
-      ink.forEach((record, cell) => {
-        cell.classList.remove('narrator-ink', 'narrator-step');
-        cell.style.removeProperty('--narrator-ink-opacity');
-      });
-      ink.clear();
-      data('inkCount', 0);
+    function createActor(word,overlapping){
+      const palette=COLORS[actorNumber++%COLORS.length];
+      const node=element('div','narrator-character');node.setAttribute('aria-hidden','true');node.style.setProperty('--luci-body',palette.body);
+      const drawing=luci();node.append(drawing.svg);
+      const shadow=element('span','narrator-shadow');root.append(shadow,node);
+      const actor={node,drawing,shadow,palette,score:compileWord(word,overlapping),born:time,current:6,step:0,ink:new Map(),retire:null,lastPose:''};
+      actors.push(actor);data('actors',actors.length);return actor;
     }
-    function light(point) {
-      const cell = points[point.index] && points[point.index].cell;
-      if (!cell || ink.has(cell)) return;
-      cell.classList.add('narrator-ink');
-      cell.style.setProperty('--narrator-ink-opacity', '1');
-      ink.set(cell, {opacity: 1, delay: ((point.column * 13 + point.row * 29) % 37) / 36 * FADE_SPREAD});
-      data('inkCount', ink.size);
+    function removeActor(actor){actor.ink.forEach(record=>record.node.remove());actor.ink.clear();actor.node.remove();actor.shadow.remove();actors=actors.filter(item=>item!==actor);data('actors',actors.length);}
+    function startWord(overlapping){
+      const entry=bank[sentenceIndex];
+      active=createActor(entry.words[wordIndex],overlapping);data('message',active.score.word);data('phase','draw');data('inkCount',0);data('color',active.palette.name);
     }
-    function setThought(index, instant) {
-      thought = (index + thoughts.length) % thoughts.length;
-      letters = instant ? thoughts[thought].length : 0;
-      copy.textContent = thoughts[thought].slice(0, letters);
-      counter.textContent = String(thought + 1).padStart(2, '0') + ' / ' + String(thoughts.length).padStart(2, '0');
-      bubble.setAttribute('aria-label', 'İç ses: ' + thoughts[thought] + ' Sonraki düşünce için tıkla veya Enter tuşuna bas.');
-      announcement.textContent = thoughts[thought];
-      typingPhase = instant ? 'hold' : 'type';
-      nextLetter = time + 100;
-      holdUntil = time + 4700;
-      root.classList.toggle('is-typing', !instant);
+    function advanceWord(){
+      const old=active;
+      // A single outgoing actor is the hard cap, even if the visitor skips.
+      actors.filter(actor=>actor!==old).forEach(removeActor);
+      if(old){old.retire=time;old.node.classList.add('is-retiring');}
+      wordIndex++;
+      if(wordIndex>=bank[sentenceIndex].words.length)nextSentence();
+      startWord(Boolean(old));
     }
-    function isActive() { return !destroyed && !paused && !reduced && visible && !document.hidden && points.length === 364; }
-    function measure() {
-      dirty = false;
-      const panelRect = panel.getBoundingClientRect();
-      const gridRect = grid.getBoundingClientRect();
-      points = [...grid.querySelectorAll('.rhythm-cell')].map(cell => {
-        const rect = cell.getBoundingClientRect();
-        return {cell, x: rect.left + rect.width / 2 - panelRect.left, y: rect.top + rect.height * .65 - panelRect.top};
-      });
-      box = {
-        width: panel.clientWidth,
-        bubbleWidth: bubble.offsetWidth,
-        bubbleHeight: bubble.offsetHeight,
-        size: character.offsetWidth,
-        gridTop: gridRect.top - panelRect.top,
-        pitch: gridRect.width / 52
-      };
-      lastPose = '';
-      data('ready', points.length === 364);
-      if (points.length === 364) {
-        if (reduced) showStatic();
-        else renderPose();
+    function light(actor,point){
+      const cell=points[point.index]&&points[point.index].cell;if(!cell||actor.ink.has(point.index))return;
+      const node=element('span','narrator-ink-layer');node.setAttribute('aria-hidden','true');node.style.background=actor.palette.ink;cell.append(node);
+      actor.ink.set(point.index,{node,column:point.column,row:point.row,opacity:1});
+      if(actor===active)data('inkCount',actor.ink.size);
+    }
+    function activeMotion(){return !destroyed&&!paused&&!reduced&&visible&&!document.hidden&&points.length===364;}
+    function paint(actor,x,y,scaleX,scaleY,tilt,arc){
+      const size=box.size,top=y-size*.94,direction=actor.direction||1;
+      actor.node.style.transform=`translate3d(${(x-size*.5).toFixed(2)}px,${top.toFixed(2)}px,0)`;
+      actor.drawing.svg.style.transform=`rotate(${tilt.toFixed(2)}deg) scale(${(scaleX*direction).toFixed(3)},${scaleY.toFixed(3)})`;
+      actor.shadow.style.transform=`translate3d(${x.toFixed(2)}px,${(y+arc*Math.min(24,box.pitch*1.7)).toFixed(2)}px,0) scale(${(1-arc*.45).toFixed(2)})`;
+      actor.shadow.style.opacity=String(.45-arc*.25);
+      actor.node.classList.toggle('is-airborne',arc>.1);
+      if(actor===active){
+        const bubbleX=clamp(x-box.bubbleWidth*.48,12,Math.max(12,box.width-box.bubbleWidth-12));
+        const bubbleY=box.gridTop-box.bubbleHeight-Math.max(40,size*1.1);
+        bubble.style.transform=`translate3d(${bubbleX.toFixed(2)}px,${bubbleY.toFixed(2)}px,0)`;
+        bubble.style.setProperty('--narrator-tail-x',clamp(x-bubbleX,18,box.bubbleWidth-22).toFixed(2)+'px');
+        bubble.style.setProperty('--narrator-accent',actor.palette.ink);
       }
     }
-    function paint(x, y, scaleX, scaleY, tilt, arc) {
-      const characterTop = y - box.size * .94;
-      const bubbleX = clamp(x - box.bubbleWidth * .48, 12, Math.max(12, box.width - box.bubbleWidth - 12));
-      const bubbleY = box.gridTop - box.bubbleHeight - Math.max(40, box.size * 1.1);
-      const pose = [x, y, scaleX, scaleY, tilt, direction, bubbleX, bubbleY, arc].map(value => Number(value).toFixed(2)).join('/');
-      if (pose !== lastPose) {
-        character.style.transform = 'translate3d(' + (x - box.size * .5).toFixed(2) + 'px,' + characterTop.toFixed(2) + 'px,0)';
-        drawing.svg.style.transform = 'rotate(' + tilt.toFixed(2) + 'deg) scale(' + (scaleX * direction).toFixed(3) + ',' + scaleY.toFixed(3) + ')';
-        shadow.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + (y + arc * Math.min(24, box.pitch * 1.7)).toFixed(2) + 'px,0) scale(' + (1 - arc * .45).toFixed(2) + ')';
-        shadow.style.opacity = String(.48 - arc * .28);
-        bubble.style.transform = 'translate3d(' + bubbleX.toFixed(2) + 'px,' + bubbleY.toFixed(2) + 'px,0)';
-        const tailX = clamp(x - bubbleX, 18, box.bubbleWidth - 22);
-        bubble.style.setProperty('--narrator-tail-x', tailX.toFixed(2) + 'px');
-        const startY = bubbleY + box.bubbleHeight + 18;
-        const endY = Math.max(startY + 1, characterTop + box.size * .14);
-        tetherPath.setAttribute('d', 'M ' + (bubbleX + tailX).toFixed(1) + ' ' + startY.toFixed(1) + ' Q ' + (x + 8).toFixed(1) + ' ' + ((startY + endY) / 2).toFixed(1) + ' ' + x.toFixed(1) + ' ' + endY.toFixed(1));
-        lastPose = pose;
-      }
-      root.classList.toggle('is-airborne', arc > .1);
+    function pose(actor){
+      const current=points[actor.current];if(!current)return;
+      const local=time-actor.born,next=actor.score.route[actor.step];
+      if(!next||local<next.start){paint(actor,current.x,current.y,1,1,0,0);return;}
+      const destination=points[next.index];if(!destination)return;
+      const progress=clamp((local-next.start)/next.duration,0,1),arc=Math.sin(Math.PI*progress),travel=progress*progress*(3-2*progress);
+      actor.direction=destination.x===current.x?actor.direction||1:destination.x>current.x?1:-1;
+      const distance=Math.hypot(destination.x-current.x,destination.y-current.y),height=Math.min(box.size*.6,Math.max(box.pitch*.9,distance*.17));
+      paint(actor,current.x+(destination.x-current.x)*travel,current.y+(destination.y-current.y)*travel-arc*height,1-arc*.05,1+arc*.07,actor.direction*arc*9,arc);
     }
-    function queueMeasure() {
-      dirty = true;
-      if (!frame && !layoutFrame && !destroyed) layoutFrame = requestAnimationFrame(() => {
-        layoutFrame = 0;
-        measure();
-        sync();
-      });
+    function measure(){
+      dirty=false;const panelRect=panel.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();
+      points=[...grid.querySelectorAll('.rhythm-cell')].map(cell=>{const rect=cell.getBoundingClientRect();return{cell,x:rect.left+rect.width/2-panelRect.left,y:rect.top+rect.height*.65-panelRect.top}});
+      box={width:panel.clientWidth,size:active?active.node.offsetWidth:44,bubbleWidth:bubble.offsetWidth,bubbleHeight:bubble.offsetHeight,gridTop:gridRect.top-panelRect.top,pitch:gridRect.width/52};
+      data('ready',points.length===364);if(reduced)staticWord();else actors.forEach(pose);
     }
-    function updateThought() {
-      if (typingPhase === 'hold') {
-        if (time >= holdUntil) { typingPhase = 'erase'; nextLetter = time + 30; root.classList.add('is-typing'); }
-        return;
-      }
-      if (time < nextLetter) return;
-      if (typingPhase === 'erase') {
-        letters = Math.max(0, letters - 1);
-        copy.textContent = thoughts[thought].slice(0, letters);
-        nextLetter = time + 25;
-        if (!letters) setThought(thought + 1, false);
-      } else {
-        letters = Math.min(thoughts[thought].length, letters + 1);
-        copy.textContent = thoughts[thought].slice(0, letters);
-        nextLetter = time + (/[.,?!…]/.test(thoughts[thought][letters - 1]) ? 260 : 62 + letters % 3 * 8);
-        if (letters === thoughts[thought].length) {
-          typingPhase = 'hold'; holdUntil = time + 4700; root.classList.remove('is-typing');
+    function queueMeasure(){dirty=true;if(!frame&&!layoutFrame&&!destroyed)layoutFrame=requestAnimationFrame(()=>{layoutFrame=0;measure();sync()});}
+    function staticWord(){if(!active)return;active.score.route.forEach(point=>light(active,point));active.step=active.score.route.length;active.current=active.score.route.at(-1).index;data('phase','hold');pose(active);}
+    function update(){
+      if(thoughtLetters<bank[sentenceIndex].text.length&&time>=nextLetter){thoughtLetters++;copy.textContent=bank[sentenceIndex].text.slice(0,thoughtLetters);nextLetter=time+43;if(thoughtLetters===bank[sentenceIndex].text.length)root.classList.remove('is-typing');}
+      actors.slice().forEach(actor=>{
+        const local=time-actor.born;
+        if(actor.retire!==null){
+          const elapsed=time-actor.retire;
+          const columns=actor.score.width;
+          actor.ink.forEach(record=>{
+            const left=Math.floor((52-columns)/2),stagger=(record.column-left)/Math.max(1,columns-1)*650;
+            const opacity=Math.round(clamp(1-(elapsed-stagger)/950,0,1)*36)/36;
+            if(record.opacity!==opacity){record.opacity=opacity;record.node.style.opacity=String(opacity);}
+          });
+          actor.node.style.opacity=String(clamp(1-elapsed/FADE_MS,0,1));actor.shadow.style.opacity=actor.node.style.opacity;
+          if(elapsed>=FADE_MS){removeActor(actor);return;}
+          pose(actor);return;
         }
-      }
+        while(actor.step<actor.score.route.length&&local>=actor.score.route[actor.step].end){const point=actor.score.route[actor.step++];light(actor,point);actor.current=point.index;}
+        pose(actor);
+        if(actor===active&&local>=actor.score.end){data('phase',actors.length>1?'overlap':'hold');if(local>=actor.score.end+actor.score.hold)advanceWord();}
+      });
+      if(active&&actors.length>1)data('phase','overlap');
+      else if(active&&time-active.born<active.score.end)data('phase','draw');
     }
-    function beginScene(index) {
-      scene = index % scores.length;
-      sceneTime = 0;
-      routeIndex = 0;
-      currentIndex = 6;
-      direction = 1;
-      clearInk();
-      data('message', scores[scene].text);
-      setPhase('draw');
-    }
-    function showStatic() {
-      const score = scores[scene];
-      score.route.forEach(light);
-      currentIndex = score.route[score.route.length - 1].index;
-      setPhase('hold');
-      const current = points[currentIndex];
-      if (current) paint(current.x, current.y, 1, 1, 0, 0);
-    }
-    function updateWriting() {
-      const score = scores[scene];
-      while (routeIndex < score.route.length && sceneTime >= score.route[routeIndex].end) {
-        light(score.route[routeIndex]);
-        currentIndex = score.route[routeIndex].index;
-        routeIndex++;
-      }
-      if (sceneTime >= FADE_START) {
-        if (currentPhase !== 'fade') setPhase('fade');
-        ink.forEach((record, cell) => {
-          // Quantise only the style write, not the animation clock. All letters
-          // get their full reading hold before this shared fade can begin.
-          const opacity = Math.round(clamp(1 - (sceneTime - FADE_START - record.delay) / FADE_LENGTH, 0, 1) * 48) / 48;
-          if (opacity !== record.opacity) {
-            record.opacity = opacity;
-            cell.style.setProperty('--narrator-ink-opacity', opacity.toFixed(3));
-          }
-        });
-      } else if (routeIndex === score.route.length && currentPhase !== 'hold') setPhase('hold');
-      renderPose();
-      if (sceneTime >= SCENE_LENGTH) beginScene(scene + 1);
-    }
-    function renderPose() {
-      const current = points[currentIndex];
-      if (!current) return;
-      const next = scores[scene].route[routeIndex];
-      if (!next || sceneTime < next.start || sceneTime >= next.end) {
-        paint(current.x, current.y, 1, 1, 0, 0);
-        return;
-      }
-      const destination = points[next.index];
-      if (!destination) return;
-      const progress = clamp((sceneTime - next.start) / next.duration, 0, 1);
-      direction = destination.x === current.x ? direction : destination.x > current.x ? 1 : -1;
-      if (progress < .1) {
-        const crouch = progress / .1;
-        paint(current.x, current.y, 1 + crouch * .1, 1 - crouch * .16, -direction * crouch * 3, 0);
-      } else if (progress < .87) {
-        const leap = (progress - .1) / .77;
-        const arc = Math.sin(Math.PI * leap);
-        const travel = leap * leap * (3 - 2 * leap);
-        const distance = Math.hypot(destination.x - current.x, destination.y - current.y);
-        const height = Math.min(box.size * .6, Math.max(box.pitch * .9, distance * .17));
-        paint(current.x + (destination.x - current.x) * travel, current.y + (destination.y - current.y) * travel - arc * height,
-          1 - arc * .05, 1 + arc * .07, direction * arc * 9 + Math.sign(destination.y - current.y) * arc * 3, arc);
-      } else {
-        const landing = (progress - .87) / .13;
-        paint(destination.x, destination.y, 1.1 - landing * .1, .83 + landing * .17, direction * (1 - landing) * -3, 0);
-      }
-    }
-    function tick(now) {
-      frame = 0;
-      if (dirty) measure();
-      if (!isActive()) { sync(); return; }
-      const delta = previous ? Math.min(50, now - previous) : 0;
-      time += delta;
-      sceneTime += delta;
-      previous = now;
-      updateThought();
-      updateWriting();
-      root.classList.toggle('is-curious', time < curiousUntil);
-      drawing.pupil.setAttribute('cx', String(52 + direction * 2));
-      frame = requestAnimationFrame(tick);
-    }
-    function sync() {
-      const active = isActive();
-      data('active', active);
-      data('reduced', reduced);
-      if (active && !frame) { previous = 0; frame = requestAnimationFrame(tick); }
-      if (!active) {
-        if (frame) cancelAnimationFrame(frame);
-        frame = 0; previous = 0;
-      }
-    }
-    function inViewport() {
-      const rect = panel.getBoundingClientRect();
-      return rect.bottom > 0 && rect.top < window.innerHeight;
-    }
-    function changeMotion(event) {
-      reduced = event.matches;
-      beginScene(scene);
-      if (reduced) { setThought(thought, true); showStatic(); }
-      else setThought(thought, false);
-      sync();
-    }
-    listen(bubble, 'click', () => {
-      curiousUntil = time + 1000;
-      setThought(thought + 1, !isActive());
-    });
-    listen(scroll, 'scroll', queueMeasure, {passive: true});
-    listen(window, 'resize', queueMeasure, {passive: true});
-    listen(document, 'visibilitychange', sync);
-    if ('IntersectionObserver' in window) {
-      const intersection = new IntersectionObserver(entries => {
-        visible = entries[0].isIntersecting;
-        if (visible) queueMeasure();
-        sync();
-      }, {threshold: .02});
-      intersection.observe(panel);
-      cleanups.push(() => intersection.disconnect());
-    } else listen(window, 'scroll', () => { visible = inViewport(); queueMeasure(); sync(); }, {passive: true});
-    if ('ResizeObserver' in window) {
-      const resize = new ResizeObserver(queueMeasure);
-      resize.observe(panel); resize.observe(grid); resize.observe(scroll);
-      cleanups.push(() => resize.disconnect());
-    }
-    const mutations = new MutationObserver(queueMeasure);
-    mutations.observe(grid, {childList: true});
-    cleanups.push(() => mutations.disconnect());
-    if (media.addEventListener) { media.addEventListener('change', changeMotion); cleanups.push(() => media.removeEventListener('change', changeMotion)); }
-    else if (media.addListener) { media.addListener(changeMotion); cleanups.push(() => media.removeListener(changeMotion)); }
-    beginScene(0);
-    setThought(0, reduced);
-    visible = inViewport();
-    measure();
-    sync();
-    const api = Object.freeze({
-      setPaused(value) { paused = Boolean(value); sync(); },
-      destroy() {
-        if (destroyed) return;
-        destroyed = true;
-        sync();
-        if (layoutFrame) cancelAnimationFrame(layoutFrame);
-        cleanups.forEach(cleanup => cleanup());
-        clearInk();
-        root.remove();
-        if (!hadClass) panel.classList.remove('has-activity-narrator');
-        mounted.delete(panel);
-      }
-    });
-    mounted.set(panel, api);
-    return api;
+    function tick(now){frame=0;if(dirty)measure();if(!activeMotion()){sync();return;}time+=previous?Math.min(50,now-previous):0;previous=now;update();frame=requestAnimationFrame(tick);}
+    function sync(){const on=activeMotion();data('active',on);data('reduced',reduced);if(on&&!frame){previous=0;frame=requestAnimationFrame(tick)}if(!on){if(frame)cancelAnimationFrame(frame);frame=0;previous=0;}}
+    function inViewport(){const rect=panel.getBoundingClientRect();return rect.bottom>0&&rect.top<window.innerHeight;}
+    function changeMotion(event){reduced=event.matches;actors.slice().forEach(removeActor);if(reduced)setSentence(sentenceIndex,true);startWord(false);if(reduced)staticWord();sync();}
+    listen(bubble,'click',()=>{nextSentence();actors.slice().forEach(removeActor);startWord(false);if(reduced)staticWord();queueMeasure();});
+    listen(scroll,'scroll',queueMeasure,{passive:true});listen(window,'resize',queueMeasure,{passive:true});listen(document,'visibilitychange',sync);
+    if('IntersectionObserver'in window){const io=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)queueMeasure();sync()},{threshold:.02});io.observe(panel);cleanups.push(()=>io.disconnect());}
+    else listen(window,'scroll',()=>{visible=inViewport();queueMeasure();sync()},{passive:true});
+    if('ResizeObserver'in window){const ro=new ResizeObserver(queueMeasure);[panel,grid,scroll,bubble].forEach(node=>ro.observe(node));cleanups.push(()=>ro.disconnect());}
+    const mo=new MutationObserver(queueMeasure);mo.observe(grid,{childList:true});cleanups.push(()=>mo.disconnect());
+    if(media.addEventListener){media.addEventListener('change',changeMotion);cleanups.push(()=>media.removeEventListener('change',changeMotion));}
+    else if(media.addListener){media.addListener(changeMotion);cleanups.push(()=>media.removeListener(changeMotion));}
+    setSentence(0,reduced);startWord(false);visible=inViewport();measure();sync();
+    const api=Object.freeze({setPaused(value){paused=Boolean(value);sync()},destroy(){if(destroyed)return;destroyed=true;sync();if(layoutFrame)cancelAnimationFrame(layoutFrame);cleanups.forEach(cleanup=>cleanup());actors.slice().forEach(removeActor);root.remove();if(!hadClass)panel.classList.remove('has-activity-narrator');mounted.delete(panel)}});
+    mounted.set(panel,api);return api;
   }
-  window.ActivityNarrator = Object.freeze({mount});
+  window.ActivityNarrator=Object.freeze({mount});
 })();
