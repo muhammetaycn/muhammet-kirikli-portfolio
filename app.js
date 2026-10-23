@@ -76,10 +76,10 @@
     $('#case-flow').replaceChildren(...project.flow.map((step, i) => { const node = element('div'); node.append(element('span', '', String(i + 1).padStart(2, '0')), element('b', '', step)); return node; }));
     projectDialog.scrollTop = 0;
   }
-  function openProject(index) { paintCase(index); projectDialog.showModal(); document.body.classList.add('modal-open'); }
+  function openProject(index) { paintCase(index); projectDialog.showModal(); document.body.classList.add('modal-open'); syncSurfaces(); }
   document.querySelectorAll('[data-open-project]').forEach(button => button.addEventListener('click', () => openProject(Number(button.dataset.openProject))));
   $('#case-close').addEventListener('click', () => projectDialog.close());
-  projectDialog.addEventListener('close', () => document.body.classList.remove('modal-open'));
+  projectDialog.addEventListener('close', () => { document.body.classList.remove('modal-open'); syncSurfaces(); });
   $('#case-next').addEventListener('click', () => {
     const next = (caseIndex + 1) % projects.length;
     if (moving && $('.case-content').animate) {
@@ -92,9 +92,9 @@
   });
 
   const menu = $('#menu-dialog');
-  $('#menu-open').addEventListener('click', () => { menu.showModal(); document.body.classList.add('modal-open'); });
+  $('#menu-open').addEventListener('click', () => { menu.showModal(); document.body.classList.add('modal-open'); syncSurfaces(); });
   $('#menu-close').addEventListener('click', () => menu.close());
-  menu.addEventListener('close', () => document.body.classList.remove('modal-open'));
+  menu.addEventListener('close', () => { document.body.classList.remove('modal-open'); syncSurfaces(); });
   menu.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', () => menu.close()));
   $('#back-top').addEventListener('click', () => window.scrollTo({top: 0, behavior: moving ? 'smooth' : 'instant'}));
 
@@ -144,14 +144,19 @@
     $('.art-caption b').textContent = ({flow:'001 — BAĞLANTILAR',structure:'002 — YAPININ İÇİ',signal:'003 — SİNYALİN İZİ'})[button.dataset.scene];
   }));
   try { if (window.SystemLab) cleanups.push(window.SystemLab.mount()); } catch { $('#lab-result').textContent = 'Demo şu anda yüklenemedi. Proje detaylarından akışı inceleyebilirsin.'; }
+  function syncSurfaces() {
+    const covered = Boolean(document.querySelector('dialog[open]'));
+    document.body.classList.toggle('surface-covered', covered);
+    if (scene) scene.setPaused(!moving || covered);
+    if (narrator) narrator.setPaused(!moving || covered);
+  }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
     $('#motion-toggle').setAttribute('aria-pressed', String(moving));
     $('#motion-toggle').setAttribute('aria-label', moving ? 'Hareketi durdur' : 'Hareketi aç');
     $('#motion-toggle span').textContent = moving ? 'Ⅱ' : '▷';
     document.documentElement.style.scrollBehavior = moving ? 'smooth' : 'auto';
-    if (scene) scene.setPaused(!moving);
-    if (narrator) narrator.setPaused(!moving);
+    syncSurfaces();
     const svg = $('#lab-stage');
     if (!moving && svg.pauseAnimations) svg.pauseAnimations();
     if (moving && svg.unpauseAnimations) svg.unpauseAnimations();
@@ -224,7 +229,7 @@
     grid.replaceChildren(...cells);
     if (window.ActivityNarrator) {
       narrator = window.ActivityNarrator.mount({panel:$('.rhythm-panel'), grid, scroll:$('.rhythm-scroll'), reducedMotion:media.matches});
-      narrator.setPaused(!moving);
+      syncSurfaces();
     }
     if(visible.length) { $('#rhythm-summary').textContent = `${active} üretim günü / son 364 gün`; $('#rhythm-detail').textContent='Yoğunluk kayıtlı etkinlik sayısıdır; süre veya iş kalitesi ölçümü değildir.'; }
   }
