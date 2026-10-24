@@ -36,9 +36,19 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 - `cursor.js` ve `cursor.css`: beş parmaklı dikişli eldiven, açılan eklem ve elden hedefe uzanan, gerilip geri çekilen siyah simbiyot dokusu.
 - `system-lab.js/css`: yedi yerel akış; düzenlenebilir veri, doğrulama, onay/durdurma, tekrar kayıt koruması ve JSON/işlem izi.
 - `capability-map.js/css`: sekiz yetenek alanını ilgili gerçek proje ayrıntılarına bağlayan harita.
-- `ARASTIRMA.md`: sekiz tasarım kaynağı, gözlem sınırları ve özgün uygulama kararları.
+- `personal-dock.js/css`: sabit bölüm bağlantıları ve gerçek profil içeriğini kullanan küçük kişisel panel.
+- `project-motion.js/css`: proje önizlemesiyle ayrıntı dialogu arasında görsel devamlılık, kesilebilir proje değişimi ve geri dönüş.
+- `ARASTIRMA.md`: tasarım kaynakları, ayrı video/site gözlemleri, gözlem sınırları ve özgün uygulama kararları.
 
 Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. Bu portföy için yeni görsel üretimi kullanılmadı; sahne ve akışlar kodla çizilir.
+
+## Kişisel Dock ve proje ayrıntıları
+
+Alttaki kompakt Dock; Başlangıç, Çalışmalar, Sistemler ve Kod günlüğüne normal bölüm bağlantılarıyla gider. Küçük `mk` düğmesi, Muhammet Kırıklı'nın adını, Türkiye/İstanbul saatini, `content.js` içindeki gerçek proje ve yetenek sayılarını gösteren kişisel paneli açar. GitHub ve LinkedIn bağlantıları aynı kimlik kaynağından gelir. Geliştirme kartı, yalnız bu portföyün kaynak deposuyla eşleşen commit günlüğünü kabul eder; ilk halinde doğrudan kaynak depoya bağlanır.
+
+Proje ayrıntısında seçilen çalışmanın kodla çizilmiş önizlemesi büyük sahneye taşınır. Açılış, başka projeye geçiş ve kapanış birbirini kesebilir; eski animasyon yeni seçimi değiştiremez. Escape, kapatma kontrolü ve klavye odağı yerel dialog davranışıyla çalışır. Genel duraklatma ve azaltılmış hareket seçimi, bu geçişlerin sabit karşılığını kullanır. Dar ekranlarda Dock'un dış sosyal kısayolları gizlenir; sosyal bağlantılar kişisel panelde bulunur.
+
+Bu uyarlama, videodaki küçük kişisel alan ile ayrıca incelenen proje galerisi örneğinden gelir. Kullanıcının ekran görüntüsündeki sitenin kesin URL'si henüz çözülmedi; o siteyle eşleştirme tamamlanmış sayılmaz. Kaynakların ayrımı [ARASTIRMA.md](ARASTIRMA.md) ve [istek durumu](ISTEK-DURUMU.md) içinde kayıtlıdır.
 
 ## Simbiyot imleci
 

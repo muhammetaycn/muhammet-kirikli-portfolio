@@ -1,0 +1,18 @@
+.project-dialog.has-project-motion[open]{animation:none}
+.has-project-motion .case-intro{display:grid;grid-template-columns:minmax(0,1.13fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;margin-bottom:36px}
+.has-project-motion .case-intro .case-heading{min-width:0;max-width:none}
+.has-project-motion .case-intro .case-heading h2{font-size:clamp(38px,4.6vw,72px);overflow-wrap:anywhere}
+.has-project-motion .case-intro .case-heading>p{font-size:16px;line-height:1.7}
+.has-project-motion .case-intro .case-stack{margin-bottom:0;gap:7px}
+.has-project-motion .case-visual.project-preview{position:relative;top:auto;min-width:0;width:100%;height:390px;min-height:0;max-height:none;aspect-ratio:auto;margin:0;padding:0;isolation:isolate;overflow:hidden;border:1px solid #e7e3db22;border-radius:5px;transform-origin:0 0;background:radial-gradient(ellipse at 50% 32%,#2b2b2580,transparent 70%),#0c0e0e;pointer-events:none;will-change:transform,opacity}
+.has-project-motion .case-visual .preview-drawing{position:absolute;inset:8% 0 10%;z-index:0;transform:none;perspective:800px}
+.has-project-motion .case-visual .mini-scene{pointer-events:none}
+.has-project-motion .case-visual[data-project=gorgez] .mini-mobile,.has-project-motion .case-visual[data-project=paulukizlar] .mini-discussion,.has-project-motion .case-visual[data-project=dm] .mini-content{display:flex}
+.has-project-motion .case-visual-number{position:absolute;left:16px;bottom:13px;font:9px/1 Consolas,"Courier New",monospace;letter-spacing:.08em;color:#aca595}
+.has-project-motion .case-visual .mini-label{font-size:8px}
+.has-project-motion .case-visual .mini-windowbar{font-size:8px}
+.has-project-motion .case-visual .mini-scene{gap:17px}
+.has-project-motion.project-motion-paused .case-visual *{animation:none!important;transition:none!important}
+@media(max-width:900px){.has-project-motion .case-intro{grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}.has-project-motion .case-visual.project-preview{height:340px;max-width:620px}.has-project-motion .case-intro .case-heading h2{font-size:clamp(36px,7vw,62px)}.has-project-motion .case-intro .case-heading>p{font-size:15px}.has-project-motion .case-intro .case-stack{margin-top:22px}}
+@media(max-width:480px){.has-project-motion .case-visual.project-preview{height:290px}.has-project-motion .case-visual .mini-scene{gap:10px}.has-project-motion .case-visual .mini-phone{width:82px;height:149px}.has-project-motion .case-visual .mini-stage{width:133px;height:122px}.has-project-motion .case-visual .mini-windowbar{font-size:6px}.has-project-motion .case-visual .mini-label{font-size:7px}.has-project-motion .case-intro .case-heading>p{font-size:14px}.has-project-motion .case-intro .case-stack span{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.has-project-motion .case-visual{will-change:auto}.has-project-motion .case-visual *{animation:none!important;transition:none!important}}

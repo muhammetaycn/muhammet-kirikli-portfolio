@@ -15,6 +15,9 @@
   let computerScene;
   let capabilityMap;
   let systemLab;
+  let personalDock;
+  let projectMotion;
+  let requestedCaseIndex=0;
   const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
   const cleanups = [];
@@ -40,7 +43,7 @@
       const item = element('button','archive-project');
       const title = element('span','',project.title);
       item.append(element('small','',project.category),title,element('b','','↗'));
-      item.addEventListener('click',()=>openProject(index));
+      item.addEventListener('click',()=>openProject(index,item));
       $('#project-archive-list').append(item);
       return;
     }
@@ -54,15 +57,16 @@
     information.append(tags);
     const arrow = element('span', 'project-arrow', '↗'); arrow.setAttribute('aria-hidden', 'true');
     const hit = element('button', 'project-hit'); hit.type = 'button'; hit.setAttribute('aria-label', project.title + ' detaylarını aç');
-    hit.addEventListener('click', () => openProject(index));
+    hit.addEventListener('click', () => openProject(index,hit));
     hit.addEventListener('focus', () => selectProject(index));
     row.addEventListener('pointerenter', () => selectProject(index));
     row.append(information, arrow, hit); $('#project-list').append(row);
   });
-  $('#preview-open').addEventListener('click', () => openProject(selected));
+  $('#preview-open').addEventListener('click', () => openProject(selected,$('.project-preview')));
   selectProject(0);
 
   const projectDialog = $('#project-dialog');
+  if(window.ProjectMotion){projectMotion=window.ProjectMotion.mount({dialog:projectDialog,content:$('.case-content'),heading:$('.case-heading'),preview:$('.project-preview'),canMove:()=>moving});cleanups.push(()=>projectMotion.destroy());}
   function paintCase(index) {
     caseIndex = index;
     const project = projects[index];
@@ -82,7 +86,12 @@
     $('#case-flow').replaceChildren(...project.flow.map((step, i) => { const node = element('div'); node.append(element('span', '', String(i + 1).padStart(2, '0')), element('b', '', step)); return node; }));
     projectDialog.scrollTop = 0;
   }
-  function openProject(index) { paintCase(index); projectDialog.showModal(); document.body.classList.add('modal-open'); syncSurfaces(); }
+  function openProject(index,source=document.activeElement) {
+    requestedCaseIndex=index;
+    if(projectMotion)projectMotion.open({project:projects[index],render:()=>paintCase(index),source});
+    else {paintCase(index);projectDialog.showModal();}
+    syncSurfaces();
+  }
   function launchExperience(index){
     if(!computerScene)return;
     if(projectDialog.open)projectDialog.close();
@@ -92,18 +101,15 @@
     syncSurfaces();
   }
   $('#case-demo').addEventListener('click',()=>launchExperience(projectExperiences[projects[caseIndex].id]??3));
-  document.querySelectorAll('[data-open-project]').forEach(button => button.addEventListener('click', () => openProject(Number(button.dataset.openProject))));
-  $('#case-close').addEventListener('click', () => projectDialog.close());
+  document.querySelectorAll('[data-open-project]').forEach(button => button.addEventListener('click', () => openProject(Number(button.dataset.openProject),button)));
+  $('#case-close').addEventListener('click', () => {if(projectMotion)projectMotion.close();else projectDialog.close();});
   projectDialog.addEventListener('close', () => { document.body.classList.remove('modal-open'); syncSurfaces(); });
   $('#case-next').addEventListener('click', () => {
-    const next = (caseIndex + 1) % projects.length;
-    if (moving && $('.case-content').animate) {
-      const content = $('.case-content');
-      content.animate([{opacity: 1, transform: 'translateY(0)'}, {opacity: 0, transform: 'translateY(-12px)'}], {duration: 130, fill: 'forwards'}).finished.then(() => {
-        paintCase(next); content.getAnimations().forEach(a => a.cancel());
-        content.animate([{opacity: 0, transform: 'translateY(16px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 320, easing: 'cubic-bezier(.22,.75,.2,1)'});
-      });
-    } else paintCase(next);
+    if(!projectDialog.open)return;
+    requestedCaseIndex=(requestedCaseIndex+1)%projects.length;
+    const next=requestedCaseIndex;
+    if(projectMotion)projectMotion.replace({project:projects[next],render:()=>paintCase(next)});
+    else paintCase(next);
   });
 
   const menu = $('#menu-dialog');
@@ -172,8 +178,10 @@
   const labExperiences={fullstack:[4,'API ekranını aç ↗'],automation:[13,'Kuyruğa gir ↗'],mobile:[11,'Haritayı aç ↗'],event:[9,'Onayı yönet ↗'],textile:[10,'Siparişi taşı ↗'],content:[13,'Kuyruğu düzenle ↗'],community:[14,'Kuralı dene ↗']};
   document.querySelectorAll('[data-lab-project]').forEach(button=>button.addEventListener('click',()=>{$('#lab-explore').textContent=(labExperiences[button.dataset.labProject]||labExperiences.fullstack)[1];}));
   $('#lab-explore').addEventListener('click',()=>{const selected=document.querySelector('[data-lab-project][aria-pressed="true"]')?.dataset.labProject||'fullstack';launchExperience((labExperiences[selected]||labExperiences.fullstack)[0]);});
+  if(window.PersonalDock){personalDock=window.PersonalDock.mount({identity:data.identity,projects,skills,onSurfaceChange:syncSurfaces,canMove:()=>moving});cleanups.push(()=>personalDock.destroy());}
   function syncSurfaces() {
     const covered = Boolean(document.querySelector('dialog[open]'));
+    document.body.classList.toggle('modal-open',covered);
     document.body.classList.toggle('surface-covered', covered);
     const ownComputer=Boolean(document.querySelector('dialog.cos-dialog[open]'))&&!document.querySelector('dialog[open]:not(.cos-dialog)');
     if(deck) deck.setPaused(!moving||covered,moving&&ownComputer);
@@ -182,6 +190,8 @@
     if (cursor) cursor.setPaused(!moving);
     capabilityMap?.setPaused(!moving||covered);
     systemLab?.setPaused?.(!moving||covered);
+    personalDock?.setPaused(!moving);
+    projectMotion?.setPaused(!moving);
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
@@ -228,9 +238,10 @@
     let daily = new Map(), events = new Map(), buildLog = false;
     const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json?v=20261024s');
+      const response = await fetch('data/activity.json?v=20261024u');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
+      personalDock?.setBuildLog(json);
       buildLog=json.metric==='repository_commits'&&json.repository===repository;
       if (Array.isArray(json.days) && json.days.length <= 20000) {
         for (const row of json.days) {
@@ -285,5 +296,5 @@
     }
   }
   renderRhythm();
-  addEventListener('pagehide', () => { cleanups.forEach(cleanup=>{ if(typeof cleanup==='function') cleanup(); }); if(deck) deck.destroy(); if(computerScene) computerScene.destroy(); if(scene) scene.destroy(); if(narrator) narrator.destroy(); if(cursor) cursor.destroy(); removeEventListener('scroll',onScroll); if(scrollFrame) cancelAnimationFrame(scrollFrame); }, {once:true});
+  addEventListener('pagehide', function cleanupPage(event) { if(event.persisted)return;removeEventListener('pagehide',cleanupPage);cleanups.forEach(cleanup=>{ if(typeof cleanup==='function') cleanup(); }); if(deck) deck.destroy(); if(computerScene) computerScene.destroy(); if(scene) scene.destroy(); if(narrator) narrator.destroy(); if(cursor) cursor.destroy(); removeEventListener('scroll',onScroll); if(scrollFrame) cancelAnimationFrame(scrollFrame); });
 })();

@@ -110,3 +110,26 @@ Sistemler bölümü yedi yerel deneye ayrıldı. Girdi düzenlenir, doğrulanır
 384 kısa düşünce için konu bankası genişletildi. Eşleşen EN/TR konuları döngü içinde tekrarlanmaz; yeni döngüde sıra karışır. Teknik anlamlar için [MDN önbellekleme](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching), [SQLite WAL](https://sqlite.org/wal.html), [performance.now](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now) ve [Node.js akışları](https://nodejs.org/api/stream.html) kontrol edildi.
 
 Kullanıcının 50,7 saniyelik video referansından altı farklı anın yerel kareleri incelendi. Küçük kişisel paneller, iz bırakma ve keşif katmanları dikkate alındı; hesap, ziyaretçi veya dinleme verisi kopyalanmadı. Bu sitedeki geliştirme izi, kendi Git geçmişinden üretilen tarihli commit bağlantılarıdır. AI hesabı kullanım analitiği değildir.
+
+## 24 Ekim / Ayrı video incelemesi ve proje galerisi
+
+Bu turda yerel `2026-10-22 17-13-29.mp4` dosyasının 50,7 saniyelik akışı, 21 farklı zamanın tam çözünürlüklü kareleriyle incelendi. Önceki altı karelik bakış genişletildi; aşağıdaki zamanlar doğrudan görülen yapıları belirtir. Karelerden easing süreleri, sesin çalması, sunucu mimarisi veya cihaz performansı çıkarılmadı.
+
+| Zaman | Videoda doğrudan görülen yapı |
+| --- | --- |
+| 00–06 sn | Solda banner/avatar, ad, konum/saat, kısa biyografi ve bağlantılar; sağda Spotify OFFLINE ve Current Project panelleri. |
+| 00–49 sn | Altta ortalanmış altı ikonlu sabit Dock, ayrı sosyal ikonlar; açık pencerenin arkasında bulanmış gezinme. |
+| 09 ve 43 sn | Büyük ön kapak ve iki yanda eğilen/küçülen kapaklarla perspektifli müzik karuseli. |
+| 11 ve 16 sn | Dört parçalı geri sayım, Guestbook açma kartı ve yatay konumu değişen iki teknoloji logosu satırı. Geri sayımın hedefi doğrulanamıyor. |
+| 14 sn | Functional, Third party media, Sound effects ve Visual effects seçenekli ayar penceresi. |
+| 20–28 sn | Mesajlar/Yaz sekmeleri, arama, mesaj kartları, emoji ve değişen kalp sayıları; 26 sn'de parola alanlı Admin access alt penceresi. |
+| 31–36 sn | Avatar seçimi, ad ve 280 karakterlik mesaj alanı; Undo/Clear kontrollü imza pedi ve artan mavi çizgiler. |
+| 37–40 sn | Gönderim bildirimi, artan mesaj sayısı, yeni Hello kartı ve çizimin kart içindeki küçük önizlemesi. |
+
+Video, küçük modüllü bir kişisel alan referansıdır. Bu portföydeki `PersonalDock`, sabit bölüm bağlantılarını ve kompakt profil panelini bu gözleme göre yorumlar: Muhammet Kırıklı kimliği, gerçek proje/yetenek sayıları, İstanbul saati ve doğrulanmış kaynak depoya ait GitHub geliştirme izi. Başkasının avatarı, müzik geçmişi, katkı veya ziyaretçi sayısı alınmadı. Videodaki ziyaretçi defteri, kalıcı ortak servis veya güvenli yönetim akışı uygulandığının kanıtı sayılmaz; bu sürüm böyle bir hizmet sunmuş olarak belgelenmez.
+
+Ayrıca [Awwwards ana sayfası](https://www.awwwards.com/) bu turda tarayıcıda görsel olarak gezildi: büyük tipografi, öne çıkan Brandon Yasin çalışmasının geniş proje kartı ve alttaki kategori Dock'u gözlendi. Aynı galeriden açılan [Brandon Yasin](https://brandonyasin.com/) örneğinde yatay fotoğraflı büyük proje kapakları, küçük kalıcı gezinme ve yerel saat görüldü; bir projeye basılınca büyük görsel, başlık ve meta bilgileri olan ayrıntı sayfası açıldı. Bu, kullanıcının ekran görüntüsünün kaynağı olarak doğrulanmış değildir.
+
+`ProjectMotion`, bu ek galeri incelemesinden seçilen önizleme ile ayrıntı sahnesi arasındaki devamlılık ilkesini portföyün kendi çizimlerine uyarlar. Proje sahnesi büyük ayrıntı alanında sürer; proje değiştirme ve kapanış kesilebilir. Referansın fotoğrafları, kodu veya birebir sayfa düzeni kopyalanmadı. Kişisel panel ve proje geçişleri için normal bağlantı/düğme semantiği, Escape, odak dönüşü, duraklatma ve azaltılmış hareket karşılıkları kontrol edildi; bu kontroller referans sitelerin performans testi değildir.
+
+**Açık kalan referans:** YVL, kullanıcının ekran görüntüsündeki site için doğru referans değildir. O ekran görüntüsüne ait kesin URL henüz çözülemedi. Bu kaynağın görsel incelemesi ve eşleştirmesi tamamlanmış olarak kaydedilmez; video ve yukarıdaki ek galeri gözlemleri ayrı kaynaklardır.
