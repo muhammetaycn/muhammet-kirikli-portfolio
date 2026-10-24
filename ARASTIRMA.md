@@ -65,3 +65,13 @@ Yerel önizlemede yüzeyden tutma/bükme, sıfırlama, sahne seçimi, terminal b
 Tam ad ve LinkedIn birincil kimlik oldu. Yazılım, AI otomasyonu, sistem tasarımı, mobil ürünler, görsel iletişim ve tekstil deneyimi birlikte ele alındı. Dört seçili proje ve altı ek çalışma bulunur. LinkedIn’den alınan proje açıklamaları, kullanıcının profil beyanı olarak içerik kaynağıdır; hepsinin kodunun veya canlı dağıtımının ayrıca denetlendiği iddia edilmez. Önceden kodu incelenen projelerdeki prototip/geliştirme sınırları korundu. Bu portföyün kodla çizilen 3B sahnesi ve piksel anlatıcısı da çalışma olarak eklendi.
 
 Luci, üst kenarda yürüyen bir süs yerine 52 × 7 matrisin tamamında iki boyutlu hareket eder. Her iniş, harf desenindeki bir hücreyi geçici renk katmanıyla işaretler. Beş renk sırayla devreye girer; yazım 3,4–7,8 saniye, okuma 2,4–3,5 saniye sürer. Eski kelime 1,6 saniyede arkadan silinirken yeni karakter girer. 896 proje temelli kısa düşünce ve bütün kelimeler kullanılır; aynı anda en fazla iki karakter görünür. Bu izler gerçek faaliyet kayıtlarına eklenmez.
+
+## 24 Ekim / Nesne olarak portföy
+
+[Alissa Wang’ın Discord karakter çalışması](https://alissawang.com/Discord) hem metin hem tarayıcıdaki hareketli karakter örnekleriyle incelendi. Alınan ilke, kısa squash/stretch hareketleri ve aynı karakter ailesinde tutarlı oranlardır. Marka rengi veya Wumpus çizimi kopyalanmadı. Bilgisayar, mevcut siyah–fildişi–turuncu paletle CSS hacimleri olarak kurulur; ekran ve 32 tuş gerçek DOM etkileşimleridir.
+
+[Poolsuite](https://poolsuite.net/) tarayıcıda açılış ve masaüstü/pencere düzeni düzeyinde gözlendi. Referans, içerikle oynanabilen bir nesne hissidir; pembe palet, video, ses veya uygulama grafikleri alınmadı. [Bruno Simon’ın kendi açıklamasındaki](https://bruno-simon.com/) keşfedilebilir deneyim ilkesi, portföy içeriğine kısa ve doğrudan erişimle birleştirildi.
+
+Şerit ve bilgisayar aynı açılış alanını sırayla paylaşır. İlk sahne 12, bilgisayar sahnesi 18 saniyedir; pointer, basılı tutma, klavye odağı ve açılmış ekran otomatik turu kilitler. Etkileşim bittikten sonra 14 saniye beklenir. Manuel seçim ve otomatik geçiş kontrolü her zaman bulunur. Azaltılmış harekette sahneler elle seçilir.
+
+SQLite deneyi, [sql.js](https://github.com/sql-js/sql.js/releases/tag/v1.15.1) 1.15.1’in yerel WebAssembly dosyalarını gerektiğinde yükler. npm paket bütünlüğü SHA-512 ile doğrulanmıştır. Veritabanı bellektedir; gerçek sunucuya istek veya kalıcı veri kaydı iddiası yoktur. Paket lisansı ve kaynak kaydı `assets/vendor/sqljs/` içindedir.

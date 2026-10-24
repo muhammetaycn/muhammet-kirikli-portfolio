@@ -129,7 +129,7 @@
     {
       "id": "portfolio",
       "title": "Motion portföyü",
-      "short": "Tutup şekil verebildiğin bir açılış, çalıştırabildiğin sistem akışları ve karelere yazı yazan küçük bir anlatıcı.",
+      "short": "Bükülebilen bir yüzey, 32 tuşlu bir bilgisayar ve içinde çalışan terminal, SQLite, motion araçları ve küçük deneyler.",
       "category": "Creative development",
       "status": "Geliştirme",
       "year": "2026",
@@ -139,15 +139,16 @@
         "CSS",
         "Canvas 2D",
         "SVG",
-        "requestAnimationFrame"
+        "requestAnimationFrame",
+        "SQLite / WebAssembly"
       ],
       "summary": "Bu portföyde yaptığım işleri yalnızca metinle sıralamak yerine, etkileşime girebileceğin küçük sistemlerle anlatıyorum.",
       "problem": "Projeler ve yetenekler düz bir listeye dönüştüğünde nasıl düşündüğümü ve farklı katmanları nasıl birleştirdiğimi göstermek zorlaşıyor.",
-      "solution": "İmlecin çekimine tepki veren bükülebilir bir Canvas sahnesini, SVG sistem demolarını ve hücrelere yazı yazan bir anlatıcıyı aynı deneyimde birleştiriyorum.",
+      "solution": "Bükülebilir Canvas yüzeyini, 32 etkileşim açan pofuduk bir bilgisayarı ve hücrelere birlikte yazan anlatıcıları aynı akışta birleştiriyorum. Küçük sistemler tarayıcıda çalışıyor; SQLite deneyi gerçek bellek veritabanı kullanıyor.",
       "features": [
         "Üç biçim arasında dönüşen, dönmeye devam ederken tutup bükülebilen etkileşimli yüzey",
-        "Proje detayları ve adım adım çalıştırılabilen SVG sistem akışları",
-        "52 × 7 hücreyi kullanarak yazı oluşturan Luci ve terminal biçiminde düşünce balonu"
+        "32 boş tuş: terminal, SQLite sorguları, transaction, uygulama akışları, motion araçları ve mini oyunlar",
+        "Dikişli eldiven imleci, etkileşime uzanan siyah lifler ve 52 × 7 hücreye yazan Luciler"
       ],
       "flow": [
         "Dokun / şekil ver",

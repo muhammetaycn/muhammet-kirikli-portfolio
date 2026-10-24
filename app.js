@@ -11,6 +11,8 @@
   let scene;
   let narrator;
   let cursor;
+  let deck;
+  let computerScene;
   let toastTimer;
   const cleanups = [];
   function element(tag, className, text) { const e = document.createElement(tag); if (className) e.className = className; if (text !== undefined) e.textContent = text; return e; }
@@ -140,6 +142,14 @@
   catch { $('.art-hint').textContent = 'BİR FİKRİN FARKLI BİÇİMLERİ.'; }
   try { if (window.SymbioteCursor) cursor = window.SymbioteCursor.mount({reducedMotion:media.matches}); }
   catch { /* Native pointer remains available if the decorative layer fails. */ }
+  try {
+    if(window.ComputerScene) computerScene=window.ComputerScene.mount($('#computer-host'),{
+      reducedMotion:media.matches,
+      onActivity:()=>deck?.activity(),
+      onProject:value=>{const index=typeof value==='number'?value:projects.findIndex(project=>project.id===value);if(index>=0&&index<projects.length)openProject(index);}
+    });
+    if(window.HeroDeck&&computerScene) deck=window.HeroDeck.mount({art:$('.hero-art'),ribbon:$('#ribbon-host'),computer:$('#computer-host'),scene,computerScene,reducedMotion:media.matches});
+  } catch(error) { console.error('Computer scene:',error); }
   $('#shape-reset').addEventListener('click', () => { if (scene && scene.resetShape) scene.resetShape(); });
   document.querySelectorAll('[data-scene]').forEach(button => button.addEventListener('click', () => {
     document.querySelectorAll('[data-scene]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
@@ -150,7 +160,9 @@
   function syncSurfaces() {
     const covered = Boolean(document.querySelector('dialog[open]'));
     document.body.classList.toggle('surface-covered', covered);
-    if (scene) scene.setPaused(!moving || covered);
+    const ownComputer=Boolean(document.querySelector('dialog.cos-dialog[open]'))&&!document.querySelector('dialog[open]:not(.cos-dialog)');
+    if(deck) deck.setPaused(!moving||covered,moving&&ownComputer);
+    else if (scene) scene.setPaused(!moving || covered);
     if (narrator) narrator.setPaused(!moving || covered);
     if (cursor) cursor.setPaused(!moving);
   }
@@ -168,6 +180,9 @@
   $('#motion-toggle').addEventListener('click', () => { moving = !moving; applyMotion(); });
   media.addEventListener('change', e => { moving = !e.matches; applyMotion(); });
   applyMotion();
+  const dialogObserver=new MutationObserver(syncSurfaces);
+  dialogObserver.observe(document.body,{subtree:true,attributes:true,attributeFilter:['open']});
+  cleanups.push(()=>dialogObserver.disconnect());
 
   if ('IntersectionObserver' in window) {
     const reveal = new IntersectionObserver(entries => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('in-view'); reveal.unobserve(entry.target); } }); }, {threshold: .08, rootMargin: '0px 0px -25px 0px'});
@@ -238,5 +253,5 @@
     if(visible.length) { $('#rhythm-summary').textContent = `${active} üretim günü / son 364 gün`; $('#rhythm-detail').textContent='Yoğunluk kayıtlı etkinlik sayısıdır; süre veya iş kalitesi ölçümü değildir.'; }
   }
   renderRhythm();
-  addEventListener('pagehide', () => { cleanups.forEach(cleanup=>{ if(typeof cleanup==='function') cleanup(); }); if(scene) scene.destroy(); if(narrator) narrator.destroy(); if(cursor) cursor.destroy(); removeEventListener('scroll',onScroll); if(scrollFrame) cancelAnimationFrame(scrollFrame); }, {once:true});
+  addEventListener('pagehide', () => { cleanups.forEach(cleanup=>{ if(typeof cleanup==='function') cleanup(); }); if(deck) deck.destroy(); if(computerScene) computerScene.destroy(); if(scene) scene.destroy(); if(narrator) narrator.destroy(); if(cursor) cursor.destroy(); removeEventListener('scroll',onScroll); if(scrollFrame) cancelAnimationFrame(scrollFrame); }, {once:true});
 })();

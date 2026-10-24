@@ -60,3 +60,16 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 ## Luci’nin piksel sahnesi
 
 52 × 7 hücrenin tamamı hareket alanıdır. Siyah, Discord mavisi, turkuaz, kehribar ve gül renkli Luci yorumları sırayla bütün kelimeler yazar. Yazım 3,4–7,8 saniye, okunur bekleme 2,4–3,5 saniye sürer; eski kelime 1,6 saniyede arkadan silinirken yeni karakter girer. Aynı anda en fazla iki karakter görünür. Proje içeriklerinden türetilen 896 kısa düşünce tekrar sırasını değiştirir. Sayfa görünmüyorken süre ilerlemez. Genel hareket kontrolü sahneyi durdurur; azaltılmış harekette okunur sabit yazı gösterilir. Renkli animasyon katmanı gerçek üretim verilerini değiştirmez.
+
+## mk.desktop / 32 tuş
+
+Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 12, bilgisayar 18 saniye görünür. Pointer, odak, basılı tutma ve büyütülmüş ekran keşfi kesmez; otomatik tur etkileşimden 14 saniye sonra devam eder. Üstteki genel hareket düğmesi tüm sahneleri durdurur.
+
+Bilgisayarın 8 × 4 gri tuşu yazısızdır. Hover veya klavye odağında işlev adı görünür; oklarla gezin, Enter/Space ile çalıştır. Terminal, düzenlenebilir arayüz, yerel API, gerçek SQLite sorguları/ilişkileri/transaction, proje akışları, kod farkı, sürümler, testler, kuyruk/cache/yetkiler, motion/renk/piksel araçları ve iki küçük oyun bulunur. **Ekranı büyüt** aynı uygulamanın durumunu korur. Deneyler bu tarayıcıda çalışır; gerçek servis veya hesaplarda işlem yapmaz.
+
+- `hero-deck.js/css`: sahne geçişi, etkileşim ve görünürlük kilitleri.
+- `computer-scene.js/css`: CSS hacimleri, blank tuşlar, Luci ve fiziksel geri bildirim.
+- `computer-os.js/css`: 32 deney, büyütülebilir ekran, ortak yerel durum ve temizleme.
+- `computer-db.js`: gerektiğinde yüklenen gerçek SQLite bellek veritabanı.
+
+`assets/vendor/sqljs/` altındaki sql.js 1.15.1 MIT lisanslıdır; kaynak ve bütünlük kaydı aynı klasördedir. SQLite dosyaları yalnızca veritabanı uygulaması açılınca yüklenir. Sayfa yenilendiğinde deney verileri sıfırlanır.

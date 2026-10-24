@@ -13,17 +13,24 @@
   <title>Muhammet Kırıklı — Yazılım, sistemler & tasarım</title>
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/fonts/fonts.css">
-  <link rel="stylesheet" href="style.css?v=20261024b">
-  <link rel="stylesheet" href="direction.css?v=20261024b">
-  <link rel="stylesheet" href="profile.css?v=20261024b">
-  <link rel="stylesheet" href="narrator.css?v=20261024b">
-  <link rel="stylesheet" href="cursor.css?v=20261024b">
-  <script defer src="content.js?v=20261024b"></script>
-  <script defer src="kinetic.js?v=20261024b"></script>
-  <script defer src="system-lab.js?v=20261024b"></script>
-  <script defer src="narrator.js?v=20261024b"></script>
-  <script defer src="cursor.js?v=20261024b"></script>
-  <script defer src="app.js?v=20261024b"></script>
+  <link rel="stylesheet" href="style.css?v=20261024f">
+  <link rel="stylesheet" href="direction.css?v=20261024f">
+  <link rel="stylesheet" href="profile.css?v=20261024f">
+  <link rel="stylesheet" href="narrator.css?v=20261024f">
+  <link rel="stylesheet" href="cursor.css?v=20261024f">
+  <link rel="stylesheet" href="computer-os.css?v=20261024f">
+  <link rel="stylesheet" href="computer-scene.css?v=20261024f">
+  <link rel="stylesheet" href="hero-deck.css?v=20261024f">
+  <script defer src="content.js?v=20261024f"></script>
+  <script defer src="kinetic.js?v=20261024f"></script>
+  <script defer src="system-lab.js?v=20261024f"></script>
+  <script defer src="narrator.js?v=20261024f"></script>
+  <script defer src="cursor.js?v=20261024f"></script>
+  <script defer src="computer-db.js?v=20261024f"></script>
+  <script defer src="computer-os.js?v=20261024f"></script>
+  <script defer src="computer-scene.js?v=20261024f"></script>
+  <script defer src="hero-deck.js?v=20261024f"></script>
+  <script defer src="app.js?v=20261024f"></script>
 </head>
 <body>
   <a class="skip-link" href="#work">Çalışmalara geç</a>
@@ -39,7 +46,16 @@
     <section class="hero" id="home" aria-labelledby="hero-title">
       <div class="hero-topline"><span>MUHAMMET KIRIKLI / KİŞİSEL PORTFÖY</span><span id="local-clock">TÜRKİYE / UTC+3</span></div>
       <div class="hero-copy"><div class="intro-label"><i></i> MERHABA, BEN</div><h1 id="hero-title"><span class="hero-line">Muhammet </span><span class="hero-line hero-surname">Kırıklı<span class="hero-period">.</span></span></h1><span class="hero-signature">Yazılım · Sistemler · Tasarım</span><p>Web uygulamaları, AI otomasyonları<br>ve etkileşimli deneyimler geliştiriyorum.</p><div class="hero-fields"><span>CREATIVE DEVELOPMENT</span><span>INTERFACES & AUTOMATION</span></div><a class="round-link" href="#work"><span class="round-arrow" aria-hidden="true">↘</span><span>Yaptıklarıma bak<small>04 PROJE / DEVAM EDEN ÇALIŞMALAR</small></span></a></div>
-      <div class="hero-art"><canvas id="kinetic-canvas" aria-hidden="true"></canvas><div class="art-caption"><span class="art-cross" aria-hidden="true">+</span><span>BU BİÇİM SANA BAKIYOR<br><b>001 — BAĞLANTILAR</b></span></div><div class="scene-modes" role="group" aria-label="Hareketli sahne biçimi"><button data-scene="flow" aria-pressed="true">Akış</button><button data-scene="structure" aria-pressed="false">Yapı</button><button data-scene="signal" aria-pressed="false">Sinyal</button></div><button id="shape-reset" class="shape-reset" aria-label="Objenin şeklini sıfırla">↺ <span>Biçimi sıfırla</span></button><p class="art-hint">İMLEÇ = ÇEKİM MERKEZİ · ŞERİDİ TUT + BÜK</p></div>
+      <div class="hero-art has-deck" aria-label="Etkileşimli açılış sahneleri">
+        <div id="ribbon-host" class="hero-stage is-active"><canvas id="kinetic-canvas" aria-hidden="true"></canvas><div class="art-caption"><span class="art-cross" aria-hidden="true">+</span><span>BU BİÇİM SANA BAKIYOR<br><b>001 — BAĞLANTILAR</b></span></div><div class="scene-modes" role="group" aria-label="Hareketli sahne biçimi"><button data-scene="flow" aria-pressed="true">Akış</button><button data-scene="structure" aria-pressed="false">Yapı</button><button data-scene="signal" aria-pressed="false">Sinyal</button></div><button id="shape-reset" class="shape-reset" aria-label="Objenin şeklini sıfırla">↺ <span>Biçimi sıfırla</span></button><p class="art-hint">İMLEÇ = ÇEKİM MERKEZİ · ŞERİDİ TUT + BÜK</p></div>
+        <div id="computer-host" class="hero-stage" aria-hidden="true" inert></div>
+        <div class="hero-deck-controls" role="group" aria-label="Açılış sahnesi seç">
+          <span class="deck-progress" aria-hidden="true"><i></i></span><span class="deck-status" aria-live="off">sırayla keşfet</span>
+          <button class="deck-scene-button" data-deck-scene="0" aria-pressed="true"><small>01</small> Çekim</button>
+          <button class="deck-scene-button" data-deck-scene="1" aria-pressed="false"><small>02</small> mk.desktop</button>
+          <button class="deck-auto" data-deck-auto aria-pressed="true" aria-label="Otomatik sahne geçişini durdur"><span aria-hidden="true">Ⅱ</span></button>
+        </div>
+      </div>
       <div class="hero-footer"><span>ŞEKLİ SEN VER.</span><a href="#work">AŞAĞIDA NELER VAR? <b>↓</b></a></div>
     </section>
 

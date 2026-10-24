@@ -112,7 +112,7 @@
     function stop() { if(raf) global.cancelAnimationFrame(raf); raf=0; last=0; }
     function start() { if(active() && !raf) raf=global.requestAnimationFrame(tick); }
     function sync() { if(active()) start(); else stop(); }
-    function inputFrame() { if(active()) start(); else if(!destroyed && visible && !document.hidden)draw(0,true); }
+    function inputFrame() { if(canvas.closest && canvas.closest('[inert]'))return; if(active()) start(); else if(!destroyed && visible && !document.hidden)draw(0,true); }
 
     function sample(array, parameter) {
       const position=((parameter%1+1)%1)*NODE_COUNT, i=Math.floor(position), f=position-i;

@@ -1,0 +1,84 @@
+/* Soft hardware. The keys stay blank; their behaviour supplies the labels. */
+.computer-scene{position:absolute;inset:0;isolation:isolate;perspective:1200px;color:#e7e3db;--case-light:#f1ecdf;--case-mid:#c4bdaf;--case-dark:#807a72;--key-ink:#656560;--computer-scale:1}
+.computer-world{position:absolute;left:62%;top:calc(50% - 34px);width:430px;height:560px;transform:translate(-50%,-50%) scale(var(--computer-scale,1));transform-origin:50% 50%}
+.computer-float{position:absolute;inset:0;animation:computer-float 7s ease-in-out infinite;will-change:transform}
+.computer-object{position:absolute;inset:0;transform-style:preserve-3d;--computer-light-x:50%;--computer-light-y:40%}
+.computer-scene.is-pointer-inside .computer-float,.computer-scene:focus-within .computer-float{animation-play-state:paused}
+.computer-scene.is-pointer-inside .computer-ground-shadow,.computer-scene:focus-within .computer-ground-shadow{animation-play-state:paused}
+.computer-object-label{position:absolute;top:0;left:31px;font:8px/1.6 Consolas,monospace;letter-spacing:.1em;color:#8e8980}
+.computer-expand{position:absolute;top:-7px;right:33px;z-index:6;display:flex;align-items:center;justify-content:center;gap:18px;min-height:33px;padding:5px 12px;border:1px solid #e7e3db2e;background:#191a1bdd;backdrop-filter:blur(10px);border-radius:30px;font:9px/1.4 Consolas,monospace;letter-spacing:-.03em;color:#c8c1b5;transition:background .2s,border-color .2s,color .2s}
+.computer-expand span{font-size:18px;line-height:1;color:var(--orange,#ff6a35)}
+.computer-expand:hover{border-color:#ff6a3570;background:#2b231c;color:#f4ede2}
+.computer-expand:focus-visible{outline:2px solid var(--orange,#ff6a35);outline-offset:4px}
+.computer-monitor{position:absolute;left:19px;top:43px;width:374px;height:287px;transform:rotate(-3deg);transform-style:preserve-3d}
+.computer-case{position:absolute;inset:0 9px 9px 0;border-radius:39px 42px 43px 38px;background:linear-gradient(127deg,#f8f2e6 0%,#eae3d5 30%,#c9c1b2 74%,#b5ac9d 100%);box-shadow:inset 3px 4px 4px #fff9,inset -5px -7px 7px #81786a66,inset 0 -2px 2px #f2eadb9c,4px 7px 1px #5e5b5266,8px 15px 22px #0008,0 0 38px #efe7c70b;z-index:2}
+.computer-case:before{content:"";position:absolute;inset:9px 8px 8px;border:1px solid #fff7;border-right-color:#fff3;border-bottom-color:#746e5e22;border-radius:33px 35px 35px 33px;pointer-events:none}
+.computer-case:after{content:"";position:absolute;left:22px;right:30px;bottom:10px;height:3px;border-radius:50%;background:linear-gradient(90deg,transparent,#e7dfcd9c,transparent);filter:blur(1px);pointer-events:none}
+.computer-case-side{position:absolute;z-index:0;right:-5px;top:14px;width:48px;height:264px;border-radius:22px 42px 34px 16px;transform:skewY(10deg);background:linear-gradient(90deg,#b6ae9e,#999283 59%,#585750);box-shadow:inset -3px -1px 5px #312f294f,4px 5px 11px #0008}
+.computer-side-vents{position:absolute;right:8px;top:77px;display:flex;flex-direction:column;gap:7px;transform:rotate(2deg)}
+.computer-side-vents i{display:block;width:13px;height:4px;border-radius:4px;background:#5b5a51;box-shadow:0 1px 0 #dfd9c657,inset 0 1px 1px #1118}
+.computer-glass-rim{position:absolute;left:24px;right:24px;top:24px;height:198px;padding:7px;border-radius:23px 23px 24px 25px;background:linear-gradient(145deg,#77766a,#b4ac9b 18%,#e2d8c5 45%,#d9d0bd 60%,#817c70 100%);box-shadow:inset 2px 3px 6px #0007,1px 2px 1px #fff9;overflow:hidden}
+.computer-display{height:100%;width:100%;border-radius:16px 16px 18px 18px;position:relative;overflow:hidden;background:#131b1b;isolation:isolate;box-shadow:inset 0 0 15px #0009;transform:translateZ(.1px)}
+.computer-glass-sheen{position:absolute;inset:7px;border-radius:16px 16px 18px 18px;z-index:4;pointer-events:none;box-shadow:inset 0 2px 8px #000b,inset 1px 0 0 #ffffff15,inset 0 -1px 4px #ffffff13;background:radial-gradient(ellipse at var(--computer-light-x) var(--computer-light-y),#ffffff07,transparent 70%),linear-gradient(112deg,#fff9 0,transparent 1.6%,transparent 70%,#d2dbe30b 100%)}
+.computer-case-brand{position:absolute;left:31px;bottom:22px;display:flex;align-items:start;gap:4px;color:#716a5e;text-shadow:0 1px 0 #fff9}
+.computer-case-brand b{font:600 26px/.8 "Bricolage Grotesque",sans-serif;letter-spacing:-.1em}
+.computer-case-brand span{font:12px/1 "Segoe UI",sans-serif;color:#9c6a45}
+.computer-speaker{display:flex;gap:3px;position:absolute;left:143px;bottom:25px;align-items:center;height:8px}
+.computer-speaker i{width:3px;height:3px;background:#8c8575;border-radius:50%;box-shadow:inset 0 1px 1px #4a4132a8,0 1px 0 #fff8}
+.computer-speaker i:nth-child(3n){height:5px}
+.computer-power-light{position:absolute;right:47px;bottom:25px;width:12px;height:5px;background:#ff6a35;border-radius:5px;box-shadow:inset 0 1px 1px #ffdf9180,0 0 8px #ff6a35a8,0 0 20px #ff6a3540}
+.computer-stand{position:absolute;left:122px;top:266px;width:135px;height:33px;background:linear-gradient(90deg,#90897b,#d3c9b5 35%,#a99e89 74%,#776e5d);border-radius:8px 8px 21px 20px;box-shadow:inset 0 -7px 7px #60594b77,0 8px 9px #0007;transform:perspective(140px) rotateX(27deg);z-index:0}
+.computer-stand:before{content:"";position:absolute;left:29px;right:29px;top:-7px;height:20px;background:#b9af9a;border-radius:0 0 10px 10px;box-shadow:inset 0 4px 9px #51483799}
+.computer-stand i{position:absolute;inset:auto 10px 4px;height:3px;border-radius:50%;background:#e9dfcc55}
+.computer-keyboard{position:absolute;left:23px;top:353px;width:377px;height:158px;transform:rotate(-3deg);transform-style:preserve-3d;z-index:3}
+.computer-keyboard-tray{position:absolute;inset:-13px -12px -14px;border-radius:24px 24px 26px 25px;transform:skewX(-4deg);background:linear-gradient(135deg,#c2bdaf,#a6a193 55%,#8c877b);box-shadow:inset 2px 3px 4px #ece8de9c,inset -4px -7px 5px #5f5b4f77,inset 0 -2px 0 #c0b7a275,2px 7px 0 #68665c,4px 15px 3px #302f2bb3,6px 22px 24px #0009}
+.computer-keyboard-tray:before{content:"";position:absolute;inset:6px 7px 10px;border-radius:18px 17px 18px 19px;background:linear-gradient(125deg,#6a6b624a,#78786c);box-shadow:inset 1px 2px 4px #494a429c,0 1px 1px #ded8c690}
+.computer-keyboard-tray:after{content:"";position:absolute;left:58px;right:57px;bottom:-4px;height:2px;background:linear-gradient(90deg,transparent,#bdb7a54f,transparent);border-radius:3px}
+.computer-keys{position:absolute;inset:0;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(4,1fr);gap:6px 7px;isolation:isolate}
+.computer-key{position:relative;width:100%;height:100%;min-width:0;min-height:0;padding:0;border:0;border-radius:11px 12px 12px 11px;background:transparent;box-shadow:none;touch-action:manipulation;cursor:pointer}
+.computer-key-cap{position:absolute;inset:0;display:block;border-radius:inherit;background:linear-gradient(145deg,#e4e1d8 0%,#c0beb4 27%,#afafa5 61%,#999b92 100%);box-shadow:inset 1px 2px 3px #ffffffe0,inset -2px -3px 4px #555a5177,inset 0 -1px 1px #a6a894,0 4px 0 #5c6057,0 5px 4px #1b211873;transition:transform .12s,box-shadow .12s,background .2s;pointer-events:none}
+.computer-key-cap:before{content:"";position:absolute;inset:4px 5px 7px;border-radius:7px 8px 8px 7px;box-shadow:inset 0 1px 1px #fff6,inset 0 -1px 2px #858a7833;background:linear-gradient(145deg,#e1e0d554,transparent 80%);pointer-events:none}
+.computer-key-soft-top{position:absolute;top:4px;left:7px;right:8px;height:4px;border-radius:50%;background:#fff6;filter:blur(2px);pointer-events:none}
+.computer-key-light{position:absolute;left:12px;right:12px;bottom:6px;height:2px;opacity:0;transform:scaleX(.3);border-radius:3px;background:#ff6a35;box-shadow:0 0 7px #ff6a3588;transition:opacity .2s,transform .3s;pointer-events:none}
+.computer-key:hover .computer-key-cap,.computer-key:focus-visible .computer-key-cap{background:linear-gradient(145deg,#eeeae1,#d3d0c3 38%,#b8b9ac);box-shadow:inset 1px 2px 3px #fff,inset -2px -3px 4px #5c625377,0 4px 0 #5c6057,0 5px 4px #1b211873,0 0 0 1px #ff9a704f}
+.computer-key:focus-visible{outline:2px solid #ff6a35;outline-offset:3px;z-index:2}
+.computer-key:hover .computer-key-light,.computer-key:focus-visible .computer-key-light,.computer-key.is-last-key .computer-key-light{opacity:1;transform:scaleX(1)}
+.computer-key.is-pressed .computer-key-cap{transform:translateY(4px) scale(.98);box-shadow:inset 0 2px 4px #71766955,inset -2px -1px 3px #63695b66,0 1px 0 #494e43,0 1px 2px #0005}
+.computer-key.is-rippling:not(.is-pressed) .computer-key-cap{animation:computer-key-wave .38s var(--wave-delay,0ms) cubic-bezier(.2,.7,.2,1)}
+.computer-key-hint{position:absolute;left:20px;right:28px;top:536px;display:flex;gap:10px;align-items:start;min-height:34px;line-height:1.45;transform:rotate(-3deg);pointer-events:none}
+.computer-key-number{font:10px/1.5 Consolas,monospace;color:#e5b78f;min-width:17px}
+.computer-key-description{font:9px/1.55 Consolas,monospace;letter-spacing:-.015em;color:#aaa49b;max-width:340px}
+.computer-key-hint.is-key-selected .computer-key-description{color:#c8c0b4}
+.computer-companion{position:absolute;left:335px;top:237px;width:89px;height:89px;z-index:5;filter:drop-shadow(2px 4px 3px #0008);transform:rotate(2deg);pointer-events:none}
+.computer-luci-drawing{display:block;width:100%;height:100%;overflow:visible;fill:#09090b;stroke:#a9a299;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round}
+.computer-luci-tail{transform-box:fill-box;transform-origin:90% 70%;animation:computer-luci-tail 4.7s ease-in-out infinite}
+.computer-luci-eye{transform-box:fill-box;transform-origin:50% 50%;animation:computer-luci-blink 7.2s linear infinite}
+.computer-luci-pupil{transform:translateX(var(--luci-look,0px));transition:transform .3s}
+.computer-luci-arm{transform-box:fill-box;transform-origin:5% 30%;transition:transform .4s}
+.computer-companion.is-looking .computer-luci-arm{transform:rotate(-20deg)}
+.computer-companion.is-excited{animation:computer-luci-hop .48s cubic-bezier(.2,.7,.2,1)}
+.computer-thought{position:absolute;left:107px;top:282px;width:234px;min-height:59px;z-index:5;padding:8px 11px 8px;background:#121416f7;border:1px solid #8073656b;border-radius:11px 11px 5px 11px;box-shadow:2px 5px 12px #0007;transform:rotate(-3deg);pointer-events:none}
+.computer-thought:before,.computer-thought:after{content:"";position:absolute;right:-12px;top:13px;width:5px;height:5px;background:#121416;border:1px solid #80736577;border-radius:50%}
+.computer-thought:after{right:-20px;top:8px;width:3px;height:3px}
+.computer-thought-header{display:flex;justify-content:space-between;align-items:center;font:7px/1 Consolas,monospace;letter-spacing:.07em;color:#8d877d;margin-bottom:5px}
+.computer-thought-header>i{display:block;width:4px;height:4px;background:#ff6a35;border-radius:50%;box-shadow:0 0 4px #ff6a3566}
+.computer-thought-line{margin:0;font:9px/1.5 Consolas,monospace;color:#d2c9b9;letter-spacing:-.02em;min-height:27px}
+.computer-thought-prompt{color:#ff8b57}
+.computer-thought-caret{display:inline-block;width:4px;height:9px;margin-left:2px;background:#ff8b579c;vertical-align:-1px;animation:computer-caret 1.2s steps(1,end) infinite}
+.computer-ground-shadow{position:absolute;left:15%;right:4%;top:523px;height:31px;transform:rotate(-3deg);border-radius:50%;background:radial-gradient(ellipse,#000c,transparent 68%);filter:blur(9px);opacity:.7;animation:computer-shadow 7s ease-in-out infinite;pointer-events:none}
+.computer-os-loading{height:100%;display:grid;place-items:center;color:#b8b5a7;font:12px Consolas,monospace}
+.computer-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.computer-scene.is-still .computer-float,.computer-scene.is-still .computer-ground-shadow,.computer-scene.is-still .computer-luci-tail,.computer-scene.is-still .computer-luci-eye,.computer-scene.is-still .computer-companion,.computer-scene.is-still .computer-thought-caret,.computer-scene.is-still .computer-key-cap{animation:none!important}
+.computer-scene.is-still .computer-object,.computer-scene.is-still .computer-key-cap{transition:none!important}
+.computer-scene.is-still .computer-object{transform:none}
+.computer-scene.is-expanded .computer-glass-sheen{opacity:.45}
+@keyframes computer-float{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-9px) rotate(.5deg)}}
+@keyframes computer-shadow{0%,100%{transform:rotate(-3deg) scaleX(1);opacity:.7}50%{transform:rotate(-3deg) scaleX(.87);opacity:.4}}
+@keyframes computer-key-wave{0%,100%{transform:translateY(0);filter:none}40%{transform:translateY(-2px);filter:brightness(1.13)}}
+@keyframes computer-luci-tail{0%,100%{transform:rotate(0)}50%{transform:rotate(9deg)}}
+@keyframes computer-luci-blink{0%,43%,46%,100%{transform:scaleY(1)}44%,45%{transform:scaleY(.05)}}
+@keyframes computer-luci-hop{0%,100%{transform:translateY(0) rotate(2deg)}45%{transform:translateY(-14px) rotate(-8deg)}75%{transform:translateY(2px) scaleY(.92)}}
+@keyframes computer-caret{0%,52%,100%{opacity:1}53%,99%{opacity:0}}
+@media(max-width:1100px) and (min-width:761px){.computer-world{left:60%}}
+@media(max-width:760px){.computer-world{left:50%;top:calc(50% - 37px)}.computer-object-label{font-size:9px;top:-1px}.computer-expand{font-size:10px;min-height:36px;top:-9px}.computer-key-description{font-size:10px}.computer-key-number{font-size:11px}.computer-thought-line{font-size:10px;line-height:1.4}.computer-thought-header{font-size:8px}.computer-thought{min-height:63px;top:278px}.computer-key-hint{top:536px}.computer-monitor{transform:rotate(-2deg)}.computer-keyboard{transform:rotate(-2deg)}}
+@media(prefers-reduced-motion:reduce){.computer-scene *,.computer-scene *:before,.computer-scene *:after{animation:none!important;transition:none!important}.computer-object{transform:none}}
