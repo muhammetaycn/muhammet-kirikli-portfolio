@@ -45,8 +45,14 @@
     let nextThought = 0;
     let lastType = 0;
     let frame = 0;
-    let demoTimer = 0;
-    const timers = new Set();
+    let clock = 0;
+    let previousFrame = 0;
+    let demoAt = 0;
+    let wakeAt = null;
+    let wakeReady = false;
+    let waveUntil = 0;
+    let signalUntil = 0;
+    const pressUntil = Array(32).fill(0);
     const removeListeners = [];
     const keys = [];
     const definitions = window.ComputerOS?.keys || Array.from({length: 32}, (_, index) => ({name: `Deneyim ${index + 1}`, hint: 'Bir tuş seç ve içerideki akışı izle.'}));
@@ -75,7 +81,16 @@
     const display = node('div', 'computer-display');
     const glass = node('div', 'computer-glass-sheen');
     glass.setAttribute('aria-hidden', 'true');
-    glassRim.append(display, glass);
+    const wake = node('div', 'computer-wake');
+    wake.setAttribute('aria-hidden', 'true');
+    wake.dataset.step = 'dormant';
+    const wakeMark = node('span', 'computer-wake-mark', 'mk');
+    const wakeTitle = node('b', 'computer-wake-title', 'mk.local');
+    const wakeMessage = node('span', 'computer-wake-message', 'Ekran uyanıyor.');
+    const wakeTrack = node('span', 'computer-wake-track');
+    wakeTrack.append(node('i'));
+    wake.append(wakeMark, wakeTitle, wakeMessage, wakeTrack);
+    glassRim.append(display, glass, wake);
     const brand = node('div', 'computer-case-brand');
     brand.setAttribute('aria-hidden', 'true');
     brand.append(node('b', '', 'mk'), node('span', '', '✳'));
@@ -103,6 +118,14 @@
     const status = node('span', 'computer-sr-only');
     status.setAttribute('role', 'status');
     status.setAttribute('aria-live', 'polite');
+    const signal = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    signal.setAttribute('class', 'computer-signal');
+    signal.setAttribute('viewBox', '0 0 430 620');
+    signal.setAttribute('aria-hidden', 'true');
+    const signalPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    signalPath.setAttribute('class', 'computer-signal-path');
+    signalPath.setAttribute('pathLength', '100');
+    signal.append(signalPath);
 
     const companion = node('div', 'computer-companion');
     companion.setAttribute('aria-hidden', 'true');
@@ -118,7 +141,7 @@
     bubble.setAttribute('aria-hidden', 'true');
 
     keyboard.append(tray, keyboardGrid);
-    object.append(label, expand, monitor, keyboard, bubble, companion, hint, status);
+    object.append(label, expand, monitor, keyboard, signal, bubble, companion, hint, status);
     float.append(object);
     world.append(shadow, float);
     scene.append(world);
@@ -129,30 +152,37 @@
       removeListeners.push(() => target.removeEventListener(type, callback, settings));
     }
 
-    function later(callback, delay) {
-      const id = setTimeout(() => {timers.delete(id); if (!destroyed) callback();}, delay);
-      timers.add(id);
-      return id;
+    function finishWake() {
+      wakeReady = true;
+      wake.dataset.step = 'ready';
+      scene.dataset.wake = 'ready';
+      wakeMessage.textContent = 'Sıra sende.';
     }
 
     function activity(kind) {
       touched = true;
-      clearTimeout(demoTimer);
-      demoTimer = 0;
+      demoAt = 0;
+      finishWake();
       options.onActivity?.(kind || 'computer');
     }
 
     function setThought(text) {
       if (destroyed || !text) return;
+      if (String(text) === thoughtText) {
+        if (typedCount === thoughtText.length) nextThought = clock + readingTime();
+        return;
+      }
       thoughtText = String(text);
       typedCount = reduced || paused ? thoughtText.length : 0;
       thought.textContent = thoughtText.slice(0, typedCount);
       bubble.classList.add('is-speaking');
       scene.dataset.thought = thoughtText;
-      nextThought = performance.now() + Math.max(10000, thoughtText.length * 70 + 5500);
-      lastType = performance.now();
+      nextThought = typedCount === thoughtText.length ? clock + readingTime() : 0;
+      lastType = clock;
       schedule();
     }
+
+    function readingTime() {return Math.max(6500, thoughtText.split(/\s+/).length * 250 + 1800);}
 
     function showHint(index) {
       const definition = definitions[index] || {};
@@ -174,7 +204,33 @@
       // Force only the key grid's animation state to restart for rapid repeated taps.
       void keyboardGrid.offsetWidth;
       keys.forEach(key => key.classList.add('is-rippling'));
-      later(() => keys.forEach(key => key.classList.remove('is-rippling')), 700);
+      waveUntil = clock + 700;
+    }
+
+    function traceKey(index) {
+      if (!active()) return;
+      const row = Math.floor(index / 8), column = index % 8;
+      const x = column * 48 + 20.5, y = row * 41 + 17.5;
+      const angle = (window.matchMedia('(max-width: 760px)').matches ? -2 : -3) * Math.PI / 180;
+      const localX = x - 188.5, localY = y - 79;
+      const startX = 23 + 188.5 + localX * Math.cos(angle) - localY * Math.sin(angle);
+      const startY = 390 + 79 + localX * Math.sin(angle) + localY * Math.cos(angle);
+      signalPath.setAttribute('d', `M${startX.toFixed(2)} ${startY.toFixed(2)}C${startX.toFixed(2)} ${(startY - 38).toFixed(2)} 185 365 202 303`);
+      scene.classList.remove('is-signalling');
+      void signal.offsetWidth;
+      scene.classList.add('is-signalling');
+      signalUntil = clock + 950;
+      companion.dataset.attention = 'keys';
+      scene.dataset.signal = definitions[index]?.name || String(index + 1);
+    }
+
+    function clearImpulses() {
+      waveUntil = signalUntil = 0;
+      pressUntil.fill(0);
+      keys.forEach(key => {key.classList.remove('is-pressed');key.classList.remove('is-rippling');});
+      scene.classList.remove('is-signalling');
+      companion.classList.remove('is-excited');
+      companion.dataset.attention = 'idle';
     }
 
     function selectKey(index, announce) {
@@ -184,14 +240,14 @@
       scene.dataset.lastKey = String(index);
       scene.dataset.keyCount = String(Number(scene.dataset.keyCount || 0) + 1);
       keys.forEach((key, number) => key.classList.toggle('is-last-key', number === index));
-      keys[index].classList.add('is-pressed');
+      if (active()) {keys[index].classList.add('is-pressed');pressUntil[index] = clock + 190;}
       companion.classList.remove('is-excited');
       if (!reduced && !paused) {
         void companion.offsetWidth;
         companion.classList.add('is-excited');
       }
       wave(index);
-      later(() => keys[index]?.classList.remove('is-pressed'), 190);
+      traceKey(index);
       if (announce) status.textContent = `${definitions[index]?.name || 'Deneyim'} açılıyor.`;
       os?.runKey(index);
     }
@@ -270,8 +326,9 @@
       const mobile = window.matchMedia('(max-width: 760px)').matches;
       const width = rect.width * (mobile ? .96 : .78);
       const height = Math.max(360, rect.height - 72);
-      const scale = Math.max(.8, Math.min(1.06, width / 430, height / 560));
+      const scale = Math.max(.8, Math.min(1.06, width / 430, height / 620));
       world.style.setProperty('--computer-scale', scale.toFixed(3));
+      world.style.setProperty('--computer-text-scale', (1 / scale).toFixed(3));
       scene.dataset.scale = scale.toFixed(3);
     }
     const resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null;
@@ -283,14 +340,30 @@
     function tick(now) {
       frame = 0;
       if (!active()) return;
-      if (typedCount < thoughtText.length && now - lastType > 27) {
-        typedCount = Math.min(thoughtText.length, typedCount + Math.max(1, Math.floor((now - lastType) / 27)));
-        lastType = now;
-        thought.textContent = thoughtText.slice(0, typedCount);
-        if (typedCount === thoughtText.length) bubble.classList.remove('is-speaking');
+      clock += Math.min(50, Math.max(0, now - previousFrame));
+      previousFrame = now;
+      scene.dataset.elapsed = String(Math.round(clock));
+      if (!wakeReady && wakeAt !== null) {
+        const elapsed = clock - wakeAt;
+        wake.dataset.step = elapsed < 360 ? 'signal' : 'opening';
+        scene.dataset.wake = wake.dataset.step;
+        wakeMessage.textContent = elapsed < 760 ? '32 tuş, bir sürü olasılık.' : 'Sıra sende.';
+        if (elapsed >= 1200) finishWake();
       }
-      if (!nextThought) nextThought = now + 11000;
-      if (now >= nextThought) {
+      keys.forEach((key,index) => {if (pressUntil[index] && clock >= pressUntil[index]) {key.classList.remove('is-pressed');pressUntil[index] = 0;}});
+      if (waveUntil && clock >= waveUntil) {keys.forEach(key => key.classList.remove('is-rippling'));waveUntil = 0;}
+      if (signalUntil) {
+        if (clock >= signalUntil) {scene.classList.remove('is-signalling');signalUntil = 0;companion.dataset.attention = 'idle';}
+        else if (signalUntil - clock < 650) {companion.dataset.attention = 'screen';companion.style.setProperty('--luci-look', '-4px');}
+      }
+      if (demoAt && clock >= demoAt && !touched) {demoAt = 0;os?.autoDemo?.();}
+      if (typedCount < thoughtText.length && clock - lastType > 37) {
+        typedCount = Math.min(thoughtText.length, typedCount + Math.max(1, Math.floor((clock - lastType) / 37)));
+        lastType = clock;
+        thought.textContent = thoughtText.slice(0, typedCount);
+        if (typedCount === thoughtText.length) {bubble.classList.remove('is-speaking');nextThought = clock + readingTime();}
+      }
+      if (nextThought && clock >= nextThought && !touched) {
         thoughtIndex = (thoughtIndex + 1) % idleThoughts.length;
         setThought(idleThoughts[thoughtIndex]);
       }
@@ -299,19 +372,16 @@
     function sync() {
       scene.classList.toggle('is-still', paused || reduced || !visible || document.hidden);
       scene.dataset.paused = String(paused || reduced);
-      os?.setPaused(paused || !visible || document.hidden);
-      if (!active() && frame) {cancelAnimationFrame(frame); frame = 0;}
+      os?.setPaused(paused || reduced || !visible || document.hidden);
+      if (!active()) {if (frame) cancelAnimationFrame(frame);frame = 0;clearImpulses();}
+      if (visible && (reduced || paused)) finishWake();
       if (active()) {
-        lastType = performance.now();
-        nextThought = Math.max(nextThought, performance.now() + 2000);
+        previousFrame = performance.now();
+        if (!wakeReady && wakeAt === null) {wakeAt = clock;wake.dataset.step = 'signal';scene.dataset.wake = 'signal';}
         schedule();
         if (!demoStarted && !touched) {
           demoStarted = true;
-          demoTimer = later(() => {
-            demoTimer = 0;
-            if (active() && !touched) os?.autoDemo?.();
-            else if (!touched) demoStarted = false;
-          }, 1800);
+          demoAt = clock + 1800;
         }
       }
     }
@@ -323,7 +393,7 @@
         sync();
         if (visible) {
           resize();
-        } else {clearTimeout(demoTimer); demoTimer = 0; if (!touched) demoStarted = false;}
+        }
       },
       setPaused(value) {paused = Boolean(value); sync();},
       setReducedMotion(value) {reduced = Boolean(value); if (reduced) {typedCount = thoughtText.length; thought.textContent = thoughtText;} sync();},
@@ -333,8 +403,7 @@
         if (destroyed) return;
         destroyed = true;
         if (frame) cancelAnimationFrame(frame);
-        timers.forEach(clearTimeout);
-        timers.clear();
+        clearImpulses();
         removeListeners.forEach(remove => remove());
         resizeObserver?.disconnect();
         os?.destroy();

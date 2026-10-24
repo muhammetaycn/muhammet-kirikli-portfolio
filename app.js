@@ -13,6 +13,8 @@
   let cursor;
   let deck;
   let computerScene;
+  let capabilityMap;
+  let systemLab;
   const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
   const cleanups = [];
@@ -124,11 +126,11 @@
     row.addEventListener('toggle', () => {
       if (!row.open) return;
       document.querySelectorAll('.capability-item').forEach(other => { if (other !== row) other.open = false; });
-      ['#tool-a','#tool-b','#tool-c'].forEach((id,i) => $(id).textContent = capability.tools[i] || capability.tools[0]);
-      $('.stack-instrument').dataset.selection = String(index);
+      capabilityMap?.select(index);
     });
     $('#capability-list').append(row);
   });
+  if(window.CapabilityMap){capabilityMap=window.CapabilityMap.mount({host:$('#capability-map'),capabilities:data.capabilities,projects,onProject:openProject});cleanups.push(()=>capabilityMap?.destroy());}
   $('#source-link').href = 'https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
   const skills = data.linkedinSkills || [];
   $('#skill-count').textContent = String(skills.length);
@@ -166,10 +168,10 @@
     if (scene) scene.setMode(button.dataset.scene);
     $('.art-caption b').textContent = ({flow:'001 — BAĞLANTILAR',structure:'002 — YAPININ İÇİ',signal:'003 — SİNYALİN İZİ'})[button.dataset.scene];
   }));
-  try { if (window.SystemLab) cleanups.push(window.SystemLab.mount()); } catch { $('#lab-result').textContent = 'Demo şu anda yüklenemedi. Proje detaylarından akışı inceleyebilirsin.'; }
-  const labExperiences={event:[9,'Onayı yönet ↗'],textile:[10,'Siparişi taşı ↗'],content:[13,'Kuyruğu düzenle ↗'],community:[14,'Kuralı dene ↗']};
-  document.querySelectorAll('[data-lab-project]').forEach(button=>button.addEventListener('click',()=>{$('#lab-explore').textContent=labExperiences[button.dataset.labProject][1];}));
-  $('#lab-explore').addEventListener('click',()=>{const selected=document.querySelector('[data-lab-project][aria-pressed="true"]')?.dataset.labProject||'event';launchExperience(labExperiences[selected][0]);});
+  try { if (window.SystemLab){systemLab=window.SystemLab.mount();cleanups.push(systemLab);} } catch { $('#lab-result').textContent = 'Demo şu anda yüklenemedi. Proje detaylarından akışı inceleyebilirsin.'; }
+  const labExperiences={fullstack:[4,'API ekranını aç ↗'],automation:[13,'Kuyruğa gir ↗'],mobile:[11,'Haritayı aç ↗'],event:[9,'Onayı yönet ↗'],textile:[10,'Siparişi taşı ↗'],content:[13,'Kuyruğu düzenle ↗'],community:[14,'Kuralı dene ↗']};
+  document.querySelectorAll('[data-lab-project]').forEach(button=>button.addEventListener('click',()=>{$('#lab-explore').textContent=(labExperiences[button.dataset.labProject]||labExperiences.fullstack)[1];}));
+  $('#lab-explore').addEventListener('click',()=>{const selected=document.querySelector('[data-lab-project][aria-pressed="true"]')?.dataset.labProject||'fullstack';launchExperience((labExperiences[selected]||labExperiences.fullstack)[0]);});
   function syncSurfaces() {
     const covered = Boolean(document.querySelector('dialog[open]'));
     document.body.classList.toggle('surface-covered', covered);
@@ -178,6 +180,8 @@
     else if (scene) scene.setPaused(!moving || covered);
     if (narrator) narrator.setPaused(!moving || covered);
     if (cursor) cursor.setPaused(!moving);
+    capabilityMap?.setPaused(!moving||covered);
+    systemLab?.setPaused?.(!moving||covered);
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
@@ -221,11 +225,13 @@
     const part = name => parts.find(p => p.type === name).value;
     const end = Date.parse(`${part('year')}-${part('month')}-${part('day')}T00:00:00Z`);
     const dateLabel = new Intl.DateTimeFormat('tr-TR', {timeZone:'UTC', day:'numeric', month:'long', year:'numeric'});
-    let daily = new Map();
+    let daily = new Map(), events = new Map(), buildLog = false;
+    const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json');
+      const response = await fetch('data/activity.json?v=20261024s');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
+      buildLog=json.metric==='repository_commits'&&json.repository===repository;
       if (Array.isArray(json.days) && json.days.length <= 20000) {
         for (const row of json.days) {
           if (!row || !/^\d{4}-\d{2}-\d{2}$/.test(row.date) || !Number.isSafeInteger(row.count) || row.count < 0) continue;
@@ -233,6 +239,7 @@
           if (!Number.isFinite(stamp) || new Date(stamp).toISOString().slice(0,10) !== row.date) continue;
           const count = (daily.get(row.date) || 0) + row.count;
           if (Number.isSafeInteger(count)) daily.set(row.date, count);
+          if(buildLog&&Array.isArray(row.events))events.set(row.date,row.events.filter(event=>event&&/^[a-f0-9]{40}$/.test(event.sha)&&event.url===repository+'/commit/'+event.sha&&typeof event.title==='string').slice(0,50));
         }
       }
     } catch { /* The honest empty state remains available offline. */ }
@@ -242,19 +249,25 @@
     const active = visible.filter(date => daily.get(date)>0).length;
     let chosen = 363;
     const grid = $('#rhythm-grid');
+    const records=element('div','rhythm-records');records.hidden=true;$('.rhythm-panel').append(records);
+    function showRecords(date){
+      const entries=events.get(date)||[];records.hidden=!entries.length;
+      const heading=element('p','',dateLabel.format(new Date(date+'T00:00:00Z'))+' · GitHub kaydı');
+      records.replaceChildren(heading,...entries.slice(0,5).map(event=>{const link=element('a','',event.title.slice(0,180));link.href=event.url;link.target='_blank';link.rel='noopener noreferrer';link.append(element('small','',event.sha.slice(0,7)+' ↗'));return link;}));
+    }
     const cells = dates.map((date, index) => {
       const count = daily.get(date);
       const cell = element('button', 'rhythm-cell');
       cell.type = 'button'; cell.tabIndex = index === chosen ? 0 : -1;
       cell.dataset.level = count ? String(Math.ceil(count / maximum * 4)) : '0';
-      const label = dateLabel.format(new Date(date+'T00:00:00Z')) + (count === undefined ? ' · Kayıt paylaşılmadı.' : ` · ${count} kayıtlı etkinlik.`);
+      const label = dateLabel.format(new Date(date+'T00:00:00Z')) + (count === undefined ? ' · Kayıt paylaşılmadı.' : ` · ${count} ${buildLog?'GitHub değişikliği':'kayıtlı etkinlik'}.`);
       cell.title = label; cell.setAttribute('aria-label',label);
-      cell.addEventListener('click', () => { cells[chosen].tabIndex=-1; chosen=index; cell.tabIndex=0; $('#rhythm-detail').textContent=label; });
+      cell.addEventListener('click', () => { cells[chosen].tabIndex=-1; chosen=index; cell.tabIndex=0; $('#rhythm-detail').textContent=label;showRecords(date); });
       cell.addEventListener('keydown',event=>{
         const moves={ArrowRight:7,ArrowLeft:-7,ArrowDown:1,ArrowUp:-1};
         if(!(event.key in moves)) return;
         event.preventDefault(); const next=Math.max(0,Math.min(363,index+moves[event.key]));
-        cells[chosen].tabIndex=-1; chosen=next; cells[next].tabIndex=0; cells[next].focus(); $('#rhythm-detail').textContent=cells[next].getAttribute('aria-label');
+        cells[chosen].tabIndex=-1; chosen=next; cells[next].tabIndex=0; cells[next].focus(); $('#rhythm-detail').textContent=cells[next].getAttribute('aria-label');showRecords(dates[next]);
       });
       return cell;
     });
@@ -263,7 +276,13 @@
       narrator = window.ActivityNarrator.mount({panel:$('.rhythm-panel'), grid, scroll:$('.rhythm-scroll'), reducedMotion:media.matches});
       syncSurfaces();
     }
-    if(visible.length) { $('#rhythm-summary').textContent = `${active} üretim günü / son 364 gün`; $('#rhythm-detail').textContent='Yoğunluk kayıtlı etkinlik sayısıdır; süre veya iş kalitesi ölçümü değildir.'; }
+    if(visible.length) {
+      const total=visible.reduce((sum,date)=>sum+daily.get(date),0);
+      $('#rhythm-summary').textContent=buildLog?`${active} geliştirme günü · ${total} GitHub kaydı`:`${active} üretim günü / son 364 gün`;
+      $('#rhythm-detail').textContent=buildLog?'Bu portföyün kaynak geçmişi. Kayıtlı bir günü seç; değişikliği aç.':'Yoğunluk kayıtlı etkinlik sayısıdır; süre veya iş kalitesi ölçümü değildir.';
+      grid.setAttribute('aria-label',buildLog?'Portföy geliştirme günleri':'AI ile üretim günleri');
+      showRecords(visible.at(-1));
+    }
   }
   renderRhythm();
   addEventListener('pagehide', () => { cleanups.forEach(cleanup=>{ if(typeof cleanup==='function') cleanup(); }); if(deck) deck.destroy(); if(computerScene) computerScene.destroy(); if(scene) scene.destroy(); if(narrator) narrator.destroy(); if(cursor) cursor.destroy(); removeEventListener('scroll',onScroll); if(scrollFrame) cancelAnimationFrame(scrollFrame); }, {once:true});

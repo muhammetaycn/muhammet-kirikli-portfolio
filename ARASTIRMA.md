@@ -66,7 +66,7 @@ Tam ad ve LinkedIn birincil kimlik oldu. Yazılım, AI otomasyonu, sistem tasar�
 
 52 × 7 matris ortak bir sahnedir. Siyah Luci kimliğini korur; ikinci yazar cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişir. Yazım sınırı her EN/TR çiftinde kayar, yazarlar dört turda bir taraf değiştirir. İki kelime arasında okuma için iki sütun bırakılır; bu boşluk da yer değiştirir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
 
-32 teknik konu, dönüşümlü EN/TR 64 diyalog çifti ve 128 kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
+96 teknik konu, dönüşümlü EN/TR 192 sahne ve 384 özgün kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
 ## 24 Ekim / Nesne olarak portföy
 
@@ -101,3 +101,12 @@ Yerel davranış testlerindeki 19 grup; geometriyi, dal sayısını, temas yön�
 Elin küçük ölçüsünde basma esnemesi dört ondalıklı aynı dönüşümle hem çizime hem ağ köklerine uygulanır. Yay adımları bölünür, hareket yumuşatması geçen süreye bağlıdır. Kopan altı dal temas noktalarını aynı anda dondurur; yeniden tutunmada uç 180 ms boyunca birleştirilir. Butonun temas kenarındaki kabarma ve basma dalgası SVG katmanındadır; gerçek kontrolün tıklama alanı değişmez.
 
 Luci'lerin sabit iki yarısı, yer değiştiren yazım alanlarına çevrildi. Okuma aralığı iki sütundur ve her konu çiftinde kayar; rota kontrolü 52 sütunun ve 364 hücrenin tamamının sahne bankasında kullanıldığını doğrular. Dört turda bir taraf değişimi 700 ms sıçramayla gösterilir. Mobil terminal metni 12 px'e, başlık bilgileri en az 8 px'e çıkarıldı; sözcükler dar alanda satır kırabilir. Proje ayrıntılarındaki kalan morumsu metinler sıcak fildişi tonlarıyla değiştirildi.
+## 24 Ekim / İzlemekten denemeye
+
+İlk bilgisayar turundaki sabit imleç hareketi, uygulama düğmelerinin gerçek yerel koordinatlarını izleyen bir akışla değiştirildi: Terminal'de `projects`, SQLite'ta JOIN, ardından Sürümler'de v0.3 ilişki şeması. Kullanıcı girişi turu keser; geciken sorgular kullanıcının devraldığı ekranı değiştiremez. Uyanış, düşünce okuma süresi ve tuş tepkileri görünür sahne saatiyle ilerler.
+
+Sistemler bölümü yedi yerel deneye ayrıldı. Girdi düzenlenir, doğrulanır, onay noktasında durur ve ancak onaydan sonra yerel kayıt oluşur. Aynı veri yeniden kaydedilmez. SVG düğümleri klavyeyle seçilebilir; aynı verinin JSON biçimi ve sınırlı işlem izi görünür. Yetenek haritası da sekiz alanı ilgili proje ayrıntılarına bağlar.
+
+384 kısa düşünce için konu bankası genişletildi. Eşleşen EN/TR konuları döngü içinde tekrarlanmaz; yeni döngüde sıra karışır. Teknik anlamlar için [MDN önbellekleme](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching), [SQLite WAL](https://sqlite.org/wal.html), [performance.now](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now) ve [Node.js akışları](https://nodejs.org/api/stream.html) kontrol edildi.
+
+Kullanıcının 50,7 saniyelik video referansından altı farklı anın yerel kareleri incelendi. Küçük kişisel paneller, iz bırakma ve keşif katmanları dikkate alındı; hesap, ziyaretçi veya dinleme verisi kopyalanmadı. Bu sitedeki geliştirme izi, kendi Git geçmişinden üretilen tarihli commit bağlantılarıdır. AI hesabı kullanım analitiği değildir.

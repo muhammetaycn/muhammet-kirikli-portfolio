@@ -15,18 +15,17 @@ Ardından [localhost:8000](http://localhost:8000) adresine git. Windows’ta Pyt
 ## İçeriği değiştir
 
 - `content.js`: kişisel bilgiler, on proje, teknoloji listeleri, proje akışları ve iletişim. Yeni proje eklerken aynı alan yapısını kullan; `id` değerini benzersiz tut. Yayınlanmış bir kaynak bağlantısı yoksa `repo: null` bırak.
-- `data/activity.json`: AI ile üretim günleri. Biçim:
+- `data/activity.json`: bu portföyün kaynak commitlerinden üretilen geliştirme günlüğü. İstanbul tarihine göre son 364 gün gösterilir. Kayıtlı günü seçince commit başlığı, SHA ve GitHub bağlantısı açılır. Luci renkleri bu verinin üstünde ayrı bir animasyon katmanıdır.
 
-```json
-{
-  "source": "AI ile üretim günleri",
-  "days": [
-    { "date": "2026-10-23", "count": 3 }
-  ]
-}
+Günlüğü yenilemek için kaynak değişikliklerini önce commit et, sonra Node.js ve Git bulunan bir terminalde çalıştır:
+
+```sh
+node scripts/update-activity.cjs
+git add data/activity.json
+git commit -m "Refresh portfolio build log"
 ```
 
-`date`, `YYYY-MM-DD`; `count`, sıfır veya pozitif bir tam sayıdır. Aynı günün kayıtları toplanır. Takvim İstanbul tarihine göre geriye dönük 364 günü gösterir. Başlangıç dosyası boştur; otomatik bir AI kaynağı bağlı değildir. Yalnız paylaşmak istediğin gerçek kayıtları ekle. Yoğunluk etkinlik sayısıdır; süre veya iş kalitesi ölçümü değildir.
+Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosyası güncellemeleri sayımın dışında kalır. JSON, `metric: repository_commits`, kaynak depo, üretim tarihi ve her günün commit bağlantılarını taşır. Bu dosyada AI hesabı kullanım analitiği bulunmaz.
 
 ## Dosyalar
 
@@ -35,7 +34,8 @@ Ardından [localhost:8000](http://localhost:8000) adresine git. Windows’ta Pyt
 - `kinetic.js`: imleç çekimi, yerel bükülme ve kalıcı biçim vermeyi destekleyen Canvas şerit; dönüş sürer, sıfırlama düğmesi biçimi geri alır.
 - `narrator.js` ve `narrator.css`: birlikte yazan Luciler, EN/TR terminal düşünceleri ve yanlış inişten toparlanma. Balona tıkla veya Enter ile sonraki düşünceyi sıraya al.
 - `cursor.js` ve `cursor.css`: beş parmaklı dikişli eldiven, açılan eklem ve elden hedefe uzanan, gerilip geri çekilen siyah simbiyot dokusu.
-- `system-lab.js`: projelerin adımlarını gösteren etkileşimli akış alanı.
+- `system-lab.js/css`: yedi yerel akış; düzenlenebilir veri, doğrulama, onay/durdurma, tekrar kayıt koruması ve JSON/işlem izi.
+- `capability-map.js/css`: sekiz yetenek alanını ilgili gerçek proje ayrıntılarına bağlayan harita.
 - `ARASTIRMA.md`: sekiz tasarım kaynağı, gözlem sınırları ve özgün uygulama kararları.
 
 Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. Bu portföy için yeni görsel üretimi kullanılmadı; sahne ve akışlar kodla çizilir.
@@ -71,7 +71,7 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 
 52 × 7 matris ortak bir sahnedir. Siyah Luci kimliğini korur; ikinci yazar cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişir. Yazım sınırı her EN/TR çiftinde kayar, yazarlar dört turda bir taraf değiştirir. İki kelime arasında okuma için iki sütun bırakılır; bu boşluk da yer değiştirir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
 
-32 teknik konu, dönüşümlü EN/TR 64 diyalog çifti ve 128 kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
+96 teknik konu, dönüşümlü EN/TR 192 sahne ve 384 özgün kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
 Taraf değiştirirken karakter 700 ms'lik bir sıçramayla yeni yerine geçer; balonlar birlikte yer değiştirir. Telefon dahil düşünce gövdesi 12 px, terminal başlıkları en az 8 px'tir. Uzun teknik terimler balonun dışına taşmadan satıra bölünür.
 
@@ -89,3 +89,7 @@ Bilgisayarın 8 × 4 gri tuşu yazısızdır. Hover veya klavye odağında işle
 `assets/vendor/sqljs/` altındaki sql.js 1.15.1 MIT lisanslıdır; kaynak ve bütünlük kaydı aynı klasördedir. SQLite dosyaları yalnızca veritabanı uygulaması açılınca yüklenir. Sayfa yenilendiğinde deney verileri sıfırlanır.
 
 Proje detayları ve sistem akışlarındaki uygulama düğmeleri, ilgili deneyi aynı bilgisayar ekranında açar. Büyütülen ekran kapatılınca klavye odağı onu açan kontrole döner.
+
+İlk bilgisayar görünümünde 1,2 saniyelik uyanış, ardından tek seferlik bir uygulama turu vardır. İç imleç gerçek uygulama düğmesinin merkezine gider; Terminal'de `projects`, SQLite'ta gerçek JOIN ve Sürümler'de ilişki şeması gösterilir. Fare, klavye veya yazıyla kontrolü almak turu anında durdurur. Geç kalan otomatik sorgu sonucu kullanıcının ekranını veya yazısını değiştiremez. Sahne görünmezken düşünce ve fizik süreleri ilerlemez.
+
+Bu sürümün istek karşılaştırması [ISTEK-DURUMU.md](ISTEK-DURUMU.md) içindedir.

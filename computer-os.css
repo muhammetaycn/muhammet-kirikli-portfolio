@@ -13,3 +13,16 @@
 @media(max-width:600px){.cos-dialog{width:96vw;height:92svh;border-radius:10px}.cos-dialog-bar{padding:10px 12px;font-size:9px}.cos-expanded-stage{padding:6px}.cos-expanded-stage .cos-body{padding:1.1em}.cos-expanded-stage .cos-shell{font-size:12px}.cos-expanded-stage .cos-kanban{grid-template-columns:1fr 1fr}.cos-expanded-stage .cos-two-columns{grid-template-columns:1fr}.cos-expanded-stage .cos-desktop-app{min-height:7em}.cos-expanded-stage .cos-relations{gap:1em}.cos-expanded-stage .cos-relation-targets{padding-left:.7em}.cos-expanded-stage .cos-photo-grid{gap:.4em}.cos-expanded-stage .cos-photo-card{padding:.5em}.cos-expanded-stage .cos-card-actions{flex-direction:column}.cos-expanded-stage .cos-test-row{flex-wrap:wrap}.cos-expanded-stage .cos-test-row>small{width:100%;padding-left:2em}.cos-expanded-stage .cos-map,.cos-expanded-stage .cos-world-map{height:12em}}
 @media(max-width:600px){.cos-dialog-bar{flex-wrap:wrap;gap:8px}.cos-dialog-bar>span{flex:1}.cos-dialog-bar>.cos-app-picker{order:3;flex:1 0 100%;max-width:100%;margin:0;font-size:12px}.cos-dialog-close{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.cos-shell *{animation:none!important;transition:none!important}.cos-inner-cursor{display:none}}
+/* The idle tour shares the screen's coordinate space. It never captures input. */
+.cos-shell{position:relative}
+.cos-tour-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none!important;opacity:0;z-index:5;transition:opacity .14s}
+.cos-tour-layer *{pointer-events:none!important}
+.cos-tour-layer.is-active{opacity:1}
+.cos-tour-layer .cos-inner-cursor{left:0;top:0;width:1.8em;height:1.8em;font-size:1em;line-height:1;text-shadow:none;will-change:transform;filter:drop-shadow(.08em .16em .1em #0008)}
+.cos-inner-cursor>svg{display:block;width:100%;height:100%;overflow:visible;fill:#fff7e9;stroke:#171d15;stroke-width:1.2;stroke-linejoin:round}
+.cos-inner-cursor:after{content:"";position:absolute;left:0;top:0;width:1.4em;height:1.4em;border:1px solid #ffb58d;border-radius:50%;transform:translate(-50%,-50%) scale(.4);opacity:0;transition:opacity .12s,transform .16s}
+.cos-inner-cursor.is-pressing:after{transform:translate(-50%,-50%) scale(1.2);opacity:.85}
+.cos-tour-label{font-size:.72em;letter-spacing:.04em;white-space:nowrap;color:#cfab85;margin-left:auto;max-width:48%;overflow:hidden;text-overflow:ellipsis}
+.cos-tour-label:empty{display:none}
+.cos-shell .is-tour-target{box-shadow:inset 0 0 0 1px #ffb58588,0 0 .6em #ff804e16;border-color:#ffab7c75}
+.cos-shell .is-tour-pressed{box-shadow:inset 0 0 0 2px #ffbc9388;background-color:#ff804e22}

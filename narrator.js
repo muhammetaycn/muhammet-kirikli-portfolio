@@ -109,12 +109,84 @@
     [['ABORT','FETCH'],['AbortError: request was cancelled.','controller.abort(); stops this request.'],['IPTAL','ISTEK'],['AbortError: bu istek iptal edildi.','İptal edilen isteğin sonucunu kullanma.']],
     [['TRACE','DEBUG'],['Follow the cause across boundaries.','Trace the evidence across the call stack.'],['IZLE','AYIKLA'],['Nedeni sistem sınırları boyunca izle.','Çağrı yığınında hatanın kaynağını izle.']],
     [['LOG','WARN'],['Write the context that will matter.','A warning should suggest a next step.'],['KAYIT','UYARI'],['Sonra gerekecek bağlamı kaydet.','Uyarı bir sonraki adımı anlatsın.']],
-    [['ASSERT','FAIL'],['assert(queue.length >= 0); // invariant','AssertionError: inspect the state first.'],['KOSUL','HATA'],['Invariant: durum varsayımını doğrula.','AssertionError: hatayı kaynağında ara.']]
+    [['ASSERT','FAIL'],['assert(queue.length >= 0); // invariant','AssertionError: inspect the state first.'],['KOSUL','HATA'],['Invariant: durum varsayımını doğrula.','AssertionError: hatayı kaynağında ara.']],
+    [['DNS','TTL'],['DNS resolves a name into records.','Keep a cached answer within its TTL.'],['DNS','SURE'],['DNS, adı kaynak kayıtlarına çözer.','Önbellekteki yanıtın TTL sınırını koru.']],
+    [['TCP','BYTES'],['TCP carries an ordered byte stream.','Define your own message boundaries.'],['AKIS','BAYT'],['TCP, sıralı bir bayt akışı taşır.','Mesaj sınırlarını protokolünde tanımla.']],
+    [['TLS','CERT'],['Check the certificate and hostname.','Encrypted transport still needs trust.'],['TLS','BELGE'],['Sertifikayı ve alan adını doğrula.','Şifreli taşıma da güven denetimi ister.']],
+    [['ETAG','MATCH'],['Send the validator with the next request.','A matching ETag can avoid a full body.'],['ETIKET','ESLE'],['Sonraki istekte doğrulayıcıyı gönder.','Eşleşen ETag tam gövde aktarımını önler.']],
+    [['H2','FLOW'],['Many streams can share one connection.','Respect the receiver flow window.'],['H2','AKIS'],['Tek bağlantıyı birçok akış paylaşabilir.','Alıcının akış penceresine saygı duy.']],
+    [['URL','PATH'],['Parse a URL before reading its parts.','Encode values at their own boundary.'],['ADRES','YOL'],['Adresin parçalarını ayrıştırarak oku.','Değerleri ait oldukları sınırda kodla.']],
+    [['JSON','UTF8'],['JSON text is a transport representation.','Parse it before checking the shape.'],['JSON','UTF8'],['JSON metni, verinin taşıma biçimidir.','Veri şeklini sınamadan önce ayrıştır.']],
+    [['FETCH','BODY'],['A response body is a consumable stream.','Check status before trusting the payload.'],['ISTEK','GOVDE'],['Yanıt gövdesi tüketilen bir akıştır.','İçeriğe güvenmeden durum kodunu denetle.']],
+    [['ABORT','CLEAN'],['Cancel work that no longer has a reader.','Detach listeners when their owner leaves.'],['IPTAL','TEMIZ'],['Okuyucusu kalmayan işi iptal et.','Sahibi ayrılan dinleyiciyi temizle.']],
+    [['TIME','BOUND'],['Give slow dependencies a deadline.','A timeout must release its resources.'],['SURE','SINIR'],['Yavaş bağımlılığa süre sınırı koy.','Süre aşımında kaynakları serbest bırak.']],
+    [['RETRY','SPREAD'],['Space retries with a little jitter.','Do not let every client retry together.'],['TEKRAR','DAGIT'],['Tekrar denemeleri küçük sapmayla dağıt.','Tüm istemciler aynı anda yüklenmesin.']],
+    [['HEAD','BODY'],['HEAD asks for metadata without the body.','Use the headers for a cheaper check.'],['BASLIK','GOVDE'],['HEAD, gövde olmadan üstbilgi ister.','Hafif bir denetim için başlıklara bak.']],
+    [['RANGE','BYTES'],['Request only the byte range you need.','Check Content-Range before joining parts.'],['ARALIK','BAYT'],['Yalnız gereken bayt aralığını iste.','Parçaları birleştirirken aralığı doğrula.']],
+    [['POST','KEY'],['A retried write may arrive more than once.','Use a deduplication key for that action.'],['GONDER','KIMLIK'],['Tekrarlanan yazma birden çok gelebilir.','Bu işlem için tekrar önleyici kimlik kullan.']],
+    [['PROXY','TRUST'],['Forwarded headers need a trust boundary.','Know which proxy can assert the client.'],['VEKIL','GUVEN'],['Aktarılan başlıkların güven sınırı olsun.','İstemciyi hangi vekilin bildirdiğini bil.']],
+    [['SOCKET','CLOSE'],['A socket can close between two writes.','Handle the failure at the write itself.'],['SOKET','KAPAT'],['Soket iki yazma arasında kapanabilir.','Hatayı yazma işleminin içinde ele al.']],
+    [['JOIN','KEY'],['Join through an explicit relationship.','Check how many rows each side contributes.'],['BAGLA','KIMLIK'],['Tabloları açık bir ilişkiyle birleştir.','Her tarafın ürettiği satır sayısını izle.']],
+    [['FK','CHECK'],['A foreign key guards a relationship.','Keep orphan records out of the model.'],['BAG','ONAY'],['Yabancı anahtar, veri ilişkisini korur.','Modelde sahipsiz kayıtlar bırakma.']],
+    [['BEGIN','COMMIT'],['Group related writes in one transaction.','Commit only when the whole unit succeeds.'],['BASLA','KAYDET'],['İlgili yazmaları tek işlemde topla.','Bütün adımlar başarılıysa kalıcılaştır.']],
+    [['UNIQUE','KEY'],['Let the database reject duplicate keys.','Decide how missing values should behave.'],['TEKIL','KIMLIK'],['Yinelenen anahtarı veritabanı reddetsin.','Eksik değerlerin kuralını ayrıca belirle.']],
+    [['UPSERT','ROW'],['Choose the conflict target explicitly.','Do not overwrite fields by accident.'],['EKLE','GUNCEL'],['Çakışmanın hangi anahtarda olduğunu belirt.','Alanların üstüne yanlışlıkla yazma.']],
+    [['WAL','READ'],['WAL separates appended writes from reads.','Checkpoint before the log grows too far.'],['WAL','OKU'],['WAL, eklenen yazmaları okumadan ayırır.','Günlük büyürken kontrol noktası planla.']],
+    [['MVCC','VIEW'],['Readers need a consistent data version.','Keep long transactions under observation.'],['MVCC','ANLIK'],['Okuyucuya tutarlı veri sürümü sun.','Uzun açık işlemleri gözlem altında tut.']],
+    [['PLAN','SCAN'],['Read the query plan before tuning it.','An index is useful when the plan uses it.'],['PLAN','TARA'],['Ayarlamadan önce sorgu planını oku.','İndeks, plana katkı sağladığında yararlıdır.']],
+    [['ALTER','STAGE'],['Evolve a schema in compatible steps.','Let old and new code overlap safely.'],['DEGIS','ADIM'],['Şemayı uyumlu adımlarla geliştir.','Eski ve yeni kod bir süre birlikte çalışsın.']],
+    [['CURSOR','PAGE'],['Page from a stable key and tie-breaker.','Changing rows should not repeat the page.'],['IMLEC','SAYFA'],['Sayfayı sabit ve tekil sırayla sürdür.','Değişen satırları tekrar göstermemeye bak.']],
+    [['COUNT','GROUP'],['Group by the dimension you are measuring.','Do not confuse rows with distinct values.'],['SAY','TOPLA'],['Ölçtüğün boyuta göre gruplama yap.','Satır sayısını tekil değerle karıştırma.']],
+    [['CHECK','RULE'],['Put a durable rule near the stored data.','Reject a broken invariant at the write.'],['KOSUL','KURAL'],['Kalıcı kuralı saklanan veriye yakın tut.','Bozuk varsayımı yazma anında reddet.']],
+    [['UTC','CLOCK'],['Store the instant with explicit semantics.','Apply the display timezone at the edge.'],['UTC','SAAT'],['Anı, zaman anlamı açık olacak şekilde sakla.','Görüntüleme saat dilimini arayüzde uygula.']],
+    [['MONEY','CENT'],['Give money an explicit unit and precision.','Keep the currency beside the amount.'],['TUTAR','KURUS'],['Paranın birimini ve hassasiyetini belirle.','Para birimini tutarla birlikte taşı.']],
+    [['BACKUP','VERIFY'],['A backup is useful only if it restores.','Rehearse recovery before the incident.'],['YEDEK','SINA'],['Yedek, geri yüklenebiliyorsa işe yarar.','Kurtarmayı olay çıkmadan önce prova et.']],
+    [['TX','ROLLBK'],['Roll back a unit that cannot finish.','Release its locks on the failure path.'],['ISLEM','GERIAL'],['Tamamlanamayan işlem birimini geri al.','Hata yolunda tuttuğu kilitleri bırak.']],
+    [['DOM','PATCH'],['Reuse a node when its identity is stable.','Patch the part whose value has changed.'],['DOM','YAMA'],['Kimliği sabit düğümü yeniden kullan.','Yalnız değeri değişen bölümü güncelle.']],
+    [['EVENT','PHASE'],['An event travels through distinct phases.','Use capture only when the path needs it.'],['OLAY','FAZ'],['Olay farklı yayılma evrelerinden geçer.','Yakalamayı akışın gerektirdiği yerde kullan.']],
+    [['FOCUS','TAB'],['Keep the focus order easy to predict.','Return focus when a temporary view closes.'],['ODAK','TUS'],['Odak sırasını tahmin edilebilir tut.','Geçici görünüm kapanınca odağı geri ver.']],
+    [['ARIA','NAME'],['An icon button needs an accessible name.','Prefer a visible label when it can fit.'],['ARIA','AD'],['Simge düğmesinin erişilebilir adı olsun.','Yer varsa görünür etiketi tercih et.']],
+    [['LABEL','INPUT'],['Connect each label to its input control.','A placeholder is not a lasting label.'],['ETIKET','GIRDI'],['Her etiketi ilgili girişle ilişkilendir.','Yer tutucu, kalıcı etiket yerine geçmez.']],
+    [['GRID','FLEX'],['Choose the layout from the relationship.','Let content influence the available space.'],['IZGARA','ESNEK'],['Yerleşimi öğelerin ilişkisine göre seç.','İçerik, kullanılabilir alanı etkileyebilsin.']],
+    [['WIDTH','CLAMP'],['Bound fluid sizes at both extremes.','A narrow screen should still keep meaning.'],['GENIS','SINIR'],['Akışkan ölçünün iki ucuna da sınır koy.','Dar ekranda da anlamı koruyan yer bırak.']],
+    [['RAF','PAINT'],['Ask for a frame only while motion needs it.','Use elapsed time instead of counting frames.'],['KARE','BOYA'],['Hareket gerektiriyorsa yeni kare iste.','Kare saymak yerine geçen süreyi kullan.']],
+    [['READ','WRITE'],['Read geometry before changing the styles.','Batch writes instead of forcing reflow.'],['OKU','YAZ'],['Stili değiştirmeden önce geometriyi oku.','Yeniden yerleşim için yazmaları grupla.']],
+    [['LAYOUT','SHIFT'],['Reserve space before content arrives.','A late image should not move the controls.'],['DUZEN','KAYMA'],['İçerik gelmeden önce yerini ayır.','Geç yüklenen görsel kontrolleri kaydırmasın.']],
+    [['PIXEL','DPR'],['Separate canvas pixels from CSS size.','Scale drawing for the actual pixel ratio.'],['PIKSEL','ORAN'],['Tuval pikselini CSS ölçüsünden ayrı tut.','Çizimi gerçek piksel oranına göre ölçekle.']],
+    [['SVG','PATH'],['A viewBox defines the drawing coordinates.','Keep the visible tip and hit point aligned.'],['SVG','YOL'],['viewBox, çizimin koordinatlarını tanımlar.','Görünen uçla tıklama noktasını hizala.']],
+    [['MATRIX','ORIGIN'],['Transforms compose in a specific order.','Choose the pivot before rotating a shape.'],['DONUS','MERKEZ'],['Dönüşümler belirli bir sırayla birleşir.','Şekli döndürmeden önce merkezini belirle.']],
+    [['EASE','SPRING'],['A spring needs damping as well as force.','Keep its integration stable on slow frames.'],['EGRI','YAY'],['Yay için kuvvet kadar sönüm de gerekir.','Yavaş karelerde de hesabı kararlı tut.']],
+    [['REDUCE','MOTION'],['Keep the meaning when motion is reduced.','Replace the journey with a readable state.'],['AZALT','AKIS'],['Hareket azalınca anlamı korumaya devam et.','Yolculuk yerine okunur durum göster.']],
+    [['FONT','GLYPH'],['A font needs the characters you actually use.','Check the fallback before it reaches users.'],['FONT','GLIF'],['Font, kullandığın karakterleri içersin.','Yedek fontu kullanıcıdan önce kontrol et.']],
+    [['QUEUE','ACK'],['Acknowledge work after its durable result.','A repeated delivery needs a safe handler.'],['KUYRUK','ONAY'],['İşi, kalıcı sonucu oluşunca onayla.','Yinelenen teslimi güvenli biçimde ele al.']],
+    [['ORDER','STAMP'],['Choose a clear ordering rule for events.','Resolve equal timestamps with a stable key.'],['SIRA','DAMGA'],['Olaylar için açık bir sıralama kuralı seç.','Eşit zamanları sabit anahtarla ayır.']],
+    [['LEASE','EXPIRE'],['A lease does not grant ownership forever.','Fence out workers whose lease has expired.'],['KIRA','BITIS'],['Süreli izin sonsuz sahiplik sağlamaz.','Süresi dolan işçinin yazmasını engelle.']],
+    [['HEART','BEAT'],['A heartbeat is evidence of recent contact.','Silence needs a timeout before a verdict.'],['NABIZ','YANIT'],['Kalp atışı, yakın temasın bir işaretidir.','Sessizlikte karar vermeden süreyi bekle.']],
+    [['FUSE','RESET'],['Stop flooding a dependency that is failing.','Probe recovery before reopening the flow.'],['KESICI','SIFIR'],['Hata veren bağımlılığa yük bindirmeyi kes.','Akışı açmadan toparlanmayı yokla.']],
+    [['TRACE','SPAN'],['Carry the trace context across boundaries.','A span should describe one useful operation.'],['IZLE','SPAN'],['İz bağlamını sistem sınırlarından geçir.','Her span anlamlı bir işlemi anlatsın.']],
+    [['METRIC','RATE'],['Rates need a clear measurement interval.','Keep labels bounded to protect the store.'],['OLCUM','HIZ'],['Hız için ölçüm aralığını açıkça belirle.','Etiket çeşitliliğini sınırlı tut.']],
+    [['CLOCK','MONO'],['Use a monotonic clock for elapsed time.','Wall-clock adjustments should not rewind it.'],['SAAT','TEKYON'],['Geçen süreyi tek yönlü saatle ölç.','Duvar saati değişince süre gerilemesin.']],
+    [['HEAP','FREE'],['Keep references only while they are useful.','Remove stale timers and detached listeners.'],['YIGIN','BOSALT'],['Referansı yalnız ihtiyaç sürerken tut.','Eski zamanlayıcı ve dinleyicileri temizle.']],
+    [['RANGE','CHECK'],['Validate a range before indexing memory.','Check the upper bound as well as the lower.'],['ARALIK','BAK'],['Belleğe erişmeden önce aralığı doğrula.','Alt sınır kadar üst sınırı da denetle.']],
+    [['BUFFER','DRAIN'],['Pause writes when the consumer falls behind.','Resume after the writable stream drains.'],['TAMPON','BOSALT'],['Tüketici yavaşlayınca yazmayı duraklat.','Yazma akışı boşalınca üretime devam et.']],
+    [['WORKER','POST'],['Send a message across the worker boundary.','Make the transferred data shape explicit.'],['ISCI','ILETI'],['İşçi sınırından ileti göndererek geç.','Aktarılan verinin şeklini açıkça tanımla.']],
+    [['ATOMIC','SWAP'],['Compare the expected value before a swap.','Keep a shared update inside one operation.'],['ATOMIK','TAKAS'],['Takastan önce beklenen değeri karşılaştır.','Ortak güncellemeyi tek işlemde tut.']],
+    [['MUTEX','CLEAN'],['Acquire one owner for a critical section.','Release ownership even when the work fails.'],['KILIT','TEMIZ'],['Kritik bölüme bir sahip atayarak gir.','İş başarısız olsa da sahipliği bırak.']],
+    [['DEAD','LOCK'],['Agree on lock order across the system.','A waiting cycle needs a path to recovery.'],['KILIT','DONGU'],['Sistem boyunca kilit sırasında anlaş.','Bekleme döngüsüne kurtarma yolu bırak.']],
+    [['HEALTH','READY'],['Alive and ready are different conditions.','Accept traffic only when dependencies fit.'],['SAGLIK','HAZIR'],['Canlı olmakla hazır olmak farklıdır.','Bağımlılıklar uygunsa trafiği kabul et.']]
   ];
   const ROUNDS = TOPICS.flatMap(topic => [
     {lang:'EN',words:topic[0],thoughts:topic[1]},
     {lang:'TR',words:topic[2],thoughts:topic[3]}
   ]);
+  function createTopicOrder(previous=-1,intro=false,random=Math.random) {
+    const order=Array.from({length:TOPICS.length},(_,index)=>index);
+    for(let index=order.length-1;index>0;index--){const other=Math.floor(random()*(index+1));[order[index],order[other]]=[order[other],order[index]];}
+    // Every topic appears once per cycle; its EN/TR pair is never separated.
+    const first=intro?order.indexOf(0):order[0]===previous?1:0;
+    [order[0],order[first]]=[order[first],order[0]];
+    return order;
+  }
   function regionFor(side, round) {
     // Both writers borrow the same matrix. Paired EN/TR scenes keep their
     // geography; the next pair changes the boundary and periodically swaps it.
@@ -163,9 +235,12 @@
     let reduced = Boolean(options.reducedMotion) || media.matches, paused=false, visible=false, destroyed=false;
     let frame=0,layoutFrame=0,previous=0,time=0,dirty=true,points=[],roundIndex=0,roundBorn=0,pendingRight=null,transitioning=false;
     let wordsStarted=0,generationId=0,errorCount=0,panelFaultUntil=0;
+    let topicOrder=createTopicOrder(-1,true),cycle=1;
     let box={width:820,size:42,pitch:14,gridTop:200,bubbleTop:24};
     const data=(name,value)=>{const next=String(value);if(root.dataset[name]!==next)root.dataset[name]=next;};
-    data('bankSize',ROUNDS.length);data('thoughtCount',ROUNDS.length*2);data('fadeMs',FADE_MS);data('holdMs',MIN_HOLD);data('errorCount',0);data('collisions',0);data('staggerMs',STAGGER);
+    data('bankSize',ROUNDS.length);data('thoughtCount',ROUNDS.length*2);data('topicCount',TOPICS.length);data('cycle',cycle);data('fadeMs',FADE_MS);data('holdMs',MIN_HOLD);data('errorCount',0);data('collisions',0);data('staggerMs',STAGGER);
+    function entryAt(index){return ROUNDS[topicOrder[Math.floor(index/2)]*2+index%2];}
+    function advanceIndex(){const next=(roundIndex+1)%ROUNDS.length;if(next===0){topicOrder=createTopicOrder(topicOrder.at(-1));data('cycle',++cycle);}return next;}
     function listen(target,type,fn,settings){target.addEventListener(type,fn,settings);cleanups.push(()=>target.removeEventListener(type,fn,settings));}
     function createActor(side,color) {
       const node=element('div','narrator-character');node.setAttribute('aria-hidden','true');node.dataset.zone=side===0?'left':'right';node.dataset.color=side===0?'black':color;
@@ -183,9 +258,9 @@
       const tether=vector('path',{});tethers.append(tether);root.append(bubble);
       const zone={side,bubble,copy,language,status,tip,tether,actor:createActor(side,SYNTAX[0]),generation:null,requested:false,bubbleX:0,bubbleY:0,bubbleWidth:250,bubbleHeight:110};
       listen(bubble,'click',()=>{
-        if(reduced){resetRound((roundIndex+1)%ROUNDS.length,true);return;}
+        if(reduced){resetRound(advanceIndex(),true);return;}
         zone.requested=true;tip.textContent='okununca ↵';bubble.dataset.queued='true';
-        bubble.setAttribute('aria-label',`Düşünce: ${ROUNDS[roundIndex].thoughts[side]} Sıradaki düşünce kuyruğa alındı.`);
+        bubble.setAttribute('aria-label',`Düşünce: ${zone.generation.entry.thoughts[side]} Sıradaki düşünce kuyruğa alındı.`);
       });
       return zone;
     });
@@ -200,9 +275,9 @@
       errorInk.splice(0).forEach(record=>record.node.remove());owners.clear();
     }
     function createGeneration(zone,index,born){
-      const entry=ROUNDS[index],score=compileWord(entry.words[zone.side],zone.side,index),serial=++wordsStarted;
+      const entry=entryAt(index),score=compileWord(entry.words[zone.side],zone.side,index),serial=++wordsStarted;
       const column=Math.floor(zone.actor.current/7),transfer=column<score.start||column>=score.end;
-      const generation={id:++generationId,round:index,score,born,step:0,hopStart:null,hopFrom:zone.actor.current,ink:new Map(),doneAt:null,fullAt:null,letters:0,nextLetter:born+80,retire:null,error:null,errorDone:false,errorPlanned:serial%5===0,serial,entryFrom:zone.actor.current,entryStart:null,entryDone:!transfer};
+      const generation={id:++generationId,round:index,entry,score,born,step:0,hopStart:null,hopFrom:zone.actor.current,ink:new Map(),doneAt:null,fullAt:null,letters:0,nextLetter:born+80,retire:null,error:null,errorDone:false,errorPlanned:serial%5===0,serial,entryFrom:zone.actor.current,entryStart:null,entryDone:!transfer};
       zone.requested=false;zone.tip.textContent='sıradaki ↵';delete zone.bubble.dataset.queued;
       zone.copy.textContent='';zone.language.textContent=entry.lang;zone.status.textContent='RUN';zone.bubble.dataset.status='run';zone.bubble.dataset.lang=entry.lang;
       zone.bubble.setAttribute('aria-label',`Düşünce: ${entry.thoughts[zone.side]} Sonraki düşünceyi okununca sıraya almak için tıkla.`);
@@ -210,7 +285,7 @@
       zone.bubble.classList.add('is-typing');zone.generation=generation;
       return generation;
     }
-    function announceRound(){const entry=ROUNDS[roundIndex];announcement.textContent=`${entry.lang}. ${entry.thoughts.join(' ')}`;}
+    function announceRound(){const entry=entryAt(roundIndex);announcement.textContent=`${entry.lang}. ${entry.thoughts.join(' ')}`;}
     function beginZone(zone,index,born,overlap){
       const old=zone.generation;
       if(old&&overlap){
@@ -225,10 +300,10 @@
       panel.classList.remove('narrator-has-warning');root.classList.remove('is-faulting');
       if(zones[1].actor.retire!==null){removeActor(zones[1].actor);zones[1].actor=createActor(1,SYNTAX[index%SYNTAX.length]);}
       zones.forEach(zone=>beginZone(zone,index,time+(instant?0:zone.side*STAGGER),false));
-      if(instant)zones.forEach(zone=>staticWord(zone));announceRound();dirty=true;queueMeasure();
+      if(instant)zones.forEach(zone=>staticWord(zone));announceRound();diagnostics();dirty=true;queueMeasure();
     }
     function nextRound(){
-      roundIndex=(roundIndex+1)%ROUNDS.length;roundBorn=time;transitioning=true;
+      roundIndex=advanceIndex();roundBorn=time;transitioning=true;
       beginZone(zones[0],roundIndex,time+600,true);pendingRight={index:roundIndex,at:time+STAGGER};announceRound();dirty=true;queueMeasure();
     }
     function addInk(zone,generation,point){
@@ -250,11 +325,13 @@
         zone.tether.setAttribute('d',`M${startX.toFixed(1)} ${startY.toFixed(1)}Q${startX.toFixed(1)} ${((startY+endY)*.5).toFixed(1)} ${x.toFixed(1)} ${endY.toFixed(1)}`);
       }
     }
-    function idlePose(zone){const p=points[zone.actor.current];if(p)paint(zone.actor,p.x,p.y);}
+    function gaze(actor,dx,dy){actor.drawing.pupil.setAttribute('cx',(54+clamp(dx/60*actor.direction,-3,3)).toFixed(2));actor.drawing.pupil.setAttribute('cy',(47+clamp(dy/55,-2,2)).toFixed(2));}
+    function idlePose(zone){const p=points[zone.actor.current];if(p){gaze(zone.actor,zone.bubbleX+zone.bubbleWidth*.5-p.x,zone.bubbleY-p.y);paint(zone.actor,p.x,p.y);}}
     function hopPose(zone,from,to,progress,warning=false){
       const actor=zone.actor,a=points[from],b=points[to];if(!a||!b)return;
       const travel=progress*progress*(3-2*progress),arc=Math.sin(Math.PI*progress);
       actor.direction=b.x===a.x?actor.direction:b.x>a.x?1:-1;
+      gaze(actor,b.x-a.x,b.y-a.y);
       const distance=Math.hypot(b.x-a.x,b.y-a.y),height=Math.min(box.size*.52,Math.max(box.pitch*.78,distance*.14))*(warning?1.15:1);
       paint(actor,a.x+(b.x-a.x)*travel,a.y+(b.y-a.y)*travel-arc*height,1-arc*.045,1+arc*.065,actor.direction*arc*(warning?12:7),arc);
     }
@@ -295,7 +372,7 @@
       }
     }
     function updateThought(zone,generation){
-      const text=ROUNDS[generation.round].thoughts[zone.side];
+      const text=generation.entry.thoughts[zone.side];
       if(time<generation.born||generation.letters>=text.length)return;
       while(generation.letters<text.length&&time>=generation.nextLetter){generation.letters++;generation.nextLetter+=29;}
       zone.copy.textContent=text.slice(0,generation.letters);
@@ -332,7 +409,7 @@
         if(generation.step===route.length)generation.doneAt=time;
       }
     }
-    function ready(zone){const g=zone.generation;return g.doneAt!==null&&g.fullAt!==null&&time>=g.doneAt+MIN_HOLD+(zone.requested?0:1000)&&time>=g.fullAt+Math.max(READ_MS,ROUNDS[g.round].thoughts[zone.side].length*88);}
+    function ready(zone){const g=zone.generation;return g.doneAt!==null&&g.fullAt!==null&&time>=g.doneAt+MIN_HOLD+(zone.requested?0:1000)&&time>=g.fullAt+Math.max(READ_MS,g.entry.thoughts[zone.side].length*88);}
     function fadeRetired(){
       for(let i=retired.length-1;i>=0;i--){
         const entry=retired[i],g=entry.generation,elapsed=time-g.retire;
@@ -345,17 +422,17 @@
       }
     }
     function fadeErrors(){for(let i=errorInk.length-1;i>=0;i--){const record=errorInk[i],age=time-record.born;record.node.style.opacity=String(clamp(1-(age-600)/700,0,1));if(age>=1300){record.node.remove();errorInk.splice(i,1);}}}
-    function staticWord(zone){const g=zone.generation;g.score.route.forEach(point=>addInk(zone,g,point));g.step=g.score.route.length;g.doneAt=time;g.fullAt=time;g.entryDone=true;g.letters=ROUNDS[g.round].thoughts[zone.side].length;zone.copy.textContent=ROUNDS[g.round].thoughts[zone.side];zone.bubble.classList.remove('is-typing');zone.actor.current=g.score.route.at(-1).index;idlePose(zone);}
+    function staticWord(zone){const g=zone.generation;g.score.route.forEach(point=>addInk(zone,g,point));g.step=g.score.route.length;g.doneAt=time;g.fullAt=time;g.entryDone=true;g.letters=g.entry.thoughts[zone.side].length;zone.copy.textContent=g.entry.thoughts[zone.side];zone.bubble.classList.remove('is-typing');zone.actor.current=g.score.route.at(-1).index;idlePose(zone);}
     function diagnostics(){
       const phase=[];
       zones.forEach(zone=>{
         const g=zone.generation,key=zone.side===0?'left':'right',currentPhase=g.error?'warn':time<g.born?'enter':!g.entryDone?'travel':g.doneAt!==null?'hold':'draw';
-        data(key+'Word',g.score.word);data(key+'Phase',currentPhase);data(key+'Lang',ROUNDS[g.round].lang);data(key+'Ink',g.ink.size);data(key+'Step',g.step);data(key+'Serial',g.serial);data(key+'Body',zone.side===0?'#050506':zone.actor.color);data(key+'ColumnStart',g.score.start);data(key+'ColumnEnd',g.score.end);data(key+'Region',g.score.region);
+        data(key+'Word',g.score.word);data(key+'Phase',currentPhase);data(key+'Lang',g.entry.lang);data(key+'Ink',g.ink.size);data(key+'Step',g.step);data(key+'Serial',g.serial);data(key+'Body',zone.side===0?'#050506':zone.actor.color);data(key+'ColumnStart',g.score.start);data(key+'ColumnEnd',g.score.end);data(key+'Region',g.score.region);
         data(key+'ReadMs',g.fullAt===null?0:Math.round(time-g.fullAt));data(key+'HoldMs',g.doneAt===null?0:Math.round(time-g.doneAt));phase.push(currentPhase);
       });
       data('phase',phase.includes('warn')?'warn':retired.length?'overlap':phase.includes('draw')||phase.includes('enter')||phase.includes('travel')?'draw':'hold');
       data('error',zones.some(zone=>zone.generation.error)?'warn':errorInk.length?'recover':'none');
-      data('actors',2+retired.filter(entry=>entry.actor).length);data('round',roundIndex+1);data('lang',ROUNDS[zones[0].generation.round].lang===ROUNDS[zones[1].generation.round].lang?ROUNDS[zones[0].generation.round].lang:'mixed');
+      data('actors',2+retired.filter(entry=>entry.actor).length);data('round',roundIndex+1);data('lang',zones[0].generation.entry.lang===zones[1].generation.entry.lang?zones[0].generation.entry.lang:'mixed');
       data('message',zones.map(zone=>zone.generation.score.word).join(' / '));data('inkCount',zones.reduce((sum,zone)=>sum+zone.generation.ink.size,0));data('elapsed',Math.round(time));
     }
     function update(){

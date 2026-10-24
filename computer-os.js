@@ -76,6 +76,8 @@
     const settings = options || {}, data = global.PORTFOLIO || {projects: [], identity: {}}, projects = data.projects || [];
     const skills = Array.from(new Set(projects.flatMap(function (project) { return project.stack || []; }))).sort(function (a,b) { return a.localeCompare(b,'tr'); });
     let destroyed = false, paused = !!settings.reducedMotion, powered = true, active = 1, generation = 0, cleanups = [], frame = 0, frameFn, frameTime = 0, widgetTime = 0, demoRunning = false, autoDispatch = false;
+    let tour = null, tourConsumed = false, humanUsed = false, terminalControl = null, sqlControl = null, versionControl = null;
+    const desktopApps = new Map();
     const db = global.ComputerDB ? global.ComputerDB.create(data) : null;
     const state = {threads: [{id:1,parent:0,title:'Bir fikir nasıl ürüne dönüşür?'},{id:2,parent:1,title:'Önce küçük bir akışı deneyerek.'}], gallery:['pending','pending','approved'], orders:[0,1,2], drafts:[], jobs:[{name:'Koordinat doğrulama',status:'bekliyor',attempt:0},{name:'Galeri önizlemesi',status:'bekliyor',attempt:0},{name:'İçerik dizini',status:'bekliyor',attempt:0}], cache:new Map(), cacheHits:0, cacheMisses:0, events:[], counter:0};
     const shell = el('div','cos-shell'), chrome = el('header','cos-chrome'), title = el('span','cos-window-title','mk / masaüstü');
@@ -84,14 +86,17 @@
     const body = el('div','cos-body'); body.setAttribute('tabindex','-1');
     const foot = el('footer','cos-foot'), status = el('span','cos-status','Yerel deney · bu tarayıcıda'), number = el('span','cos-number','02 / 32');
     const expand = el('button','cos-expand','↗'); expand.type='button'; expand.setAttribute('aria-label','Bilgisayar ekranını büyüt');
-    chrome.append(chromeLabel,expand); foot.append(status,number); shell.append(chrome,body,foot); screen.classList.add('cos-screen-host'); screen.append(shell);
+    const tourLabel = el('span','cos-tour-label'); tourLabel.setAttribute('aria-hidden','true');
+    const tourLayer = el('div','cos-tour-layer'), tourCursor = el('span','cos-inner-cursor');tourLayer.setAttribute('aria-hidden','true');
+    const cursorDrawing=svg('svg',{viewBox:'0 0 24 24'});cursorDrawing.append(svg('path',{d:'M1 1L8 21L12 13L21 10Z'}));tourCursor.append(cursorDrawing);tourLayer.append(tourCursor);
+    chrome.append(chromeLabel,tourLabel,expand); foot.append(status,number); shell.append(chrome,body,foot,tourLayer);shell.dataset.demoState='idle'; screen.classList.add('cos-screen-host'); screen.append(shell);
     const marker = document.createComment('computer-screen-home'); screen.parentNode.insertBefore(marker,screen);
     const dialog = el('dialog','cos-dialog'); dialog.setAttribute('aria-label','Muhammet’in etkileşimli bilgisayarı');
     const dialogBar = el('div','cos-dialog-bar'), dialogLabel = el('span','','mk.local / etkileşimli masaüstü'), close = el('button','cos-dialog-close','Küçült ↙'), stage = el('div','cos-expanded-stage');
     const appPicker=el('select','cos-app-picker');appPicker.setAttribute('aria-label','Bilgisayarda bir deney aç');keys.forEach(function(key,index){const option=el('option','',String(index+1).padStart(2,'0')+' / '+key.name);option.value=String(index);appPicker.append(option);});appPicker.value='1';
     function pickApp(){runKey(Number(appPicker.value));}
     appPicker.addEventListener('change',pickApp);close.type='button'; dialogBar.append(dialogLabel,appPicker,close); dialog.append(dialogBar,stage); document.body.append(dialog);
-    function activity() { if(autoDispatch)return;demoRunning=false;if (settings.onActivity) settings.onActivity(); }
+    function activity() { if(autoDispatch)return;humanUsed=true;cancelTour('interrupted');if (settings.onActivity) settings.onActivity(); }
     function setStatus(text, tone) { status.textContent = text; status.dataset.tone = tone || ''; }
     function listen(node,event,fn) { node.addEventListener(event,fn); cleanups.push(function(){node.removeEventListener(event,fn);}); }
     function button(text,fn,cls) { const node=el('button','cos-button'+(cls?' '+cls:''),text); node.type='button'; listen(node,'click',fn); return node; }
@@ -105,21 +110,115 @@
     function results(result,parent) { parent.replaceChildren(); if(!result.length){parent.append(el('p','cos-note','0 kayıt.'));return;} result.forEach(function(item){table(item.columns,item.values,parent);}); }
     function list(items,parent) { const node=el('div','cos-list');items.forEach(function(text){node.append(el('div','cos-list-row',text));});(parent||body).append(node);return node; }
     function card(label,value,parent) {const node=el('div','cos-metric');node.append(el('small','',label),el('strong','',String(value)));(parent||body).append(node);return node;}
-    function resetWidget() { generation++; cleanups.forEach(function(cleanup){cleanup();}); cleanups=[];if(frame)cancelAnimationFrame(frame);frame=0;frameFn=null;widgetTime=0;body.replaceChildren();body.scrollTop=0; }
-    function tick(now) { frame=0;if(destroyed||paused||!frameFn)return;const dt=Math.min(50,Math.max(0,now-frameTime));frameTime=now;widgetTime+=dt;frameFn(widgetTime,dt);if(frameFn)frame=requestAnimationFrame(tick); }
-    function animate(fn) {frameFn=fn;fn(widgetTime,0);if(!paused&&!frame){frameTime=performance.now();frame=requestAnimationFrame(tick);}}
+    function resetWidget() { generation++; cleanups.forEach(function(cleanup){cleanup();}); cleanups=[];if(frame)cancelAnimationFrame(frame);frame=0;frameFn=null;widgetTime=0;terminalControl=sqlControl=versionControl=null;desktopApps.clear();body.replaceChildren();body.scrollTop=0; }
+    function schedule() {if(!destroyed&&!paused&&!document.hidden&&!frame&&(frameFn||tour)){frameTime=performance.now();frame=requestAnimationFrame(tick);}}
+    function tick(now) { frame=0;if(destroyed||paused||document.hidden||(!frameFn&&!tour))return;const dt=Math.min(50,Math.max(0,now-frameTime));frameTime=now;widgetTime+=dt;if(frameFn)frameFn(widgetTime,dt);if(tour)tickTour(dt);schedule(); }
+    function animate(fn) {frameFn=fn;fn(widgetTime,0);schedule();}
     function projectAction(id) {if(dialog.open)dialog.close();if(settings.onProject)settings.onProject(id);}
     let expandedOpener;
     function openExpanded() {if(destroyed||dialog.open)return;activity();expandedOpener=document.activeElement;stage.append(screen);screen.dataset.cosExpanded='true';dialog.showModal();if(settings.onExpanded)settings.onExpanded(true);close.focus();}
-    function restore() {if(dialog.open)return;if(marker.parentNode)marker.parentNode.insertBefore(screen,marker.nextSibling);delete screen.dataset.cosExpanded;if(settings.onExpanded)settings.onExpanded(false);if(!destroyed){const target=expandedOpener?.isConnected&&!expandedOpener.closest?.('[inert],dialog:not([open])')?expandedOpener:expand;target.focus({preventScroll:true});}expandedOpener=null;}
+    function restore() {if(dialog.open)return;cancelTour('closed');if(marker.parentNode)marker.parentNode.insertBefore(screen,marker.nextSibling);delete screen.dataset.cosExpanded;if(settings.onExpanded)settings.onExpanded(false);if(!destroyed){const target=expandedOpener?.isConnected&&!expandedOpener.closest?.('[inert],dialog:not([open])')?expandedOpener:expand;target.focus({preventScroll:true});}expandedOpener=null;}
     expand.addEventListener('click',openExpanded);close.addEventListener('click',function(){dialog.close();});dialog.addEventListener('close',restore);
-    ['pointerdown','keydown','input'].forEach(function(event){shell.addEventListener(event,activity,true);});
+    const humanEvents=['pointermove','pointerdown','keydown','input','wheel','focusin'];
+    humanEvents.forEach(function(event){shell.addEventListener(event,activity,true);});
+    function visibility(){if(document.hidden){cancelTour('hidden');if(frame)cancelAnimationFrame(frame);frame=0;}else schedule();}
+    document.addEventListener('visibilitychange',visibility);
     function dbReady(callback) {const token=generation;if(!db){note('SQLite bağlayıcısı yüklenemedi.','cos-error');setStatus('SQLite kullanılamıyor','error');return;}setStatus('SQLite modülü yükleniyor…');db.ready().then(function(){if(destroyed||token!==generation)return;setStatus('SQLite · gerçek bellek veritabanı','good');callback(token);}).catch(function(error){if(destroyed||token!==generation)return;note(error.message,'cos-error');setStatus('SQLite yüklenemedi','error');body.append(button('Tekrar dene',function(){runKey(active);}));});}
+    function localPoint(node, ancestor) {
+      if(!node)return null;
+      let x=(node.offsetWidth||0)/2,y=(node.offsetHeight||0)/2,current=node,count=0;
+      while(current&&current!==ancestor&&count++<24){
+        x+=current.offsetLeft||0;y+=current.offsetTop||0;
+        const parent=current.offsetParent;if(parent){x-=parent.scrollLeft||0;y-=parent.scrollTop||0;}current=parent;
+      }
+      if(current===ancestor&&Number.isFinite(x)&&Number.isFinite(y))return{x:x,y:y};
+      if(!node.getBoundingClientRect||!ancestor.getBoundingClientRect)return null;
+      const rect=node.getBoundingClientRect(),base=ancestor.getBoundingClientRect();
+      if(!base.width||!base.height)return null;
+      return{x:(rect.left+rect.width/2-base.left)*(ancestor.clientWidth||base.width)/base.width,y:(rect.top+rect.height/2-base.top)*(ancestor.clientHeight||base.height)/base.height};
+    }
+    function tourTarget(node) {
+      if(!node)return null;
+      // Reveal only the miniature screen's scroll area; never move the page.
+      const inBody=localPoint(node,body),height=body.clientHeight;
+      if(inBody&&height>0){const y=inBody.y+(body.scrollTop||0);if(y>body.scrollTop+height-12)body.scrollTop=y-height+20;else if(y<body.scrollTop+12)body.scrollTop=Math.max(0,y-20);}
+      return localPoint(node,shell);
+    }
+    function clearTourTarget() {
+      if(tour?.target){tour.target.classList.remove('is-tour-target','is-tour-pressed');tour.target=null;}
+      tourCursor.classList.remove('is-pressing');
+    }
+    function cancelTour(reason) {
+      if(!tour)return;
+      clearTourTarget();if(sqlControl)sqlControl.cancel();tour=null;demoRunning=false;
+      tourLayer.classList.remove('is-active');tourLabel.textContent='';shell.dataset.demoState=reason||'interrupted';
+      if(!frameFn&&frame){cancelAnimationFrame(frame);frame=0;}
+    }
+    function tourStep() {
+      if(!tour)return;
+      clearTourTarget();tour.index++;tour.age=0;tour.from={...tour.point};
+      const step=tour.steps[tour.index];
+      if(!step){cancelTour('complete');setStatus('Keşif sende · gri tuşlardan veya uygulamalardan devam et.','good');return;}
+      shell.dataset.demoState=step.name;tourLabel.textContent='auto / '+step.label;
+      if(step.enter)step.enter();
+    }
+    function tickTour(dt) {
+      if(!tour)return;
+      const current=tour,step=current.steps[current.index];if(!step)return;
+      if(step.skip&&step.skip()){tourStep();return;}
+      current.age+=dt;
+      const target=step.target?.();
+      if(target){
+        if(current.target!==target){clearTourTarget();current.target=target;target.classList.add('is-tour-target');}
+        const point=tourTarget(target);
+        if(point){
+          const progress=clamp(current.age/(step.duration||1),0,1),eased=progress*progress*(3-2*progress),distance=Math.hypot(point.x-current.from.x,point.y-current.from.y);
+          current.point={x:current.from.x+(point.x-current.from.x)*eased,y:current.from.y+(point.y-current.from.y)*eased-Math.sin(progress*Math.PI)*Math.min(12,distance*.08)};
+          shell.dataset.demoTargetX=String(round(point.x));shell.dataset.demoTargetY=String(round(point.y));
+        }
+        if(step.press){target.classList.add('is-tour-pressed');tourCursor.classList.add('is-pressing');}
+      }
+      tourCursor.style.transform='translate('+round(current.point.x-1)+'px,'+round(current.point.y-1)+'px)';
+      shell.dataset.demoCursorX=String(round(current.point.x));shell.dataset.demoCursorY=String(round(current.point.y));
+      if(step.update)step.update(current.age);
+      if(tour!==current)return;
+      if(current.age>=(step.duration||0)&&(!step.ready||step.ready()||current.age>=(step.timeout||4500))){if(step.ready&&!step.ready()&&step.timeoutAction)step.timeoutAction();if(step.done)step.done();if(tour===current)tourStep();}
+    }
+    function startTour() {
+      if(destroyed||paused||document.hidden||settings.reducedMotion||tourConsumed||humanUsed)return false;
+      tourConsumed=true;demoRunning=true;runKey(1,true);
+      const open=function(index,thought){runKey(index,true);if(thought&&settings.onThought)settings.onThought(thought);};
+      const app=function(index){return()=>desktopApps.get(index);}, terminalInput=()=>terminalControl?.input, terminalSubmit=()=>terminalControl?.submit, sqlRun=()=>sqlControl?.run, versionPick=()=>versionControl?.pick;
+      const steps=[
+        {name:'desktop',label:'masaüstü',duration:300},
+        {name:'move-terminal',label:'terminal',duration:700,target:app(2)},
+        {name:'press-terminal',label:'terminal',duration:160,target:app(2),press:true,done:()=>open(2,'Önce komut. Sonra gerçek proje kayıtları.')},
+        {name:'terminal-input',label:'komut satırı',duration:450,target:terminalInput},
+        {name:'type-command',label:'projects',duration:640,target:terminalInput,update:age=>{if(terminalControl)terminalControl.input.value='projects'.slice(0,Math.floor(age/80));}},
+        {name:'move-submit',label:'komutu çalıştır',duration:420,target:terminalSubmit},
+        {name:'press-submit',label:'gerçek portföy verisi',duration:160,target:terminalSubmit,press:true,done:()=>terminalControl?.execute('projects')},
+        {name:'terminal-result',label:'proje kayıtları',duration:1800,done:()=>open(1)},
+        {name:'move-sqlite',label:'SQLite',duration:700,target:app(5)},
+        {name:'press-sqlite',label:'SQLite',duration:160,target:app(5),press:true,done:()=>open(5,'Sorgu bellekte çalışır. Sonuç gerçek veridir.')},
+        {name:'database-ready',label:'veritabanı',duration:300,ready:()=>Boolean(sqlControl?.ready),timeout:4500,timeoutAction:()=>{if(tour)tour.skipSql=true;}},
+        {name:'move-query',label:'ilişki sorgusu',duration:600,skip:()=>tour.skipSql,target:sqlRun,enter:()=>sqlControl?.selectJoin()},
+        {name:'press-query',label:'SELECT / JOIN',duration:160,skip:()=>tour.skipSql,target:sqlRun,press:true,done:()=>{const current=tour;current.queryDone=false;sqlControl.execute().finally(()=>{if(tour===current)current.queryDone=true;});}},
+        {name:'query-result',label:'ilişkili kayıtlar',duration:1800,skip:()=>tour.skipSql,ready:()=>Boolean(tour.queryDone),timeout:4000},
+        {name:'return-desktop',label:'masaüstü',duration:250,enter:()=>open(1)},
+        {name:'move-versions',label:'sürümler',duration:700,target:app(18)},
+        {name:'press-versions',label:'sürümler',duration:160,target:app(18),press:true,done:()=>open(18,'Şema büyüdükçe ilişkiler görünür olur.')},
+        {name:'version-before',label:'ilk şema',duration:1000},
+        {name:'move-version',label:'sonraki yapı',duration:600,target:versionPick},
+        {name:'press-version',label:'v0.3 / ilişkiler',duration:160,target:versionPick,press:true,done:()=>versionControl?.selectLatest()},
+        {name:'version-result',label:'ilişki şeması',duration:2000}
+      ];
+      tour={steps:steps,index:-1,age:0,target:null,point:{x:(shell.clientWidth||200)*.78,y:(shell.clientHeight||150)*.72},from:null,skipSql:false,queryDone:false};
+      tourLayer.classList.add('is-active');tourStep();schedule();return true;
+    }
     function desktop() {
       heading('mk.local','Bir uygulama aç. Tuşların her birinde başka bir deney var.');
-      const grid=el('div','cos-desktop');const apps=[[2,'>_','Terminal'],[5,'▤','SQLite'],[8,'↳','IDOLOG'],[10,'▦','TekstilOS'],[24,'∿','Dalga'],[31,'mk','Muhammet']];
-      apps.forEach(function(item){const node=button('',function(){runKey(item[0]);},'cos-desktop-app');node.append(el('b','',item[1]),el('span','',item[2]));grid.append(node);});body.append(grid);
-      const cursor=el('span','cos-inner-cursor','➚');cursor.setAttribute('aria-hidden','true');grid.append(cursor);animate(function(time){cursor.style.transform='translate('+Math.min(48,time/55)+'px,'+Math.min(15,time/140)+'px)';cursor.style.opacity=time>2300?'0':'1';grid.dataset.demoStep=time>1700?'selected':'moving';if(time>2500){frameFn=null;if(demoRunning){demoRunning=false;runKey(2,true);setStatus('Terminal açıldı. help ile bir komut deneyebilirsin.');}else setStatus('Bir uygulamaya veya gri tuşlara dokun.');}});
+      const grid=el('div','cos-desktop');const apps=[[2,'>_','Terminal'],[5,'▤','SQLite'],[8,'↳','IDOLOG'],[10,'▦','TekstilOS'],[24,'∿','Dalga'],[18,'⑂','Sürümler']];
+      apps.forEach(function(item){const node=button('',function(){runKey(item[0]);},'cos-desktop-app');node.dataset.appKey=String(item[0]);node.append(el('b','',item[1]),el('span','',item[2]));desktopApps.set(item[0],node);grid.append(node);});body.append(grid);
     }
     function terminal() {
       heading('Terminal','help · projects · skills · whoami · clear');
@@ -127,7 +226,9 @@
       function print(text,kind){output.append(el('div',kind||'',text));while(output.children.length>50)output.firstElementChild.remove();output.scrollTop=output.scrollHeight;}
       print('mk.local:~ $ help');print('Bir komut yaz. Örn: projects veya skills react');
       const form=el('form','cos-terminal-form'), label=el('label','cos-terminal-label'), input=el('input','cos-input');label.append(el('span','cos-sr','Terminal komutu'),input);input.setAttribute('aria-label','Terminal komutu');input.autocomplete='off';input.spellcheck=false;const submit=el('button','cos-button','↵');submit.type='submit';submit.setAttribute('aria-label','Komutu çalıştır');form.append(el('span','','$'),label,submit);body.append(form);
-      listen(form,'submit',function(event){event.preventDefault();const command=input.value.trim();if(!command)return;print('$ '+command,'cos-terminal-command');const parts=command.split(/\s+/), action=parts.shift().toLowerCase(), query=parts.join(' ').toLocaleLowerCase('tr-TR');input.value='';if(action==='clear'){output.replaceChildren();return;}if(action==='help')print('projects [kelime] → projeler\nskills [kelime] → araçlar\nwhoami → kimlik\nclear → temizle');else if(action==='projects')print(projects.filter(function(p){return(p.title+' '+p.category).toLocaleLowerCase('tr-TR').includes(query);}).map(function(p){return p.title+' / '+p.status;}).join('\n')||'Eşleşme yok.');else if(action==='skills')print(skills.filter(function(s){return s.toLocaleLowerCase('tr-TR').includes(query);}).join(' · ')||'Eşleşme yok.');else if(action==='whoami')print((data.identity.displayName||'Muhammet Kırıklı')+'\nYazılım · Sistemler · Tasarım');else print('Komut bulunamadı: '+action+'. help ile komutlara bak.','cos-error');});
+      function execute(command){command=String(command).trim();if(!command)return;print('$ '+command,'cos-terminal-command');const parts=command.split(/\s+/), action=parts.shift().toLowerCase(), query=parts.join(' ').toLocaleLowerCase('tr-TR');input.value='';if(action==='clear'){output.replaceChildren();return;}if(action==='help')print('projects [kelime] → projeler\nskills [kelime] → araçlar\nwhoami → kimlik\nclear → temizle');else if(action==='projects')print(projects.filter(function(p){return(p.title+' '+p.category).toLocaleLowerCase('tr-TR').includes(query);}).map(function(p){return p.title+' / '+p.status;}).join('\n')||'Eşleşme yok.');else if(action==='skills')print(skills.filter(function(s){return s.toLocaleLowerCase('tr-TR').includes(query);}).join(' · ')||'Eşleşme yok.');else if(action==='whoami')print((data.identity.displayName||'Muhammet Kırıklı')+'\nYazılım · Sistemler · Tasarım');else print('Komut bulunamadı: '+action+'. help ile komutlara bak.','cos-error');}
+      terminalControl={input:input,submit:submit,execute:execute};
+      listen(form,'submit',function(event){event.preventDefault();execute(input.value);});
     }
     function interfaceCode() {
       heading('Bir bileşenin iki yüzü','Değeri değiştir. Kod ve önizleme birlikte güncellensin.');const controls=row(), text=field('Buton metni','Keşfet','text',controls), radius=field('Köşe / px',18,'range',controls);radius.min='0';radius.max='30';const color=field('Vurgu','#ff6a35','color',controls), layout=select('Hizalama',['sol','orta','sağ'],controls);const preview=el('div','cos-live-preview'), chip=el('button','cos-preview-button','Keşfet'), code=pre('');chip.type='button';preview.append(chip);body.insertBefore(preview,code);let clicks=0;listen(chip,'click',function(){setStatus('Önizleme tıklaması: '+(++clicks));});function paint(){chip.textContent=text.value.slice(0,26)||'Buton';chip.style.borderRadius=radius.value+'px';chip.style.background=color.value;preview.style.justifyContent=({sol:'flex-start',orta:'center',sağ:'flex-end'})[layout.value];code.textContent='<button style="\n  border-radius: '+radius.value+'px;\n  background: '+color.value+';\n">'+chip.textContent+'</button>'; }[text,radius,color,layout].forEach(function(input){listen(input,'input',paint);});paint();
@@ -136,7 +237,16 @@
       heading('GET /api/projects','Yerel işleyici · gerçek portföy kaydı · dış istek yok');const controls=row(), category=select('Kategori',[['','Tümü']].concat(Array.from(new Set(projects.map(function(p){return p.category;})))),controls), statusInput=select('Durum',[['','Tümü'],'Geliştirme','Prototip'],controls), output=pre(''), route=el('div','cos-route');body.insertBefore(route,output);let requests=0;function request(){const query=new URLSearchParams();if(category.value)query.set('category',category.value);if(statusInput.value)query.set('status',statusInput.value);const rows=projects.filter(function(p){return(!category.value||p.category===category.value)&&(!statusInput.value||p.status===statusInput.value);});route.textContent='GET /api/projects'+(query.size?'?'+query.toString():'');output.textContent=JSON.stringify({status:200,total:rows.length,data:rows.map(function(p){return{id:p.id,title:p.title,status:p.status};})},null,2);setStatus('Yerel yanıt · '+rows.length+' kayıt · istek '+(++requests),'good');}controls.append(button('İstek gönder →',request));request();
     }
     function sqlite() {
-      heading('SQLite / sorgu masası','SQL gerçekten çalışır. Veri, bu sayfanın belleğinde yaşar.');const input=field('SELECT sorgusu','SELECT title, status FROM projects ORDER BY id;','textarea');input.spellcheck=false;const actions=row(), output=el('div','cos-query-result');body.append(output);const examples=select('Hazır sorgu',[['projects','Projeler'],['skills','Yetenekler'],['join','Birlikte kullanılan araçlar']],actions);listen(examples,'change',function(){input.value=({projects:'SELECT title, status FROM projects ORDER BY id;',skills:'SELECT name FROM skills ORDER BY name;',join:'SELECT p.title, s.name FROM projects p JOIN project_skills ps ON p.id = ps.project_id JOIN skills s ON s.id = ps.skill_id WHERE s.name = \'React\';'})[examples.value];});const run=button('Çalıştır ↵',function(){const token=generation;run.disabled=true;db.query(input.value).then(function(result){if(destroyed||token!==generation)return;results(result,output);setStatus('SQLite · '+result.reduce(function(n,r){return n+r.values.length;},0)+' satır','good');}).catch(function(error){if(token!==generation)return;output.replaceChildren(el('p','cos-error',error.message));setStatus('Sorgu hatası','error');}).finally(function(){if(token===generation)run.disabled=false;});});run.disabled=true;actions.append(run);dbReady(function(){run.disabled=false;run.click();});
+      heading('SQLite / sorgu masası','SQL gerçekten çalışır. Veri, bu sayfanın belleğinde yaşar.');
+      const input=field('SELECT sorgusu','SELECT title, status FROM projects ORDER BY id;','textarea');input.spellcheck=false;
+      const actions=row(), output=el('div','cos-query-result');body.append(output);let queryId=0;
+      const examples=select('Hazır sorgu',[['projects','Projeler'],['skills','Yetenekler'],['join','Birlikte kullanılan araçlar']],actions);
+      const queries={projects:'SELECT title, status FROM projects ORDER BY id;',skills:'SELECT name FROM skills ORDER BY name;',join:'SELECT p.title, s.name FROM projects p JOIN project_skills ps ON p.id = ps.project_id JOIN skills s ON s.id = ps.skill_id WHERE s.name = \'React\';'};
+      listen(examples,'change',function(){input.value=queries[examples.value];});
+      function execute(){const token=generation,request=++queryId;run.disabled=true;return db.query(input.value).then(function(result){if(destroyed||token!==generation||request!==queryId)return;results(result,output);setStatus('SQLite · '+result.reduce(function(n,r){return n+r.values.length;},0)+' satır','good');}).catch(function(error){if(token!==generation||request!==queryId)return;output.replaceChildren(el('p','cos-error',error.message));setStatus('Sorgu hatası','error');}).finally(function(){if(token===generation&&request===queryId)run.disabled=false;});}
+      const run=button('Çalıştır ↵',execute);run.disabled=true;actions.append(run);
+      const control={input:input,run:run,examples:examples,ready:false,execute:execute,selectJoin:function(){examples.value='join';input.value=queries.join;},cancel:function(){queryId++;run.disabled=!control.ready;}};sqlControl=control;
+      dbReady(function(){control.ready=true;run.disabled=false;execute();});
     }
     function relations() {
       heading('Proje ↔ yetenek','Birçoktan çoğa ilişki. Bir araç birden çok ürüne bağlanabilir.');const pick=select('Bir yetenek seç',skills), graph=el('div','cos-relations');body.append(graph);function paint(){graph.replaceChildren();const source=el('div','cos-relation-source',pick.value);graph.append(source);const matches=projects.filter(function(p){return(p.stack||[]).includes(pick.value);});const targets=el('div','cos-relation-targets');matches.forEach(function(p){targets.append(button(p.title,function(){projectAction(p.id);},'cos-relation-target'));});graph.append(targets);setStatus(matches.length+' proje bağlantısı · gerçek portföy verisi');}listen(pick,'change',paint);if(skills.includes('React'))pick.value='React';paint();
@@ -176,7 +286,7 @@
       heading('Önce / sonra','Küçük örnek kodun satır farkı hesaplanır. Metni değiştirebilirsin.');const columns=el('div','cos-two-columns');body.append(columns);const a=field('Önce','const page = {\n  title: "Portföy",\n  motion: false\n};','textarea',columns),b=field('Sonra','const page = {\n  title: "Muhammet",\n  motion: true,\n  interactive: true\n};','textarea',columns),output=el('div','cos-diff');body.append(output);function paint(){const rows=diff(a.value,b.value);output.replaceChildren();rows.forEach(function(item){output.append(el('div','cos-diff-'+item[0],(item[0]==='add'?'+ ':item[0]==='remove'?'− ':'  ')+item[1]));});setStatus(rows.filter(function(r){return r[0]==='add';}).length+' eklenen · '+rows.filter(function(r){return r[0]==='remove';}).length+' silinen satır');}listen(a,'input',paint);listen(b,'input',paint);paint();
     }
     function versions() {
-      heading('Örnek yapı / sürüm ağacı','Bu küçük şema örneği, ürünlerin gerçek sürüm geçmişi değildir.');const pick=select('Sürüm',['v0.1 / kayıt','v0.2 / durum','v0.3 / ilişkiler']),output=el('div','cos-version-view');body.append(output);function paint(){const index=pick.selectedIndex;output.replaceChildren();const rail=el('div','cos-version-rail');['v0.1','v0.2','v0.3'].forEach(function(label,i){const node=el('span','',label);node.dataset.active=String(i===index);rail.append(node);});output.append(rail);pre(['CREATE TABLE project (\n  id INTEGER PRIMARY KEY,\n  title TEXT\n);','CREATE TABLE project (\n  id INTEGER PRIMARY KEY,\n  title TEXT,\n  status TEXT DEFAULT \'draft\'\n);','CREATE TABLE project (id, title, status);\nCREATE TABLE skill (id, name);\nCREATE TABLE project_skill (\n  project_id, skill_id\n);'][index],output);output.append(el('p','cos-note',['İlk yapı yalnızca kayıt tutar.','Durum alanı eklendi: taslak ve geliştirme ayrılır.','Tekrarlanan yetenek adları ayrı tabloya taşındı.'][index]));setStatus('Seçilen örnek: v0.'+(index+1));}listen(pick,'change',paint);paint();
+      heading('Örnek yapı / sürüm ağacı','Bu küçük şema örneği, ürünlerin gerçek sürüm geçmişi değildir.');const pick=select('Sürüm',['v0.1 / kayıt','v0.2 / durum','v0.3 / ilişkiler']),output=el('div','cos-version-view');body.append(output);function paint(){const index=pick.selectedIndex;output.replaceChildren();const rail=el('div','cos-version-rail');['v0.1','v0.2','v0.3'].forEach(function(label,i){const node=el('span','',label);node.dataset.active=String(i===index);rail.append(node);});output.append(rail);pre(['CREATE TABLE project (\n  id INTEGER PRIMARY KEY,\n  title TEXT\n);','CREATE TABLE project (\n  id INTEGER PRIMARY KEY,\n  title TEXT,\n  status TEXT DEFAULT \'draft\'\n);','CREATE TABLE project (id, title, status);\nCREATE TABLE skill (id, name);\nCREATE TABLE project_skill (\n  project_id, skill_id\n);'][index],output);output.append(el('p','cos-note',['İlk yapı yalnızca kayıt tutar.','Durum alanı eklendi: taslak ve geliştirme ayrılır.','Tekrarlanan yetenek adları ayrı tabloya taşındı.'][index]));setStatus('Seçilen örnek: v0.'+(index+1));}versionControl={pick:pick,selectLatest:function(){pick.value=pick.children[2].value;paint();}};listen(pick,'change',paint);paint();
     }
     function tests() {
       heading('Doğrulama / test masası','Beklenen sonuçla fonksiyonun gerçek dönüşünü karşılaştır.');const controls=row(),lat=field('Denenecek enlem','120','number',controls),lng=field('Denenecek boylam','29','number',controls), expected=select('Beklenti',[['false','Geçersiz olmalı'],['true','Geçerli olmalı']],controls),output=el('div','cos-test-results');body.append(output);function run(){const cases=[{name:'Sınır içinde koordinat',value:coordinate(37.7,29),expected:true},{name:'Enlem sınırı dışında',value:coordinate(100,29),expected:false},{name:'Sayısal olmayan değer',value:coordinate(NaN,29),expected:false},{name:'Senin testin',value:coordinate(Number(lat.value),Number(lng.value)),expected:expected.value==='true'}];output.replaceChildren();cases.forEach(function(item){const pass=item.value===item.expected;const node=el('div','cos-test-row');node.dataset.pass=String(pass);node.append(el('b','',pass?'✓':'×'),el('span','',item.name),el('small','',String(item.value)+' / beklenen '+item.expected));output.append(node);});setStatus(cases.filter(function(test){return test.value===test.expected;}).length+' / '+cases.length+' test geçti');}controls.append(button('Testleri çalıştır →',run));run();
@@ -221,16 +331,16 @@
     function runKey(index, automatic) {
       if(destroyed)return;index=Number(index);if(!Number.isInteger(index)||index<0||index>=32)return;if(!automatic)activity();autoDispatch=!!automatic;
       if(index===0){powered=!powered;if(powered)index=1;else{resetWidget();active=0;appPicker.value='0';shell.dataset.app='0';shell.dataset.powered='false';title.textContent='mk / uyku';number.textContent='01 / 32';heading('Bir tuş uzağında.','Bilgisayarı uyandırmak için güç tuşuna veya başka bir tuşa dokun.');body.append(button('Uyandır →',function(){runKey(0);}));setStatus('Uyku · ekran durduruldu');if(settings.onThought)settings.onThought('Biraz sessizlik. Bir tuşa dokununca kaldığımız yerden devam ederiz.');autoDispatch=false;return;}}
-      powered=true;shell.dataset.powered='true';resetWidget();active=index;appPicker.value=String(index);shell.dataset.app=String(index);title.textContent='mk / '+catalog[index][0].toLocaleLowerCase('tr-TR');number.textContent=String(index+1).padStart(2,'0')+' / 32';setStatus('Yerel deney · bu tarayıcıda');if(settings.onThought)settings.onThought(catalog[index][2]);try{renderers[index]();}finally{autoDispatch=false;}
+      powered=true;shell.dataset.powered='true';resetWidget();active=index;appPicker.value=String(index);shell.dataset.app=String(index);title.textContent='mk / '+catalog[index][0].toLocaleLowerCase('tr-TR');number.textContent=String(index+1).padStart(2,'0')+' / 32';setStatus('Yerel deney · bu tarayıcıda');if(settings.onThought)settings.onThought(catalog[index][2]);try{renderers[index]();}finally{autoDispatch=false;schedule();}
     }
     runKey(1,true);
     return Object.freeze({
       runKey:runKey,openExpanded:openExpanded,
-      autoDemo:function(){if(destroyed||settings.reducedMotion)return;demoRunning=true;runKey(1,true);},
+      autoDemo:startTour,
       closeExpanded:function(){if(dialog.open)dialog.close();},
-      setPaused:function(value){paused=!!value;shell.dataset.paused=String(paused);if(paused&&frame){cancelAnimationFrame(frame);frame=0;}else if(!paused&&frameFn&&!frame){frameTime=performance.now();frame=requestAnimationFrame(tick);}},
-      getState:function(){return{activeKey:active,powered:powered,expanded:dialog.open,paused:paused};},
-      destroy:function(){if(destroyed)return;destroyed=true;demoRunning=false;if(dialog.open){dialog.close();restore();}resetWidget();if(db)db.destroy();expand.removeEventListener('click',openExpanded);appPicker.removeEventListener('change',pickApp);dialog.removeEventListener('close',restore);['pointerdown','keydown','input'].forEach(function(event){shell.removeEventListener(event,activity,true);});shell.remove();dialog.remove();marker.remove();screen.classList.remove('cos-screen-host');}
+      setPaused:function(value){paused=!!value;shell.dataset.paused=String(paused);if(paused){cancelTour('paused');if(frame)cancelAnimationFrame(frame);frame=0;}else schedule();},
+      getState:function(){return{activeKey:active,powered:powered,expanded:dialog.open,paused:paused,demoState:shell.dataset.demoState,demoRunning:demoRunning};},
+      destroy:function(){if(destroyed)return;destroyed=true;cancelTour('destroyed');if(dialog.open){dialog.close();restore();}resetWidget();if(db)db.destroy();expand.removeEventListener('click',openExpanded);appPicker.removeEventListener('change',pickApp);dialog.removeEventListener('close',restore);humanEvents.forEach(function(event){shell.removeEventListener(event,activity,true);});document.removeEventListener('visibilitychange',visibility);shell.remove();dialog.remove();marker.remove();screen.classList.remove('cos-screen-host');}
     });
   }
   global.ComputerOS=Object.freeze({keys:keys,mount:mount});
