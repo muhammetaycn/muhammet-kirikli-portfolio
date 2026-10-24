@@ -33,7 +33,7 @@ Ardından [localhost:8000](http://localhost:8000) adresine git. Windows’ta Pyt
 - `index.html`, `style.css`, `direction.css` ve `profile.css`: sayfa yapısı ve görsel dil.
 - `app.js`: gezinme, proje ayrıntıları, hareket kontrolü ve takvim.
 - `kinetic.js`: imleç çekimi, yerel bükülme ve kalıcı biçim vermeyi destekleyen Canvas şerit; dönüş sürer, sıfırlama düğmesi biçimi geri alır.
-- `narrator.js` ve `narrator.css`: takvimin üzerinde zıplayan Luci yorumu ve yavaş yazılan terminal düşünceleri. Balona tıkla veya Enter ile ilerlet.
+- `narrator.js` ve `narrator.css`: birlikte yazan Luciler, EN/TR terminal düşünceleri ve yanlış inişten toparlanma. Balona tıkla veya Enter ile sonraki düşünceyi sıraya al.
 - `cursor.js` ve `cursor.css`: beş parmaklı dikişli eldiven, yakınlaşınca açılan eklem ve butonlardan uzanan siyah lifler. Dokunma, metin girişi, hareket duraklatma ve azaltılmış harekette normal imleç korunur.
 - `system-lab.js`: projelerin adımlarını gösteren etkileşimli akış alanı.
 - `ARASTIRMA.md`: sekiz tasarım kaynağı, gözlem sınırları ve özgün uygulama kararları.
@@ -59,17 +59,21 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 
 ## Luci’nin piksel sahnesi
 
-52 × 7 hücrenin tamamı hareket alanıdır. Siyah, Discord mavisi, turkuaz, kehribar ve gül renkli Luci yorumları sırayla bütün kelimeler yazar. Yazım 3,4–7,8 saniye, okunur bekleme 2,4–3,5 saniye sürer; eski kelime 1,6 saniyede arkadan silinirken yeni karakter girer. Aynı anda en fazla iki karakter görünür. Proje içeriklerinden türetilen 896 kısa düşünce tekrar sırasını değiştirir. Sayfa görünmüyorken süre ilerlemez. Genel hareket kontrolü sahneyi durdurur; azaltılmış harekette okunur sabit yazı gösterilir. Renkli animasyon katmanı gerçek üretim verilerini değiştirmez.
+52 × 7 matris iki eşzamanlı çalışma alanıdır: solda kalıcı siyah Luci, sağda cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişen yazar. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
+
+32 teknik konu, dönüşümlü EN/TR 64 diyalog çifti ve 128 kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
 ## mk.desktop / 32 tuş
 
-Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 12, bilgisayar 18 saniye görünür. Pointer, odak, basılı tutma ve büyütülmüş ekran keşfi kesmez; otomatik tur etkileşimden 14 saniye sonra devam eder. Üstteki genel hareket düğmesi tüm sahneleri durdurur.
+Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 12, bilgisayar 18 saniye görünür. Pointer, odak, basılı tutma ve büyütülmüş ekran sırasında sahne sabit kalır; otomatik tur etkileşimden 14 saniye sonra devam eder. Üstteki genel hareket düğmesi tüm sahneleri durdurur.
 
 Bilgisayarın 8 × 4 gri tuşu yazısızdır. Hover veya klavye odağında işlev adı görünür; oklarla gezin, Enter/Space ile çalıştır. Terminal, düzenlenebilir arayüz, yerel API, gerçek SQLite sorguları/ilişkileri/transaction, proje akışları, kod farkı, sürümler, testler, kuyruk/cache/yetkiler, motion/renk/piksel araçları ve iki küçük oyun bulunur. **Ekranı büyüt** aynı uygulamanın durumunu korur. Deneyler bu tarayıcıda çalışır; gerçek servis veya hesaplarda işlem yapmaz.
 
 - `hero-deck.js/css`: sahne geçişi, etkileşim ve görünürlük kilitleri.
-- `computer-scene.js/css`: CSS hacimleri, blank tuşlar, Luci ve fiziksel geri bildirim.
+- `computer-scene.js/css`: CSS hacimleri, yazısız tuşlar, Luci ve fiziksel geri bildirim.
 - `computer-os.js/css`: 32 deney, büyütülebilir ekran, ortak yerel durum ve temizleme.
 - `computer-db.js`: gerektiğinde yüklenen gerçek SQLite bellek veritabanı.
 
 `assets/vendor/sqljs/` altındaki sql.js 1.15.1 MIT lisanslıdır; kaynak ve bütünlük kaydı aynı klasördedir. SQLite dosyaları yalnızca veritabanı uygulaması açılınca yüklenir. Sayfa yenilendiğinde deney verileri sıfırlanır.
+
+Proje detayları ve sistem akışlarındaki uygulama düğmeleri, ilgili deneyi aynı bilgisayar ekranında açar. Büyütülen ekran kapatılınca klavye odağı onu açan kontrole döner.

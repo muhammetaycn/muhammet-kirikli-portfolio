@@ -13,6 +13,7 @@
   let cursor;
   let deck;
   let computerScene;
+  const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
   const cleanups = [];
   function element(tag, className, text) { const e = document.createElement(tag); if (className) e.className = className; if (text !== undefined) e.textContent = text; return e; }
@@ -80,6 +81,15 @@
     projectDialog.scrollTop = 0;
   }
   function openProject(index) { paintCase(index); projectDialog.showModal(); document.body.classList.add('modal-open'); syncSurfaces(); }
+  function launchExperience(index){
+    if(!computerScene)return;
+    if(projectDialog.open)projectDialog.close();
+    deck?.select(1,true);
+    computerScene.runKey(index);
+    computerScene.openExpanded();
+    syncSurfaces();
+  }
+  $('#case-demo').addEventListener('click',()=>launchExperience(projectExperiences[projects[caseIndex].id]??3));
   document.querySelectorAll('[data-open-project]').forEach(button => button.addEventListener('click', () => openProject(Number(button.dataset.openProject))));
   $('#case-close').addEventListener('click', () => projectDialog.close());
   projectDialog.addEventListener('close', () => { document.body.classList.remove('modal-open'); syncSurfaces(); });
@@ -157,6 +167,9 @@
     $('.art-caption b').textContent = ({flow:'001 — BAĞLANTILAR',structure:'002 — YAPININ İÇİ',signal:'003 — SİNYALİN İZİ'})[button.dataset.scene];
   }));
   try { if (window.SystemLab) cleanups.push(window.SystemLab.mount()); } catch { $('#lab-result').textContent = 'Demo şu anda yüklenemedi. Proje detaylarından akışı inceleyebilirsin.'; }
+  const labExperiences={event:[9,'Onayı yönet ↗'],textile:[10,'Siparişi taşı ↗'],content:[13,'Kuyruğu düzenle ↗'],community:[14,'Kuralı dene ↗']};
+  document.querySelectorAll('[data-lab-project]').forEach(button=>button.addEventListener('click',()=>{$('#lab-explore').textContent=labExperiences[button.dataset.labProject][1];}));
+  $('#lab-explore').addEventListener('click',()=>{const selected=document.querySelector('[data-lab-project][aria-pressed="true"]')?.dataset.labProject||'event';launchExperience(labExperiences[selected][0]);});
   function syncSurfaces() {
     const covered = Boolean(document.querySelector('dialog[open]'));
     document.body.classList.toggle('surface-covered', covered);

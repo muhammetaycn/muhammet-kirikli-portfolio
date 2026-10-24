@@ -51,7 +51,7 @@ Canlı müşteri sayısı, performans puanı, çalışma süresi, tamamlanmış 
 - Açılışın ana unsuru Muhammet Kırıklı adı oldu. Uzun slogan bandı kaldırıldı.
 - Şerit, 96 düğümlü kapalı bir yay ağıyla bükülür. İmleç kütleyi ve yakındaki yüzeyi çeker; tutulan bölümde verilen biçim, dönüş sürerken korunur. Sıfırlama kontrolü vardır.
 - Dört proje, kendi davranışlarını anlatan özgün küçük arayüz sahneleriyle önizlenir. Bunlar gerçek ürün ekran görüntüsü olarak sunulmaz.
-- Takvime küçük bir Luci yorumu eklendi. Kodla çizilen karakter hücrelerin üstünde zıplar; terminal balonundaki proje temelli düşünceler yavaş yazılır ve kullanıcı tarafından ilerletilebilir. Karakter, Disenchantment’taki Luci’ye bir hayran çizimi yorumudur; site resmi bir bağlantı iddiası taşımaz.
+- Matrise küçük Luci yorumları eklendi. Kodla çizilen karakterler hücrelerin üstünde zıplar; terminal balonlarındaki teknik diyaloglar yavaş yazılır ve kullanıcı tarafından sıraya alınabilir. Karakter, Disenchantment’taki Luci’ye bir hayran çizimi yorumudur; site resmi bir bağlantı iddiası taşımaz.
 - Üretim kayıtları ve karakterin bastığı hücreye verilen geçici vurgu ayrı tutulur. Etkinlik sayıları değiştirilmez.
 - Görünürlük, hareket durdurma ve azaltılmış hareket tercihleri modülleri durdurur. Dokunmatik cihazlarda normal dikey kaydırma korunur.
 
@@ -64,7 +64,9 @@ Yerel önizlemede yüzeyden tutma/bükme, sıfırlama, sahne seçimi, terminal b
 
 Tam ad ve LinkedIn birincil kimlik oldu. Yazılım, AI otomasyonu, sistem tasarımı, mobil ürünler, görsel iletişim ve tekstil deneyimi birlikte ele alındı. Dört seçili proje ve altı ek çalışma bulunur. LinkedIn’den alınan proje açıklamaları, kullanıcının profil beyanı olarak içerik kaynağıdır; hepsinin kodunun veya canlı dağıtımının ayrıca denetlendiği iddia edilmez. Önceden kodu incelenen projelerdeki prototip/geliştirme sınırları korundu. Bu portföyün kodla çizilen 3B sahnesi ve piksel anlatıcısı da çalışma olarak eklendi.
 
-Luci, üst kenarda yürüyen bir süs yerine 52 × 7 matrisin tamamında iki boyutlu hareket eder. Her iniş, harf desenindeki bir hücreyi geçici renk katmanıyla işaretler. Beş renk sırayla devreye girer; yazım 3,4–7,8 saniye, okuma 2,4–3,5 saniye sürer. Eski kelime 1,6 saniyede arkadan silinirken yeni karakter girer. 896 proje temelli kısa düşünce ve bütün kelimeler kullanılır; aynı anda en fazla iki karakter görünür. Bu izler gerçek faaliyet kayıtlarına eklenmez.
+52 × 7 matris iki eşzamanlı çalışma alanıdır: solda kalıcı siyah Luci, sağda cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişen yazar. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
+
+32 teknik konu, dönüşümlü EN/TR 64 diyalog çifti ve 128 kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
 ## 24 Ekim / Nesne olarak portföy
 
@@ -75,3 +77,10 @@ Luci, üst kenarda yürüyen bir süs yerine 52 × 7 matrisin tamamında iki boy
 Şerit ve bilgisayar aynı açılış alanını sırayla paylaşır. İlk sahne 12, bilgisayar sahnesi 18 saniyedir; pointer, basılı tutma, klavye odağı ve açılmış ekran otomatik turu kilitler. Etkileşim bittikten sonra 14 saniye beklenir. Manuel seçim ve otomatik geçiş kontrolü her zaman bulunur. Azaltılmış harekette sahneler elle seçilir.
 
 SQLite deneyi, [sql.js](https://github.com/sql-js/sql.js/releases/tag/v1.15.1) 1.15.1’in yerel WebAssembly dosyalarını gerektiğinde yükler. npm paket bütünlüğü SHA-512 ile doğrulanmıştır. Veritabanı bellektedir; gerçek sunucuya istek veya kalıcı veri kaydı iddiası yoktur. Paket lisansı ve kaynak kaydı `assets/vendor/sqljs/` içindedir.
+
+
+## 24 Ekim / Birlikte yazım ve hata dili
+
+İki yazarın başlangıcı ve çizim saatleri ayrı, konu geçişi birlikte planlandı. Metin okuma süresi hücre atlama hızından bağımsız tutulur. Dar panel ve sabit balonlar gözün sürekli yer değiştirmesini azaltır. Yanlış iniş gerçek üretim verisine eklenmez; kırmızı iz ve panelde tek yumuşak sıçrama, ardından toparlanma gösterilir.
+
+Hata kodlarının anlamı [Node.js’in hata belgeleri](https://nodejs.org/api/errors.html#common-system-errors) ve [MDN HTTP 429 açıklaması](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429) ile kontrol edildi. Balondaki kısa cümleler ve kod parçaları bu deney için yazılmıştır; gerçek bir sunucudan alınmış hata kaydı olarak sunulmaz.
