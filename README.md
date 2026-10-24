@@ -44,7 +44,9 @@ Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. B
 
 Ağ, parmak eklemi, başparmak ve manşetteki üç ayrı noktadan çıkar. Her bağlantıda üç incelen gövde, altı dal ve aralarındaki zarlar bulunur; aynı anda en fazla iki bağlantı tutulur. Yakınlık dokuyu kalınlaştırır, siyah damarlar eldivene yayılır; basma hareketi ağ boyunca bir dalga gönderir.
 
-Yeni hedef 170 px içinde edinilir; tutunmuş bağlantı 238 px'e kadar gerilir, bırakıldığında 680 ms boyunca geri çekilir. İlk temas yönü dışarıdaki baskın eksene göre seçilir ve bağlantı boyunca sabit kalır. Üzeri başka bir bölümle örtülen düğmelere tutunulmaz. Parmak ucu gerçek tıklama noktasında kalır; düğmelerin konumu ve tıklama alanı değiştirilmez.
+El önceki sürüme göre yaklaşık %30 küçüktür; parmak eklemi açılırken ve basma sırasında hafifçe esnerken gerçek tıklama noktası sabit kalır. Ağ kökleri aynı hassas dönüşümle hesaplanır. Yeni hedef 150 px içinde edinilir; tutunmuş bağlantı 216 px'e kadar gerilir, bırakıldığında 580 ms boyunca geri çekilir. Bütün dallar aynı kopma anındaki konumdan çekilir; yeniden tutunma 180 ms içinde birleşir.
+
+İlk temas yönü dışarıdaki baskın eksene göre seçilir ve bağlantı boyunca sabit kalır. Üzeri başka bir bölümle örtülen düğmelere tutunulmaz. Küçük kontrollerde ana liflerin uçları da düğme kenarına sığar. Temas kenarındaki siyah doku çekimle kabarır, basmada içeriye ince bir dalga yayılır; düğmelerin konumu ve tıklama alanı değiştirilmez.
 
 İmleç etkin dialogun içine taşınır. Metin alanlarında, dokunmada, azaltılmış harekette ve genel duraklatmada normal imleç kullanılır. Sayfa gizlenince çizim durur; serbest imleç sakinleşince yeni animasyon karesi istenmez. İlgisiz metin ve piksel güncellemeleri bu döngüyü uyandırmaz.
 
@@ -67,9 +69,11 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 
 ## Luci’nin piksel sahnesi
 
-52 × 7 matris iki eşzamanlı çalışma alanıdır: solda kalıcı siyah Luci, sağda cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişen yazar. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
+52 × 7 matris ortak bir sahnedir. Siyah Luci kimliğini korur; ikinci yazar cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişir. Yazım sınırı her EN/TR çiftinde kayar, yazarlar dört turda bir taraf değiştirir. İki kelime arasında okuma için iki sütun bırakılır; bu boşluk da yer değiştirir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
 
 32 teknik konu, dönüşümlü EN/TR 64 diyalog çifti ve 128 kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
+
+Taraf değiştirirken karakter 700 ms'lik bir sıçramayla yeni yerine geçer; balonlar birlikte yer değiştirir. Telefon dahil düşünce gövdesi 12 px, terminal başlıkları en az 8 px'tir. Uzun teknik terimler balonun dışına taşmadan satıra bölünür.
 
 ## mk.desktop / 32 tuş
 

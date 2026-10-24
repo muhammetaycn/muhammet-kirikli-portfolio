@@ -65,7 +65,7 @@
     const veins=Array.from({length:3},()=>svg('path',{class:'symbiote-hand-vein'}));skin.append(cuff,...veins);glove.append(skin);
     const disposers=[],connections=[];
     const pointer={x:0,y:0,inside:false,mouse:false,native:false,hover:null};
-    const REACH=170, BREAK=238, RELEASE_MS=680;
+    const REACH=150, BREAK=216, RELEASE_MS=580, GLOVE_SCALE=.44;
     let paused=Boolean(reducedMotion),destroyed=false,keyboard=false,pressed=false;
     let frame=0,lastTime=0,lastMove=0,rectTime=-1000,dirty=true,host=document.body,targets=[],desired=null;
     let extension=0,press=0,tilt=0,lastX=0,lastY=0,motionX=0,motionY=0,pose=null;
@@ -74,7 +74,7 @@
     function schedule(){if(!frame&&!destroyed)frame=requestAnimationFrame(tick);}
     function nativeCursor(){document.documentElement.classList.remove('symbiote-cursor-active');root.classList.remove('is-visible');root.dataset.state='native';root.dataset.idle='true';}
     function clearWebs(){connections.forEach(c=>c.group.remove());connections.length=0;desired=null;root.dataset.strands='0';root.dataset.connections='0';root.dataset.target='';skin.setAttribute('opacity','0');}
-    function stop(){if(frame)cancelAnimationFrame(frame);frame=0;lastTime=0;nativeCursor();clearWebs();}
+    function stop(){if(frame)cancelAnimationFrame(frame);frame=0;lastTime=0;motionX=motionY=tilt=press=extension=0;lastX=pointer.x;lastY=pointer.y;nativeCursor();clearWebs();}
     function updateHost(){const dialogs=Array.from(document.querySelectorAll('dialog[open]'));const next=dialogs[dialogs.length-1]||document.body;if(host!==next||root.parentNode!==next){host=next;host.append(root);clearWebs();dirty=true;}}
     function readTargets(time){
       if(!dirty&&time-rectTime<240)return;
@@ -107,17 +107,17 @@
     function edgePoint(rect,side,offset=0){const inset=Math.min(3,(side<2?rect.height:rect.width)/4);return side<2?{x:side===0?rect.left:rect.right,y:clamp(pointer.y+offset,rect.top+inset,rect.bottom-inset)}:{x:clamp(pointer.x+offset,rect.left+inset,rect.right-inset),y:side===2?rect.top:rect.bottom};}
     function createConnection(item,time){
       let c=connections.find(c=>c.node===item.node);
-      if(c){c.rect=item.rect;c.released=null;c.latched=c.latched||item.distance<20;return c;}
+      if(c){if(c.released!==null){c.resumeEnd={...c.end};c.resumeAt=time;}c.rect=item.rect;c.released=null;c.latched=c.latched||item.distance<20;return c;}
       const group=svg('g',{class:'symbiote-connection'});
       const limbs=Array.from({length:3},(_,i)=>{const body=svg('path',{class:'symbiote-tendon-body'}),shine=svg('path',{class:'symbiote-tendon-shine'});group.append(body,shine);return{body,shine,controls:null,points:[],index:i};});
       const branches=Array.from({length:6},()=>{const edge=svg('path',{class:'symbiote-branch-edge'}),core=svg('path',{class:'symbiote-branch-core'});group.append(edge,core);return{edge,core};});
       const bridges=Array.from({length:2},()=>svg('path',{class:'symbiote-membrane'}));group.append(...bridges);
-      const contact=svg('path',{class:'symbiote-contact'});group.append(contact);web.append(group);
-      c={node:item.node,rect:item.rect,side:chooseSide(item.rect),group,limbs,branches,bridges,contact,amount:0,growth:0,latched:item.distance<20,released:null,pulse:0,phase:connections.length*1.7+time*.001,tip:edgePoint(item.rect,chooseSide(item.rect)),end:null};
+      const contact=svg('path',{class:'symbiote-contact'}),rim=svg('path',{class:'symbiote-target-rim'}),ripple=svg('path',{class:'symbiote-target-ripple'});group.append(contact,rim,ripple);web.append(group);
+      c={node:item.node,rect:item.rect,side:chooseSide(item.rect),group,limbs,branches,bridges,contact,rim,ripple,amount:0,growth:0,latched:item.distance<20,released:null,pulse:0,phase:connections.length*1.7+time*.001,tip:edgePoint(item.rect,chooseSide(item.rect)),end:null};
       connections.push(c);while(connections.length>2)connections.shift().group.remove();return c;
     }
-    function release(c,time){if(c.released!==null)return;c.released=time;c.releaseEnd=c.end?{...c.end}:{...c.tip};c.pulse=Math.max(c.pulse,.25);c.group.setAttribute('data-phase','recoil');}
-    function spring(p,x,y,dt){p.vx=clamp((p.vx+(x-p.x)*.12*dt)*Math.pow(.64,dt),-160,160);p.vy=clamp((p.vy+(y-p.y)*.12*dt)*Math.pow(.64,dt),-160,160);p.x+=p.vx*dt;p.y+=p.vy*dt;}
+    function release(c,time){if(c.released!==null)return;c.released=time;c.releaseEnd=c.end?{...c.end}:{...c.tip};c.releaseBranches=c.branches.map((_,i)=>edgePoint(c.rect,c.side,(i-2.5)*(3+c.amount*3)));c.pulse=Math.max(c.pulse,.25);c.group.setAttribute('data-phase','recoil');}
+    function spring(p,x,y,dt){const steps=Math.ceil(dt*2),step=dt/steps;for(let i=0;i<steps;i++){p.vx=clamp((p.vx+(x-p.x)*.12*step)*Math.pow(.64,step),-160,160);p.vy=clamp((p.vy+(y-p.y)*.12*step)*Math.pow(.64,step),-160,160);p.x+=p.vx*step;p.y+=p.vy*step;}}
     function bezier(a,b,c,d,t){const q=1-t;return{x:q*q*q*a.x+3*q*q*t*b.x+3*q*t*t*c.x+t*t*t*d.x,y:q*q*q*a.y+3*q*q*t*b.y+3*q*t*t*c.y+t*t*t*d.y};}
     function curve(a,b,c,d){return `M${number(a.x)} ${number(a.y)}C${number(b.x)} ${number(b.y)} ${number(c.x)} ${number(c.y)} ${number(d.x)} ${number(d.y)}`;}
     function outline(points,radius,time,phase,pulse){
@@ -130,11 +130,12 @@
       index.setAttribute('d',`M30 65C27 55 27 45 ${jointX-7} ${jointY}C${jointX-7} ${jointY-8} ${tipX-9} ${tipY-2} ${tipX} ${tipY}C${tipX+8} ${tipY+1} ${tipX+10} ${tipY+9} ${tipX+5} ${tipY+14}L${jointX+10} ${jointY+7}C${jointX+10} 53 47 59 47 66Z`);
       fold.setAttribute('d',`M${jointX-3} ${jointY+7}Q${jointX+4} ${jointY+mix(9,5,amount)} ${jointX+9} ${jointY+9}M${tipX-5} ${tipY+14}Q${tipX+1} ${tipY+18} ${tipX+6} ${tipY+15}`);
       seam.setAttribute('d',`M${tipX+4} ${tipY+4}C${tipX+12} ${tipY+15} ${jointX+5} ${jointY} ${jointX+6} ${jointY+13}L40 60`);highlight.setAttribute('d',`M${tipX-5} ${tipY+4}Q${tipX-1} ${tipY+1} ${tipX+3} ${tipY+5}`);
-      const scale=.63*(1-press*.045),radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
+      const scaleX=Number((GLOVE_SCALE*(1+press*.035)).toFixed(4)),scaleY=Number((GLOVE_SCALE*(1-press*.08)).toFixed(4)),rotation=Number(angle.toFixed(4)),radians=rotation*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
+      const paintedX=number(x),paintedY=number(y),localX=Number(tipX.toFixed(4)),localY=Number(tipY.toFixed(4));
       // SVG CSS viewport == viewBox: a single scale keeps the painted tip exact.
-      glove.style.transform=`translate(${number(x)}px,${number(y)}px) rotate(${number(angle)}deg) scale(${number(scale)}) translate(${-number(tipX)}px,${-number(tipY)}px)`;
-      glove.dataset.tipX=String(tipX);glove.dataset.tipY=String(tipY);
-      function world(px,py){const dx=(px-tipX)*scale,dy=(py-tipY)*scale;return{x:x+dx*cos-dy*sin,y:y+dx*sin+dy*cos};}
+      glove.style.transform=`translate(${paintedX}px,${paintedY}px) rotate(${rotation}deg) scale(${scaleX},${scaleY}) translate(${-localX}px,${-localY}px)`;
+      glove.dataset.tipX=String(localX);glove.dataset.tipY=String(localY);glove.dataset.scaleX=String(scaleX);glove.dataset.scaleY=String(scaleY);
+      function world(px,py){const dx=(px-localX)*scaleX,dy=(py-localY)*scaleY;return{x:paintedX+dx*cos-dy*sin,y:paintedY+dx*sin+dy*cos};}
       skin.setAttribute('opacity',clamp(amount*.92,0,1).toFixed(3));
       cuff.setAttribute('d',`M35 103Q45 ${97+Math.sin(lastTime*.002)*2} 51 103Q63 97 81 101L81 112Q60 119 36 112Z`);
       veins[0].setAttribute('d',`M58 107C35 95 53 75 ${jointX+3} ${jointY+10}Q${jointX-1} ${jointY} ${tipX} ${tipY+9}`);
@@ -154,42 +155,47 @@
       const rootPoint=pose.origins[2],normal=c.side===0?{x:-1,y:0}:c.side===1?{x:1,y:0}:c.side===2?{x:0,y:-1}:{x:0,y:1};
       let end;
       if(retiring){const retract=1-smooth(life);end={x:mix(rootPoint.x,c.releaseEnd.x,retract)+normal.x*Math.sin(life*Math.PI)*18,y:mix(rootPoint.y,c.releaseEnd.y,retract)+normal.y*Math.sin(life*Math.PI)*18};}
+      else if(c.resumeEnd){const progress=smooth(clamp((time-c.resumeAt)/180,0,1));end={x:mix(c.resumeEnd.x,c.tip.x,progress),y:mix(c.resumeEnd.y,c.tip.y,progress)};if(progress>=1)c.resumeEnd=null;}
       else end={x:mix(rootPoint.x,c.tip.x,smooth(c.growth)),y:mix(rootPoint.y,c.tip.y,smooth(c.growth))};
       c.end=end;c.group.setAttribute('opacity',((retiring?1-life:.25+.75*Math.sqrt(c.amount))*Math.min(1,c.growth*2)).toFixed(3));
       c.group.setAttribute('data-phase',retiring?'recoil':c.latched?'latched':'growing');
       c.limbs.forEach((limb,i)=>{
-        const start=pose.origins[i],spread=(i-1)*(4+c.amount*8),tip={x:end.x+(c.side<2?0:spread)*c.growth,y:end.y+(c.side<2?spread:0)*c.growth};
+        const start=pose.origins[i],spread=(i-1)*(3+c.amount*6),edge=edgePoint(c.rect,c.side,spread),fan=c.growth*(retiring?1-smooth(life):1),tip={x:end.x+(edge.x-c.tip.x)*fan,y:end.y+(edge.y-c.tip.y)*fan};
         const dx=tip.x-start.x,dy=tip.y-start.y,length=Math.max(1,Math.hypot(dx,dy)),nx=-dy/length,ny=dx/length;
         const sway=Math.sin(time*.0018+c.phase+i*1.9)*Math.min(8,length*.09),bend=(i-1)*Math.min(38,length*.33)+sway;
         const a={x:start.x+dx*.28+nx*bend-motionX*(.8+i*.25),y:start.y+dy*.28+ny*bend-motionY*(.8+i*.25)};
         const b={x:start.x+dx*.74-nx*bend*.65-motionX*.35,y:start.y+dy*.74-ny*bend*.65-motionY*.35};
         if(!limb.controls)limb.controls=[{...a,vx:0,vy:0},{...b,vx:0,vy:0}];spring(limb.controls[0],a.x,a.y,dt);spring(limb.controls[1],b.x,b.y,dt);
         const [p,q]=limb.controls;limb.points=Array.from({length:19},(_,n)=>bezier(start,p,q,tip,n/18));
-        const radius=((i===2?2.4:1.4)+c.amount*(i===2?4.4:2.5))*(.18+.82*Math.sqrt(c.amount))+press*.4;
+        const radius=(((i===2?2.4:1.4)+c.amount*(i===2?4.4:2.5))*(.18+.82*Math.sqrt(c.amount))+press*.4)*.78;
         limb.body.setAttribute('d',outline(limb.points,radius,time,c.phase+i,c.pulse));
         const glint=limb.points.slice(3,13).map((point,n)=>(n?'L':'M')+number(point.x+nx*radius*.35)+' '+number(point.y+ny*radius*.35)).join('');
         limb.shine.setAttribute('d',glint);limb.shine.setAttribute('opacity',(.25+c.amount*.48).toFixed(2));
       });
       c.branches.forEach((branch,i)=>{
-        const limb=c.limbs[i%3],fork=limb.points[8+(i%2)*3],tip=edgePoint(c.rect,c.side,(i-2.5)*(3+c.amount*3));
+        const limb=c.limbs[i%3],fork=limb.points[8+(i%2)*3],tip=retiring?c.releaseBranches[i]:edgePoint(c.rect,c.side,(i-2.5)*(3+c.amount*3));
         const target=retiring?{x:mix(rootPoint.x,tip.x,1-smooth(life)),y:mix(rootPoint.y,tip.y,1-smooth(life))}:{x:mix(fork.x,tip.x,smooth(c.growth)),y:mix(fork.y,tip.y,smooth(c.growth))};
         const d=curve(fork,{x:fork.x+(target.x-fork.x)*.42+normal.x*8,y:fork.y+(target.y-fork.y)*.42+normal.y*8},{x:target.x+normal.x*9,y:target.y+normal.y*9},target);
         branch.edge.setAttribute('d',d);branch.core.setAttribute('d',d);const width=.28+c.amount*(i%2?.8:1.15);branch.edge.setAttribute('stroke-width',(width+1).toFixed(2));branch.core.setAttribute('stroke-width',width.toFixed(2));
       });
       c.bridges.forEach((path,i)=>{const a=c.limbs[i].points[4],b=c.limbs[i+1].points[7],tip=c.limbs[i].points[12];path.setAttribute('d',`M${number(a.x)} ${number(a.y)}Q${number((a.x+b.x)*.5)} ${number((a.y+b.y)*.5)} ${number(b.x)} ${number(b.y)}Q${number((b.x+tip.x)*.5)} ${number((b.y+tip.y)*.5)} ${number(tip.x)} ${number(tip.y)}Q${number((tip.x+a.x)*.5+3)} ${number((tip.y+a.y)*.5-3)} ${number(a.x)} ${number(a.y)}Z`);path.setAttribute('opacity',(c.amount*.48).toFixed(2));});
-      const span=Math.min(c.side<2?c.rect.height:c.rect.width,42)*(c.growth*.65),a=edgePoint(c.rect,c.side,-span/2),b=edgePoint(c.rect,c.side,span/2),depth=2+c.amount*2.4+c.pulse*1.8;
-      c.contact.setAttribute('d',`M${number(a.x)} ${number(a.y)}Q${number(c.tip.x+normal.x*depth)} ${number(c.tip.y+normal.y*depth)} ${number(b.x)} ${number(b.y)}Q${number(c.tip.x-normal.x*depth*.6)} ${number(c.tip.y-normal.y*depth*.6)} ${number(a.x)} ${number(a.y)}Z`);
+      const span=Math.min(c.side<2?c.rect.height:c.rect.width,48)*(c.growth*.7),a=edgePoint(c.rect,c.side,-span/2),b=edgePoint(c.rect,c.side,span/2),center=edgePoint(c.rect,c.side),breath=(.5+.5*Math.sin(time*.003+c.phase))*c.amount,depth=1+c.amount*(4+breath*2)+c.pulse*3;
+      const crest={x:center.x+normal.x*depth,y:center.y+normal.y*depth},lip=`M${number(a.x)} ${number(a.y)}Q${number(crest.x)} ${number(crest.y)} ${number(b.x)} ${number(b.y)}`;
+      c.contact.setAttribute('d',`${lip}Q${number(center.x-normal.x*depth*.35)} ${number(center.y-normal.y*depth*.35)} ${number(a.x)} ${number(a.y)}Z`);
       c.contact.setAttribute('opacity',retiring?'0':(c.amount*.8*c.growth).toFixed(3));
+      c.rim.setAttribute('d',lip);c.rim.setAttribute('opacity',retiring?'0':(c.amount*.6*c.growth).toFixed(3));
+      const wave=1-c.pulse,reach=span*(.4+wave*.8),wa=edgePoint(c.rect,c.side,-reach),wb=edgePoint(c.rect,c.side,reach),inset=2+wave*6;
+      c.ripple.setAttribute('d',curve({x:wa.x-normal.x*inset,y:wa.y-normal.y*inset},{x:center.x-normal.x*inset*2,y:wa.y-normal.y*inset*2},{x:center.x-normal.x*inset*2,y:wb.y-normal.y*inset*2},{x:wb.x-normal.x*inset,y:wb.y-normal.y*inset}));c.ripple.setAttribute('opacity',retiring?'0':(c.pulse*c.amount*.6).toFixed(3));
     }
     function tick(time){
       frame=0;if(!eligible()){stop();return;}
       if(lastTime&&connections.length&&time-lastMove>160&&time-lastTime<30){schedule();return;}
-      const dt=lastTime?clamp((time-lastTime)/16.667,.2,2):1;lastTime=time;readTargets(time);
+      const fresh=!lastTime,dt=fresh?1:clamp((time-lastTime)/16.667,.2,2);if(fresh){lastX=pointer.x;lastY=pointer.y;}lastTime=time;readTargets(time);
       desired=chooseTarget();if(desired){const previous=connections.find(c=>c.node===desired.node&&c.released===null),latched=previous?.latched;desired.amount=latched ? .12+.88*smooth(1-clamp(desired.distance/BREAK,0,1)) : Math.max(.008,smooth(1-clamp(desired.distance/REACH,0,1)));}
       const active=desired?createConnection(desired,time):null;
       connections.forEach(c=>{if(c!==active)release(c,time);});
       const strength=desired?desired.amount:0;extension=mix(extension,strength,1-Math.pow(.77,dt));press=mix(press,pressed?1:0,1-Math.pow(.58,dt));
-      motionX=mix(motionX,clamp((pointer.x-lastX)/dt,-35,35),.3);motionY=mix(motionY,clamp((pointer.y-lastY)/dt,-35,35),.3);lastX=pointer.x;lastY=pointer.y;
+      const inertia=1-Math.pow(.7,dt);motionX=mix(motionX,clamp((pointer.x-lastX)/dt,-35,35),inertia);motionY=mix(motionY,clamp((pointer.y-lastY)/dt,-35,35),inertia);lastX=pointer.x;lastY=pointer.y;
       const attachment=active?active.tip:{x:pointer.x,y:pointer.y};const dx=attachment.x-pointer.x,dy=attachment.y-pointer.y,length=Math.max(1,Math.hypot(dx,dy));
       tilt=mix(tilt,clamp(motionX*.16-motionY*.05+dx/length*strength*7,-13,13),1-Math.pow(.8,dt));
       pose=paintGlove(extension,pointer.x,pointer.y,tilt);

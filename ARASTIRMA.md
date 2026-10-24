@@ -64,7 +64,7 @@ Yerel önizlemede yüzeyden tutma/bükme, sıfırlama, sahne seçimi, terminal b
 
 Tam ad ve LinkedIn birincil kimlik oldu. Yazılım, AI otomasyonu, sistem tasarımı, mobil ürünler, görsel iletişim ve tekstil deneyimi birlikte ele alındı. Dört seçili proje ve altı ek çalışma bulunur. LinkedIn’den alınan proje açıklamaları, kullanıcının profil beyanı olarak içerik kaynağıdır; hepsinin kodunun veya canlı dağıtımının ayrıca denetlendiği iddia edilmez. Önceden kodu incelenen projelerdeki prototip/geliştirme sınırları korundu. Bu portföyün kodla çizilen 3B sahnesi ve piksel anlatıcısı da çalışma olarak eklendi.
 
-52 × 7 matris iki eşzamanlı çalışma alanıdır: solda kalıcı siyah Luci, sağda cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişen yazar. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
+52 × 7 matris ortak bir sahnedir. Siyah Luci kimliğini korur; ikinci yazar cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişir. Yazım sınırı her EN/TR çiftinde kayar, yazarlar dört turda bir taraf değiştirir. İki kelime arasında okuma için iki sütun bırakılır; bu boşluk da yer değiştirir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
 
 32 teknik konu, dönüşümlü EN/TR 64 diyalog çifti ve 128 kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
@@ -87,11 +87,17 @@ Hata kodlarının anlamı [Node.js’in hata belgeleri](https://nodejs.org/api/e
 
 ## 24 Ekim / Eldiven ve simbiyot dokusu
 
-Tek noktadan çıkan paralel çizgiler, üç eldiven köküne bağlı üç incelen gövde ve altı dala dönüştürüldü. İnce zarlar, eldivene yayılan siyah damarlar, yayla geciken eğriler ve basma dalgası aynı malzeme hissini kurar. En fazla iki bağlantı vardır. Yeni hedef için 170 px, tutunmuş hedef için 238 px sınırı ve 680 ms geri çekilme bu uygulamanın tasarım kararlarıdır.
+Tek noktadan çıkan paralel çizgiler, üç eldiven köküne bağlı üç incelen gövde ve altı dala dönüştürüldü. İnce zarlar, eldivene yayılan siyah damarlar, yayla geciken eğriler ve basma dalgası aynı malzeme hissini kurar. En fazla iki bağlantı vardır. Son revizyonda el yaklaşık %30 küçültüldü; yeni hedef 150 px, tutunmuş hedef 216 px sınırı ve 580 ms geri çekilme kullanır. Bunlar uygulamanın tasarım kararlarıdır.
 
 - [MDN PointerEvent](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent): cihaz türü ayrımı, dokunmada normal kontrolü korumak için kullanılır. Metin alanları ve klavye gezinmesi de özel imleci bırakır; katman tıklama olaylarını yakalamaz.
 - [MDN SVG viewBox](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/viewBox): SVG koordinatlarının görüntü alanına eşlenmesi esas alınır. Eldivenin CSS alanı ve viewBox ölçüsü eşit tutularak parmak ucu gerçek tıklama noktasına yerleştirilir.
 - [MDN Document.elementFromPoint](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint): hedefin yalnız yerleşim kutusu değil, temas noktasında gerçekten görünmesi kontrol edilir. Üstü örtülen hedef bırakılır. Başlangıç kenarı dışarıdaki baskın eksenden seçilir; bağlantı sırasında kilitlenerek köşelerde sıçraması önlenir.
 - [MDN requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame): zaman damgasıyla ilerleme ve gerektiğinde yeni kare isteme kullanılır. Serbest imleç sakinleşince döngü durur; ilgisiz metin/piksel değişimleri yeniden başlatmaz. Gizlenme, duraklatma ve azaltılmış hareket çizimi kapatır; etkin dialog imlecin yeni katmanı olur.
 
-Yerel davranış testlerindeki 14 grup; geometriyi, dal sayısını, temas yönünü, örtülmeyi, gerilme/geri çekilme süresini, hedef değiştirmeyi ve temizlemeyi doğruladı. Bu kontroller cihazlar arası bir FPS veya CPU ölçümü değildir.
+Yerel davranış testlerindeki 19 grup; geometriyi, dal sayısını, temas yönünü, örtülmeyi, gerilme/geri çekilme süresini, hedef değiştirmeyi ve temizlemeyi doğruladı. Bu kontroller cihazlar arası bir FPS veya CPU ölçümü değildir.
+
+## 24 Ekim / Ölçek ve ortak sahne revizyonu
+
+Elin küçük ölçüsünde basma esnemesi dört ondalıklı aynı dönüşümle hem çizime hem ağ köklerine uygulanır. Yay adımları bölünür, hareket yumuşatması geçen süreye bağlıdır. Kopan altı dal temas noktalarını aynı anda dondurur; yeniden tutunmada uç 180 ms boyunca birleştirilir. Butonun temas kenarındaki kabarma ve basma dalgası SVG katmanındadır; gerçek kontrolün tıklama alanı değişmez.
+
+Luci'lerin sabit iki yarısı, yer değiştiren yazım alanlarına çevrildi. Okuma aralığı iki sütundur ve her konu çiftinde kayar; rota kontrolü 52 sütunun ve 364 hücrenin tamamının sahne bankasında kullanıldığını doğrular. Dört turda bir taraf değişimi 700 ms sıçramayla gösterilir. Mobil terminal metni 12 px'e, başlık bilgileri en az 8 px'e çıkarıldı; sözcükler dar alanda satır kırabilir. Proje ayrıntılarındaki kalan morumsu metinler sıcak fildişi tonlarıyla değiştirildi.

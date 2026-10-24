@@ -74,7 +74,7 @@
     Y:['101','101','101','010','010','010','010'],Z:['111','001','001','010','100','100','111']
   };
   const SYNTAX = ['#9cdcfe','#4ec9b0','#dcdcaa','#ce9178','#f9a8d4'];
-  const FADE_MS = 1600, MIN_HOLD = 4200, READ_MS = 5000, STAGGER = 900;
+  const FADE_MS = 1600, MIN_HOLD = 4200, READ_MS = 5000, STAGGER = 900, TRANSFER_MS = 700;
   const transliterate = value => String(value).replace(/[ıİ]/g,'I').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
   // Handwritten micro-dialogues, not portfolio claims or sentence permutations.
   const TOPICS = [
@@ -115,11 +115,22 @@
     {lang:'EN',words:topic[0],thoughts:topic[1]},
     {lang:'TR',words:topic[2],thoughts:topic[3]}
   ]);
-  function compileWord(value, side) {
+  function regionFor(side, round) {
+    // Both writers borrow the same matrix. Paired EN/TR scenes keep their
+    // geography; the next pair changes the boundary and periodically swaps it.
+    const pair = Math.floor(round / 2), split = [26,24,28,25,27][pair % 5];
+    const region = (side + Math.floor(pair / 2)) % 2;
+    // Two empty columns separate the current words. This breathing space moves
+    // with the split, so no columns are permanently excluded from writing.
+    return {start:region === 0 ? 0 : split+1,end:region === 0 ? split-1 : 52,region,pair};
+  }
+  function compileWord(value, side, round = 0) {
     const word = transliterate(value), compact = word.length > 4;
     const font = compact ? COMPACT : GLYPHS, glyphWidth = compact ? 3 : 5;
     const width = word.length * (glyphWidth + 1) - 1;
-    const start = side === 0 ? 0 : 28, left = start + Math.floor((24 - width) / 2), route = [];
+    const {start,end,region,pair} = regionFor(side,round), slack = end-start-width;
+    const alignment = (pair+side)%3;
+    const left = start + (alignment === 0 ? slack : alignment === 1 ? 0 : Math.floor(slack/2)), route = [];
     [...word].forEach((letter, letterIndex) => {
       const glyph = font[letter] || font.O;
       for(let line = 0; line < 7; line++) {
@@ -134,7 +145,7 @@
         });
       }
     });
-    return {word,width,left,route,hop:clamp(route.length * 95,4200,6500) / route.length};
+    return {word,width,left,start,end,region,route,hop:clamp(route.length * 95,4200,6500) / route.length};
   }
   function mount(options) {
     const {panel,grid,scroll} = options || {};
@@ -145,7 +156,7 @@
     const tethers = vector('svg',{class:'narrator-tethers','aria-hidden':'true'});
     root.append(tethers);
     const fracture = element('span','narrator-fracture');fracture.setAttribute('aria-hidden','true');root.append(fracture);
-    const helper = element('span','narrator-sr','İki Luci aynı matriste ayrı alanlara yazar. Siyah Luci ve renkli yazar, İngilizce ve Türkçe teknik düşünceleri paylaşır. Renkli izler geçicidir; gerçek etkinlik kayıtları değişmez. Balona tıklamak, okunmakta olan düşünceyi kesmeden sıradakini kuyruğa alır.');
+    const helper = element('span','narrator-sr','İki Luci aynı matrisi paylaşır ve yazarken yer değiştirir. Siyah Luci ve renkli yazar, İngilizce ve Türkçe teknik düşünceleri paylaşır. Renkli izler geçicidir; gerçek etkinlik kayıtları değişmez. Balona tıklamak, okunmakta olan düşünceyi kesmeden sıradakini kuyruğa alır.');
     const announcement = element('span','narrator-sr');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.append(helper,announcement);panel.append(root);
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const cleanups = [], owners = new Map(), retired = [], errorInk = [];
@@ -168,12 +179,12 @@
       const bar=element('span','narrator-terminal-bar'),led=element('i','narrator-led'),label=element('span','narrator-worker',`worker ${String(side+1).padStart(2,'0')}`),language=element('span','narrator-language'),status=element('span','narrator-status','RUN');
       bar.append(led,label,language,status);
       const line=element('span','narrator-line'),copy=element('span','narrator-copy'),caret=element('span','narrator-caret','▍');line.append(copy,caret);
-      const tip=element('span','narrator-tip','sıradaki düşünce ↵');terminal.append(bar,line,tip);bubble.append(terminal);
+      const tip=element('span','narrator-tip','sıradaki ↵');terminal.append(bar,line,tip);bubble.append(terminal);
       const tether=vector('path',{});tethers.append(tether);root.append(bubble);
       const zone={side,bubble,copy,language,status,tip,tether,actor:createActor(side,SYNTAX[0]),generation:null,requested:false,bubbleX:0,bubbleY:0,bubbleWidth:250,bubbleHeight:110};
       listen(bubble,'click',()=>{
         if(reduced){resetRound((roundIndex+1)%ROUNDS.length,true);return;}
-        zone.requested=true;tip.textContent='kuyruğa alındı · okununca ↵';bubble.dataset.queued='true';
+        zone.requested=true;tip.textContent='okununca ↵';bubble.dataset.queued='true';
         bubble.setAttribute('aria-label',`Düşünce: ${ROUNDS[roundIndex].thoughts[side]} Sıradaki düşünce kuyruğa alındı.`);
       });
       return zone;
@@ -189,9 +200,10 @@
       errorInk.splice(0).forEach(record=>record.node.remove());owners.clear();
     }
     function createGeneration(zone,index,born){
-      const entry=ROUNDS[index],score=compileWord(entry.words[zone.side],zone.side),serial=++wordsStarted;
-      const generation={id:++generationId,round:index,score,born,step:0,hopStart:null,hopFrom:zone.actor.current,ink:new Map(),doneAt:null,fullAt:null,letters:0,nextLetter:born+80,retire:null,error:null,errorDone:false,errorPlanned:serial%5===0,serial};
-      zone.requested=false;zone.tip.textContent='sıradaki düşünce ↵';delete zone.bubble.dataset.queued;
+      const entry=ROUNDS[index],score=compileWord(entry.words[zone.side],zone.side,index),serial=++wordsStarted;
+      const column=Math.floor(zone.actor.current/7),transfer=column<score.start||column>=score.end;
+      const generation={id:++generationId,round:index,score,born,step:0,hopStart:null,hopFrom:zone.actor.current,ink:new Map(),doneAt:null,fullAt:null,letters:0,nextLetter:born+80,retire:null,error:null,errorDone:false,errorPlanned:serial%5===0,serial,entryFrom:zone.actor.current,entryStart:null,entryDone:!transfer};
+      zone.requested=false;zone.tip.textContent='sıradaki ↵';delete zone.bubble.dataset.queued;
       zone.copy.textContent='';zone.language.textContent=entry.lang;zone.status.textContent='RUN';zone.bubble.dataset.status='run';zone.bubble.dataset.lang=entry.lang;
       zone.bubble.setAttribute('aria-label',`Düşünce: ${entry.thoughts[zone.side]} Sonraki düşünceyi okununca sıraya almak için tıkla.`);
       zone.bubble.style.setProperty('--narrator-accent',zone.side===0?'#ff6a35':zone.actor.color);
@@ -217,7 +229,7 @@
     }
     function nextRound(){
       roundIndex=(roundIndex+1)%ROUNDS.length;roundBorn=time;transitioning=true;
-      beginZone(zones[0],roundIndex,time+600,true);pendingRight={index:roundIndex,at:time+STAGGER};announceRound();
+      beginZone(zones[0],roundIndex,time+600,true);pendingRight={index:roundIndex,at:time+STAGGER};announceRound();dirty=true;queueMeasure();
     }
     function addInk(zone,generation,point){
       if(generation.ink.has(point.index))return;
@@ -247,11 +259,11 @@
       paint(actor,a.x+(b.x-a.x)*travel,a.y+(b.y-a.y)*travel-arc*height,1-arc*.045,1+arc*.065,actor.direction*arc*(warning?12:7),arc);
     }
     function errorPath(zone,generation){
-      const routeSet=new Set(generation.score.route.map(point=>point.index)),current=zone.actor.current,col=Math.floor(current/7),row=current%7,start=zone.side===0?0:28,candidates=[];
+      const routeSet=new Set(generation.score.route.map(point=>point.index)),current=zone.actor.current,col=Math.floor(current/7),row=current%7,{start,end}=generation.score,candidates=[];
       for(let radius=1;radius<6;radius++)for(let dc=-radius;dc<=radius;dc++)for(let dr=-radius;dr<=radius;dr++){
         if(Math.max(Math.abs(dc),Math.abs(dr))!==radius)continue;
         const c=col+dc,r=row+dr,index=c*7+r;
-        if(c<start||c>=start+24||r<0||r>6||routeSet.has(index)||owners.has(index)||candidates.includes(index))continue;
+        if(c<start||c>=end||r<0||r>6||routeSet.has(index)||owners.has(index)||candidates.includes(index))continue;
         candidates.push(index);if(candidates.length===3)return candidates;
       }
       return candidates;
@@ -294,6 +306,15 @@
       if(time<generation.born){idlePose(zone);return;}
       if(generation.error){updateError(zone,generation);return;}
       const route=generation.score.route;
+      if(!generation.entryDone){
+        // A side exchange is a visible leap, not a one-frame teleport. The
+        // previous writer must release this landing cell before takeoff.
+        if(generation.entryStart===null){if(!available(generation,route[0])){idlePose(zone);return;}generation.entryStart=time;}
+        const progress=clamp((time-generation.entryStart)/TRANSFER_MS,0,1);
+        hopPose(zone,generation.entryFrom,route[0].index,progress);
+        if(progress>=1&&available(generation,route[0])){addInk(zone,generation,route[0]);zone.actor.current=route[0].index;generation.step=1;generation.entryDone=true;}
+        return;
+      }
       if(generation.step>=route.length){if(generation.doneAt===null)generation.doneAt=time;idlePose(zone);return;}
       if(generation.errorPlanned&&!generation.errorDone&&generation.step>=Math.floor(route.length*.42)){startError(zone,generation);if(generation.error){updateError(zone,generation);return;}}
       const point=route[generation.step];
@@ -324,15 +345,15 @@
       }
     }
     function fadeErrors(){for(let i=errorInk.length-1;i>=0;i--){const record=errorInk[i],age=time-record.born;record.node.style.opacity=String(clamp(1-(age-600)/700,0,1));if(age>=1300){record.node.remove();errorInk.splice(i,1);}}}
-    function staticWord(zone){const g=zone.generation;g.score.route.forEach(point=>addInk(zone,g,point));g.step=g.score.route.length;g.doneAt=time;g.fullAt=time;g.letters=ROUNDS[g.round].thoughts[zone.side].length;zone.copy.textContent=ROUNDS[g.round].thoughts[zone.side];zone.bubble.classList.remove('is-typing');zone.actor.current=g.score.route.at(-1).index;idlePose(zone);}
+    function staticWord(zone){const g=zone.generation;g.score.route.forEach(point=>addInk(zone,g,point));g.step=g.score.route.length;g.doneAt=time;g.fullAt=time;g.entryDone=true;g.letters=ROUNDS[g.round].thoughts[zone.side].length;zone.copy.textContent=ROUNDS[g.round].thoughts[zone.side];zone.bubble.classList.remove('is-typing');zone.actor.current=g.score.route.at(-1).index;idlePose(zone);}
     function diagnostics(){
       const phase=[];
       zones.forEach(zone=>{
-        const g=zone.generation,key=zone.side===0?'left':'right',currentPhase=g.error?'warn':time<g.born?'enter':g.doneAt!==null?'hold':'draw';
-        data(key+'Word',g.score.word);data(key+'Phase',currentPhase);data(key+'Lang',ROUNDS[g.round].lang);data(key+'Ink',g.ink.size);data(key+'Step',g.step);data(key+'Serial',g.serial);data(key+'Body',zone.side===0?'#050506':zone.actor.color);
+        const g=zone.generation,key=zone.side===0?'left':'right',currentPhase=g.error?'warn':time<g.born?'enter':!g.entryDone?'travel':g.doneAt!==null?'hold':'draw';
+        data(key+'Word',g.score.word);data(key+'Phase',currentPhase);data(key+'Lang',ROUNDS[g.round].lang);data(key+'Ink',g.ink.size);data(key+'Step',g.step);data(key+'Serial',g.serial);data(key+'Body',zone.side===0?'#050506':zone.actor.color);data(key+'ColumnStart',g.score.start);data(key+'ColumnEnd',g.score.end);data(key+'Region',g.score.region);
         data(key+'ReadMs',g.fullAt===null?0:Math.round(time-g.fullAt));data(key+'HoldMs',g.doneAt===null?0:Math.round(time-g.doneAt));phase.push(currentPhase);
       });
-      data('phase',phase.includes('warn')?'warn':retired.length?'overlap':phase.includes('draw')||phase.includes('enter')?'draw':'hold');
+      data('phase',phase.includes('warn')?'warn':retired.length?'overlap':phase.includes('draw')||phase.includes('enter')||phase.includes('travel')?'draw':'hold');
       data('error',zones.some(zone=>zone.generation.error)?'warn':errorInk.length?'recover':'none');
       data('actors',2+retired.filter(entry=>entry.actor).length);data('round',roundIndex+1);data('lang',ROUNDS[zones[0].generation.round].lang===ROUNDS[zones[1].generation.round].lang?ROUNDS[zones[0].generation.round].lang:'mixed');
       data('message',zones.map(zone=>zone.generation.score.word).join(' / '));data('inkCount',zones.reduce((sum,zone)=>sum+zone.generation.ink.size,0));data('elapsed',Math.round(time));
@@ -349,10 +370,11 @@
       dirty=false;const panelRect=panel.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();
       points=[...grid.querySelectorAll('.rhythm-cell')].map(cell=>{const rect=cell.getBoundingClientRect();return {cell,x:rect.left+rect.width/2-panelRect.left,y:rect.top+rect.height*.65-panelRect.top};});
       box={width:panel.clientWidth,size:zones[0].actor.node.offsetWidth||42,pitch:gridRect.width/52,gridTop:gridRect.top-panelRect.top};
-      const availableWidth=gridRect.width*24/52,bubbleWidth=Math.min(280,Math.max(100,availableWidth-5));
+      const availableWidth=gridRect.width*.5,bubbleWidth=Math.min(280,Math.max(100,availableWidth-8));
       zones.forEach(zone=>{
         zone.bubble.style.width=bubbleWidth.toFixed(2)+'px';zone.bubbleWidth=bubbleWidth;zone.bubbleHeight=zone.bubble.offsetHeight;
-        const center=gridRect.left-panelRect.left+gridRect.width*((zone.side===0?12:40)/52);
+        const region=regionFor(zone.side,roundIndex);
+        const center=gridRect.left-panelRect.left+gridRect.width*((region.start+region.end)/104);
         zone.bubbleX=clamp(center-bubbleWidth/2,8,Math.max(8,box.width-bubbleWidth-8));zone.bubbleY=Math.max(14,box.gridTop-zone.bubbleHeight-35);
         zone.bubble.style.transform=`translate3d(${zone.bubbleX.toFixed(2)}px,${zone.bubbleY.toFixed(2)}px,0)`;idlePose(zone);
       });

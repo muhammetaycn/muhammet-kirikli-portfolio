@@ -10,8 +10,10 @@
 .symbiote-webs .symbiote-branch-core{stroke:#070a0b}
 .symbiote-webs .symbiote-membrane{fill:#10191a;stroke:#6e8074;stroke-width:.55}
 .symbiote-webs .symbiote-contact{fill:#070a0b;stroke:#a4b5aa;stroke-opacity:.35;stroke-width:.65}
+.symbiote-webs .symbiote-target-rim{stroke:#c6cfc2;stroke-width:.85}
+.symbiote-webs .symbiote-target-ripple{stroke:#b3c1b6;stroke-width:.65}
 /* A 100×122 CSS viewport matches the SVG viewBox. JS applies the only scale. */
-.symbiote-glove{position:absolute;left:0;top:0;width:100px;height:122px;overflow:visible;transform-origin:0 0;will-change:transform;filter:drop-shadow(1px 3px 2px #0005)}
+.symbiote-glove{position:absolute;left:0;top:0;width:100px;height:122px;overflow:visible;transform-origin:0 0;will-change:transform;filter:drop-shadow(.7px 2px 1.4px #0005)}
 .symbiote-hand-vein{fill:none;stroke:#101819;stroke-linecap:round;stroke-linejoin:round}
 .symbiote-cuff-film{fill:#080b0d;stroke:#7b887d;stroke-opacity:.5;stroke-width:.7}
 .symbiote-glove .glove-outline{stroke:#383431;stroke-width:1.55;stroke-linejoin:round;stroke-linecap:round}
