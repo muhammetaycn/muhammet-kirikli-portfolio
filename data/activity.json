@@ -2,7 +2,7 @@
   "source": "Bu portföyün GitHub geliştirme kayıtları",
   "metric": "repository_commits",
   "repository": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio",
-  "generatedAt": "2026-10-24T14:51:31.630Z",
+  "generatedAt": "2026-10-24T20:09:20.397Z",
   "days": [
     {
       "date": "2026-10-23",
@@ -22,8 +22,13 @@
     },
     {
       "date": "2026-10-24",
-      "count": 7,
+      "count": 8,
       "events": [
+        {
+          "sha": "a81d0bf9cab9c1fefec341f44b465511cfaf46e0",
+          "title": "Add personal dock and continuous project scenes with resilient navigation",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/a81d0bf9cab9c1fefec341f44b465511cfaf46e0"
+        },
         {
           "sha": "95874d0258d63031d78aa37be58c075094b9da12",
           "title": "Connect portfolio skills to live workflows and choreograph the desktop experience",
