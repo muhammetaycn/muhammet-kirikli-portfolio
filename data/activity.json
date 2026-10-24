@@ -1,1 +1,65 @@
-{"source":"AI ile üretim günleri","days":[]}
+{
+  "source": "Bu portföyün GitHub geliştirme kayıtları",
+  "metric": "repository_commits",
+  "repository": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio",
+  "generatedAt": "2026-10-24T14:51:31.630Z",
+  "days": [
+    {
+      "date": "2026-10-23",
+      "count": 2,
+      "events": [
+        {
+          "sha": "65f4ce69ba797de09fe944c73aaedc2901e2d89c",
+          "title": "Finalize LinkedIn identity and whole-grid Luci choreography",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/65f4ce69ba797de09fe944c73aaedc2901e2d89c"
+        },
+        {
+          "sha": "149297afd57d4a5e317d1a724804376dc2dd7f79",
+          "title": "Build Muhammet Kirikli portfolio with sculptable motion and pixel storytelling",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/149297afd57d4a5e317d1a724804376dc2dd7f79"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-24",
+      "count": 7,
+      "events": [
+        {
+          "sha": "95874d0258d63031d78aa37be58c075094b9da12",
+          "title": "Connect portfolio skills to live workflows and choreograph the desktop experience",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/95874d0258d63031d78aa37be58c075094b9da12"
+        },
+        {
+          "sha": "a00d06d00c24b9a023b6ee4d842c31bff126b14f",
+          "title": "Refine compact glove motion and let Luci writers share the full matrix",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/a00d06d00c24b9a023b6ee4d842c31bff126b14f"
+        },
+        {
+          "sha": "91233200a74962bf512e6c9c3456ba09699d6e25",
+          "title": "Give glove tendrils organic branching, stable attachment and elastic recoil",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/91233200a74962bf512e6c9c3456ba09699d6e25"
+        },
+        {
+          "sha": "e26266a86f40e7e3361e5bb3901aa183dc7bfd6f",
+          "title": "Coordinate bilingual Luci workers with readable thoughts and recoverable faults",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/e26266a86f40e7e3361e5bb3901aa183dc7bfd6f"
+        },
+        {
+          "sha": "65fd5022a06da86bd16fcca1f47113f516a345dd",
+          "title": "Build floating 32-key computer with live local apps and SQLite",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/65fd5022a06da86bd16fcca1f47113f516a345dd"
+        },
+        {
+          "sha": "962511c6bdeaf2056ed25fc393762c4cc4097dff",
+          "title": "Add stitched glove cursor with organic interactive tethers",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/962511c6bdeaf2056ed25fc393762c4cc4097dff"
+        },
+        {
+          "sha": "fa089718ce87c1ad708b552ebf9a9b47a26d04c4",
+          "title": "Refine multi-color Luci word choreography and profile balance",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/fa089718ce87c1ad708b552ebf9a9b47a26d04c4"
+        }
+      ]
+    }
+  ]
+}
