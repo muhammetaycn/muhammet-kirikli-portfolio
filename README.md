@@ -34,11 +34,19 @@ Ardından [localhost:8000](http://localhost:8000) adresine git. Windows’ta Pyt
 - `app.js`: gezinme, proje ayrıntıları, hareket kontrolü ve takvim.
 - `kinetic.js`: imleç çekimi, yerel bükülme ve kalıcı biçim vermeyi destekleyen Canvas şerit; dönüş sürer, sıfırlama düğmesi biçimi geri alır.
 - `narrator.js` ve `narrator.css`: birlikte yazan Luciler, EN/TR terminal düşünceleri ve yanlış inişten toparlanma. Balona tıkla veya Enter ile sonraki düşünceyi sıraya al.
-- `cursor.js` ve `cursor.css`: beş parmaklı dikişli eldiven, yakınlaşınca açılan eklem ve butonlardan uzanan siyah lifler. Dokunma, metin girişi, hareket duraklatma ve azaltılmış harekette normal imleç korunur.
+- `cursor.js` ve `cursor.css`: beş parmaklı dikişli eldiven, açılan eklem ve elden hedefe uzanan, gerilip geri çekilen siyah simbiyot dokusu.
 - `system-lab.js`: projelerin adımlarını gösteren etkileşimli akış alanı.
 - `ARASTIRMA.md`: sekiz tasarım kaynağı, gözlem sınırları ve özgün uygulama kararları.
 
 Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. Bu portföy için yeni görsel üretimi kullanılmadı; sahne ve akışlar kodla çizilir.
+
+## Simbiyot imleci
+
+Ağ, parmak eklemi, başparmak ve manşetteki üç ayrı noktadan çıkar. Her bağlantıda üç incelen gövde, altı dal ve aralarındaki zarlar bulunur; aynı anda en fazla iki bağlantı tutulur. Yakınlık dokuyu kalınlaştırır, siyah damarlar eldivene yayılır; basma hareketi ağ boyunca bir dalga gönderir.
+
+Yeni hedef 170 px içinde edinilir; tutunmuş bağlantı 238 px'e kadar gerilir, bırakıldığında 680 ms boyunca geri çekilir. İlk temas yönü dışarıdaki baskın eksene göre seçilir ve bağlantı boyunca sabit kalır. Üzeri başka bir bölümle örtülen düğmelere tutunulmaz. Parmak ucu gerçek tıklama noktasında kalır; düğmelerin konumu ve tıklama alanı değiştirilmez.
+
+İmleç etkin dialogun içine taşınır. Metin alanlarında, dokunmada, azaltılmış harekette ve genel duraklatmada normal imleç kullanılır. Sayfa gizlenince çizim durur; serbest imleç sakinleşince yeni animasyon karesi istenmez. İlgisiz metin ve piksel güncellemeleri bu döngüyü uyandırmaz.
 
 ## GitHub Pages
 

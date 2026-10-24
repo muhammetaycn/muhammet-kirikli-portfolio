@@ -84,3 +84,14 @@ SQLite deneyi, [sql.js](https://github.com/sql-js/sql.js/releases/tag/v1.15.1) 1
 İki yazarın başlangıcı ve çizim saatleri ayrı, konu geçişi birlikte planlandı. Metin okuma süresi hücre atlama hızından bağımsız tutulur. Dar panel ve sabit balonlar gözün sürekli yer değiştirmesini azaltır. Yanlış iniş gerçek üretim verisine eklenmez; kırmızı iz ve panelde tek yumuşak sıçrama, ardından toparlanma gösterilir.
 
 Hata kodlarının anlamı [Node.js’in hata belgeleri](https://nodejs.org/api/errors.html#common-system-errors) ve [MDN HTTP 429 açıklaması](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429) ile kontrol edildi. Balondaki kısa cümleler ve kod parçaları bu deney için yazılmıştır; gerçek bir sunucudan alınmış hata kaydı olarak sunulmaz.
+
+## 24 Ekim / Eldiven ve simbiyot dokusu
+
+Tek noktadan çıkan paralel çizgiler, üç eldiven köküne bağlı üç incelen gövde ve altı dala dönüştürüldü. İnce zarlar, eldivene yayılan siyah damarlar, yayla geciken eğriler ve basma dalgası aynı malzeme hissini kurar. En fazla iki bağlantı vardır. Yeni hedef için 170 px, tutunmuş hedef için 238 px sınırı ve 680 ms geri çekilme bu uygulamanın tasarım kararlarıdır.
+
+- [MDN PointerEvent](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent): cihaz türü ayrımı, dokunmada normal kontrolü korumak için kullanılır. Metin alanları ve klavye gezinmesi de özel imleci bırakır; katman tıklama olaylarını yakalamaz.
+- [MDN SVG viewBox](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/viewBox): SVG koordinatlarının görüntü alanına eşlenmesi esas alınır. Eldivenin CSS alanı ve viewBox ölçüsü eşit tutularak parmak ucu gerçek tıklama noktasına yerleştirilir.
+- [MDN Document.elementFromPoint](https://developer.mozilla.org/en-US/docs/Web/API/Document/elementFromPoint): hedefin yalnız yerleşim kutusu değil, temas noktasında gerçekten görünmesi kontrol edilir. Üstü örtülen hedef bırakılır. Başlangıç kenarı dışarıdaki baskın eksenden seçilir; bağlantı sırasında kilitlenerek köşelerde sıçraması önlenir.
+- [MDN requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame): zaman damgasıyla ilerleme ve gerektiğinde yeni kare isteme kullanılır. Serbest imleç sakinleşince döngü durur; ilgisiz metin/piksel değişimleri yeniden başlatmaz. Gizlenme, duraklatma ve azaltılmış hareket çizimi kapatır; etkin dialog imlecin yeni katmanı olur.
+
+Yerel davranış testlerindeki 14 grup; geometriyi, dal sayısını, temas yönünü, örtülmeyi, gerilme/geri çekilme süresini, hedef değiştirmeyi ve temizlemeyi doğruladı. Bu kontroller cihazlar arası bir FPS veya CPU ölçümü değildir.
