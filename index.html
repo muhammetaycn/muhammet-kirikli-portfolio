@@ -19,29 +19,34 @@
   <link rel="stylesheet" href="capability-map.css?v=20261024s">
   <link rel="stylesheet" href="personal-dock.css?v=20261024u">
   <link rel="stylesheet" href="project-motion.css?v=20261024u">
-  <link rel="stylesheet" href="system-lab.css?v=20261024s">
-  <link rel="stylesheet" href="narrator.css?v=20261024s">
+  <link rel="stylesheet" href="system-lab.css?v=20261026b">
+  <link rel="stylesheet" href="narrator.css?v=20261026b">
   <link rel="stylesheet" href="cursor.css?v=20261024s">
   <link rel="stylesheet" href="computer-os.css?v=20261024s">
   <link rel="stylesheet" href="computer-scene.css?v=20261024s">
-  <link rel="stylesheet" href="hero-deck.css?v=20261024s">
+  <link rel="stylesheet" href="hero-deck.css?v=20261026b">
+  <link rel="stylesheet" href="ui-icons.css?v=20261026b">
+  <link rel="stylesheet" href="motion-film.css?v=20261026b">
   <script defer src="content.js?v=20261024s"></script>
   <script defer src="kinetic.js?v=20261024s"></script>
-  <script defer src="system-lab.js?v=20261024s"></script>
+  <script defer src="system-lab.js?v=20261026b"></script>
   <script defer src="capability-map.js?v=20261024s"></script>
-  <script defer src="narrator.js?v=20261024s"></script>
+  <script defer src="narrator.js?v=20261026b"></script>
   <script defer src="cursor.js?v=20261024s"></script>
   <script defer src="computer-db.js?v=20261024s"></script>
   <script defer src="computer-os.js?v=20261024s"></script>
   <script defer src="computer-scene.js?v=20261024s"></script>
-  <script defer src="hero-deck.js?v=20261024s"></script>
+  <script defer src="hero-deck.js?v=20261026b"></script>
   <script defer src="personal-dock.js?v=20261024u"></script>
   <script defer src="project-motion.js?v=20261024u"></script>
-  <script defer src="app.js?v=20261024u"></script>
+  <script defer src="ui-icons.js?v=20261026b"></script>
+  <script defer src="motion-film.js?v=20261026b"></script>
+  <script defer src="app.js?v=20261026b"></script>
 </head>
 <body>
   <a class="skip-link" href="#work">Çalışmalara geç</a>
   <div class="page-progress" aria-hidden="true"><span id="page-progress"></span></div>
+  <noscript><div class="motion-film" aria-hidden="true"><img class="motion-film-poster" src="assets/motion/suspended-poster.svg" alt=""></div></noscript>
   <header class="site-header">
     <a class="wordmark" href="#home" aria-label="Muhammet Kırıklı ana sayfa">mk<span class="wordmark-star" aria-hidden="true">✳</span></a>
     <a class="header-note" href="#work">MUHAMMET KIRIKLI / PERSONAL INDEX</a>
@@ -85,8 +90,8 @@
     </section>
 
     <section class="lab-section section-shell" id="lab" aria-labelledby="lab-heading">
-      <div class="section-kicker reveal"><span>02 / SİSTEMLERİN İÇİNE GİR</span><span>ETKİLEŞİMLİ AKIŞ DEMOSU</span></div>
-      <div class="lab-heading reveal"><h2 id="lab-heading">Peki, <em>nasıl çalışıyor?</em></h2><p>Bir olay başlat.<br>Verinin nereye gittiğini izle.</p></div>
+      <div class="section-kicker reveal"><span>02 / NASIL KURUYORUM</span><span>YEDİ KÜÇÜK DENEY</span></div>
+      <div class="lab-heading reveal"><h2 id="lab-heading">Çalışırken <em>gör.</em></h2><p>Bir örnek seç.<br>Kendi girdinle sonucu dene.</p></div>
       <div id="system-lab" class="system-lab reveal"><div class="lab-tabs" role="group" aria-label="Sistem seç"><button data-lab-project="fullstack" aria-pressed="true">01 Full-stack</button><button data-lab-project="automation" aria-pressed="false">02 Otomasyon</button><button data-lab-project="mobile" aria-pressed="false">03 Mobil</button><button data-lab-project="event" aria-pressed="false">04 Etkinlik</button><button data-lab-project="textile" aria-pressed="false">05 Operasyon</button><button data-lab-project="content" aria-pressed="false">06 İçerik</button><button data-lab-project="community" aria-pressed="false">07 Topluluk</button></div><div class="lab-description"><h3 id="lab-title">Telefon → Sahne</h3><p id="lab-description">Katılım, paylaşım ve yönetim kararlarının birbirine bağlandığı akış.</p></div><div class="lab-viewport"><svg id="lab-stage" viewBox="0 0 960 380" role="img" aria-label="Seçili sistemin adımları"></svg></div><div class="lab-footer"><p id="lab-result" role="status">Demo · Bir sistem seç ve akışı başlat.</p><div><button id="lab-explore" class="text-button lab-explore">API ekranını aç ↗</button><button id="lab-reset" class="text-button">Sıfırla ↺</button><button id="lab-run" class="pill-button">Akışı çalıştır <span>↗</span></button></div></div><p class="demo-footnote">Bu etkileşim, projedeki fikri anlatan bir simülasyon. Gerçek hesaplara veya servislere işlem göndermez.</p></div>
     </section>
 
@@ -97,7 +102,7 @@
 
     <section class="background-section section-shell" aria-labelledby="background-title"><div class="section-kicker"><span id="background-title">ARKA PLAN</span><a href="https://www.linkedin.com/in/muhammet-kirikli/" target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a></div><div class="background-columns"><div><h3>Öğrenim</h3><div id="education-list"></div></div><div><h3>Deneyim alanları</h3><div id="experience-list"></div></div></div></section>
 
-    <section class="rhythm-section section-shell" id="rhythm" aria-labelledby="rhythm-title"><div class="section-kicker reveal"><span>04 / CANLI KOD MATRİSİ</span><span>EN ↔ TR / TWO WORKERS</span></div><div class="rhythm-heading reveal"><h2 id="rhythm-title" class="log-title">mk<span>.log</span><i aria-hidden="true"></i></h2><p>İki yazar, aynı matris.<br>Kod, hata ve bir sonraki deneme.</p></div><div class="rhythm-panel reveal"><div class="rhythm-meta"><span id="rhythm-summary">Henüz günlük paylaşılmadı.</span><div class="rhythm-legend"><span>RUN</span><i></i><i></i><i></i><span>WARN</span><i class="warn-dot"></i></div></div><div class="rhythm-scroll"><div id="rhythm-grid" class="rhythm-grid" role="group" aria-label="AI ile üretim günleri"></div></div><div class="rhythm-bottom"><span id="rhythm-detail" role="status">Renkler geçici animasyon izidir. Üretim günlüğü henüz paylaşılmadı.</span><a id="rhythm-source" href="https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commits/main/" target="_blank" rel="noopener noreferrer">GITHUB / BUILD LOG ↗</a></div></div></section>
+    <section class="rhythm-section section-shell" id="rhythm" aria-labelledby="rhythm-title"><div class="section-kicker reveal"><span>04 / CANLI KOD MATRİSİ</span><span>EN / TR · SİL + YAZ</span></div><div class="rhythm-heading reveal"><h2 id="rhythm-title" class="log-title">mk<span>.log</span><i aria-hidden="true"></i></h2><p>Biri siler. Diğeri izinden yazar.<br>Tek cümle, aynı tempo.</p></div><div class="rhythm-panel reveal"><div class="rhythm-meta"><span id="rhythm-summary">Henüz günlük paylaşılmadı.</span><div class="rhythm-legend"><span>RUN</span><i></i><i></i><i></i><span>WARN</span><i class="warn-dot"></i></div></div><div class="rhythm-scroll"><div id="rhythm-grid" class="rhythm-grid" role="group" aria-label="AI ile üretim günleri"></div></div><div class="rhythm-bottom"><span id="rhythm-detail" role="status">Renkler geçici animasyon izidir. Üretim günlüğü henüz paylaşılmadı.</span><a id="rhythm-source" href="https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commits/main/" target="_blank" rel="noopener noreferrer">GITHUB / BUILD LOG ↗</a></div></div></section>
 
     <section class="contact-section section-shell" id="contact" aria-labelledby="contact-title"><div class="section-kicker reveal"><span>05 / BİR SONRAKİ FİKİR</span><span>BURADAN DEVAM EDELİM.</span></div><h2 id="contact-title" class="reveal">Aklında<br><em>bir şey mi var?</em><span aria-hidden="true">↗</span></h2><div class="contact-links reveal"><a class="contact-link" href="https://www.linkedin.com/in/muhammet-kirikli/" target="_blank" rel="noopener noreferrer"><span>LINKEDIN</span><b>Muhammet Kırıklı</b><i>↗</i></a><a class="contact-link" href="https://github.com/muhammetaycn" target="_blank" rel="noopener noreferrer"><span>GITHUB</span><b>Projeler & kaynak</b><i>↗</i></a></div><footer><a class="wordmark" href="#home">mk<span class="wordmark-star">✳</span></a><span>MUHAMMET KIRIKLI / <span id="footer-year">2026</span></span><a id="source-link" href="https://github.com/muhammetaycn" target="_blank" rel="noopener noreferrer">Kaynak kod ↗</a><button id="back-top" class="text-button">Başa dön ↑</button></footer></section>
   </main>

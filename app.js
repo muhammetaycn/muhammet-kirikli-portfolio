@@ -17,10 +17,12 @@
   let systemLab;
   let personalDock;
   let projectMotion;
+  let motionFilm;
   let requestedCaseIndex=0;
   const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
   const cleanups = [];
+  if(window.UIIcons){const uiIcons=window.UIIcons.mount();cleanups.push(()=>uiIcons.destroy());}
   function element(tag, className, text) { const e = document.createElement(tag); if (className) e.className = className; if (text !== undefined) e.textContent = text; return e; }
   function toast(text) { $('#toast').textContent = text; $('#toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.remove('visible'), 2600); }
 
@@ -179,6 +181,7 @@
   document.querySelectorAll('[data-lab-project]').forEach(button=>button.addEventListener('click',()=>{$('#lab-explore').textContent=(labExperiences[button.dataset.labProject]||labExperiences.fullstack)[1];}));
   $('#lab-explore').addEventListener('click',()=>{const selected=document.querySelector('[data-lab-project][aria-pressed="true"]')?.dataset.labProject||'fullstack';launchExperience((labExperiences[selected]||labExperiences.fullstack)[0]);});
   if(window.PersonalDock){personalDock=window.PersonalDock.mount({identity:data.identity,projects,skills,onSurfaceChange:syncSurfaces,canMove:()=>moving});cleanups.push(()=>personalDock.destroy());}
+  if(window.MotionFilm){motionFilm=window.MotionFilm.mount({canMove:()=>moving});cleanups.push(()=>motionFilm.destroy());}
   function syncSurfaces() {
     const covered = Boolean(document.querySelector('dialog[open]'));
     document.body.classList.toggle('modal-open',covered);
@@ -192,6 +195,7 @@
     systemLab?.setPaused?.(!moving||covered);
     personalDock?.setPaused(!moving);
     projectMotion?.setPaused(!moving);
+    motionFilm?.setPaused(!moving);
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
@@ -238,7 +242,7 @@
     let daily = new Map(), events = new Map(), buildLog = false;
     const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json?v=20261024u');
+      const response = await fetch('data/activity.json?v=20261026b');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
       personalDock?.setBuildLog(json);

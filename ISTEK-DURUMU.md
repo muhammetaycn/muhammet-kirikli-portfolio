@@ -1,4 +1,4 @@
-# Portföy isteklerinin durumu — 24 Ekim 2026
+# Portföy isteklerinin durumu — 26 Ekim 2026
 
 Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmalarını birlikte anlatan kişisel portföydür. Aşağıdaki durumlar bu site kapsamındadır.
 
@@ -7,18 +7,21 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | Ad, LinkedIn, tüm yetenek alanları | Tam ad, 65 yetenek, eğitim ve deneyim; yazılım ve tekstil birlikte, alanlardan gerçek projelere bağlantılar |
 | Özgün hareket dili, lila olmayan palet | Siyah, sıcak fildişi ve turuncu; kodla çizilmiş sahneler ve dikişli eldiven |
 | İmlece çekilen, dönerken tutulup biçim verilen nesne | Kalıcı yerel bükülme, çekim fiziği, üç biçim modu ve sıfırlama |
-| Tek görsel yerine sırayla modeller | Şerit ve bilgisayar arasında otomatik/elle geçiş; etkileşim sırasında sahne kilidi |
+| Kısa döngü, fareyle durdurma | Şerit 4,2 sn / bilgisayar 5,8 sn; alana girince tur donar, çıkınca kalan süre 320 ms sonra sürer |
 | Pofuduk, yazısız 32 tuşlu bilgisayar | 32 farklı işlev, tuş–ekran sinyali, fiziksel basma, ekran uyanışı ve Luci tepkisi |
 | Bilgisayarın içinde imleçle uygulama açılması | Gerçek düğme konumlarını izleyen, kesilebilir Terminal → SQLite → sürüm/şema turu |
 | SQL, kodlar, sistemler, küçük oyunlar | Gerçek SQLite JOIN/transaction, düzenlenebilir yerel uygulamalar, sürümler, motion araçları ve iki oyun |
-| Luci'lerin tüm karelerde birlikte yazması | Ortak 52 × 7 alan, kayan yazım sınırları, taraf değişimi; sahne bankasında 364 hücrenin tamamı |
+| Tek cümle, önden silme ve arkadan eşli yazma | Ortak 52 × 7 alanda iki kalıcı Luci; aynı saatle silme/yazma, üç sütun aralık, çarpışmasız hücre sahipliği |
 | Siyah Luci, farklı syntax renkleri, EN/TR | Siyah karakter korunur; ikinci yazar renk değiştirir; eşleşen EN/TR düşünceleri |
 | Tekrarlamayan geniş yazı çeşitliliği | 96 teknik konu, 192 sahne, 384 özgün düşünce; konu çifti döngü içinde tekrarlanmaz |
-| Okunur düşünceler ve kelime bütünlüğü | Tam metin en az 5 sn, kelime en az 4,2 sn; eski iz silinirken yenisi başlar; mobil metinler büyütüldü |
+| Okunur düşünceler ve cümle bütünlüğü | Düşünce en az 5 sn, tamamlanan cümle 2,8 sn; başlangıçtan silinen izlerin arkasından yeni cümle gelir; 12 px düşünceler |
 | Yanlış kare, kırmızı iz, WARN ve panel kırılması | Yanlış iniş, üç kırmızı iz, küçük tek sıçrama/kırılma ve toparlanma |
 | Küçük beş parmaklı dikişli eldiven | Yaklaşık %30 küçültülmüş el, açılan işaret parmağı eklemi, basma esnemesi ve gerçek tıklama hizası |
 | Elden çıkan, yaklaşınca kalınlaşan simbiyot | Üç eldiven kökü, üç ana gövde/altı dal, zarlar, kenar tepkisi, gerilme/kopma/yeniden tutunma |
-| Yalnız metin yerine sistemleri keşfetme | Yedi düzenlenebilir akış; eksik veri, insan kararı, tekrar koruması ve seçilebilir adımlar |
+| Kullanıcı dostu sistemler | Yedi somut iş, girdinin yanındaki eylem, adlandırılmış onay ve sonuç; JSON/iz kapalı Teknik ayrıntılar içinde |
+| Hafif arka plan motion ve metin girişleri | Kendi 7,2 sn / 54 KB şerit filmi, siyah maskeler, SVG poster ve beş başlıkta kelime bütünlüğünü koruyan giriş |
+| Mobilde emoji görünen okları düzeltme | İlk yükleme ve dinamik içerik için SVG işaretler; kod/terminal/metin alanları korunur |
+| Yeni referanslarda ayrıntılı araştırma | Dribbble çalışmaları, Kaelorian canlı sitesi, Webflow Rexton/Prosma canlı önizlemeleri ve Noctra; kapsam ve sınırlar MOTION-ARASTIRMA.md içinde |
 | Profili destekleyen gerçek üretim izi | Bu deponun tarihli GitHub commitleri ve açılabilir değişiklik kayıtları |
 | Videodaki kompakt kişisel alan ve alt Dock | Normal bölüm bağlantıları, küçük profil dialogu, doğru ad/kimlik, gerçek proje ve yetenek sayıları, İstanbul saati ve kaynak depoya bağlı geliştirme kartı |
 | Proje keşfinde hareket ve sahne devamlılığı | Ek Awwwards/Brandon Yasin galeri incelemesinden uyarlanan, kendi çizimlerini büyüten proje dialogu; kesilebilir açılış, proje değiştirme ve kapanış |

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
+  <defs>
+    <linearGradient id="metal" x1="250" y1="98" x2="577" y2="326" gradientUnits="userSpaceOnUse"><stop stop-color="#101513"/><stop offset=".24" stop-color="#777970"/><stop offset=".42" stop-color="#1b211e"/><stop offset=".73" stop-color="#a39d8b"/><stop offset="1" stop-color="#101614"/></linearGradient>
+    <linearGradient id="edge" x1="250" y1="300" x2="580" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#171d18"/><stop offset=".55" stop-color="#696557"/><stop offset="1" stop-color="#171d18"/></linearGradient>
+  </defs>
+  <path fill="#050707" d="M0 0h640v400H0z"/>
+  <path d="M269 151c-2-51 104-82 189-45 85 36 140 117 92 163-42 40-143 14-153-39-11-56 117-111 106-61-6 26-65 91-115 85-51-7-119-58-119-103Z" stroke="url(#metal)" stroke-width="35"/>
+  <path d="M306 292c-66-4-42-144 46-173 106-35 231 13 196 83-35 71-183 118-242 90Z" stroke="url(#edge)" stroke-width="8"/>
+  <path d="M333 160c63-50 123-42 142-13 27 41-50 127-96 124-61-5-86-79-46-111Z" stroke="url(#metal)" stroke-width="24" opacity=".8"/>
+</svg>

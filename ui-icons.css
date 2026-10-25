@@ -1,0 +1,9 @@
+.has-ui-icons svg.ui-icon{display:inline-block;width:1em;height:1em;min-width:1em;vertical-align:-.14em;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;overflow:visible;flex-shrink:0}
+.has-ui-icons .round-arrow>.ui-icon,.has-ui-icons .dialog-close>.ui-icon{display:block;margin:auto}
+.has-ui-icons .round-arrow>.ui-icon{width:1em;height:1em}
+.has-ui-icons .preview-open{display:grid;place-items:center}
+.has-ui-icons .preview-open>.ui-icon{display:block;width:1em;height:1em}
+.has-ui-icons .shape-reset>.ui-icon{flex:0 0 1em}
+.has-ui-icons .wordmark-star>.ui-icon{vertical-align:-.05em}
+.has-ui-icons .case-flow>div:not(:last-child)::after{content:"";width:1em;height:1em;background:currentColor;-webkit-mask:url("assets/ui/arrow-right.svg") center/contain no-repeat;mask:url("assets/ui/arrow-right.svg") center/contain no-repeat}
+.has-ui-icons .case-features li::before{content:"";display:inline-block;width:.9em;height:.9em;vertical-align:-.08em;background:currentColor;-webkit-mask:url("assets/ui/arrow-up-right.svg") center/contain no-repeat;mask:url("assets/ui/arrow-up-right.svg") center/contain no-repeat}

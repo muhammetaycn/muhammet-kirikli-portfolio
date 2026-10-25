@@ -1,0 +1,15 @@
+.motion-film{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;user-select:none;background:#080b09;isolation:isolate}
+.motion-film-poster,.motion-film-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:68% center;pointer-events:none;mix-blend-mode:screen;transition:opacity .7s ease}
+.motion-film-poster{opacity:.28}.motion-film-video{opacity:0}
+.motion-film.is-film-playing .motion-film-video{opacity:.38}.motion-film.is-film-playing .motion-film-poster{opacity:0}
+.motion-film.is-reduced .motion-film-video{opacity:0}.motion-film.is-reduced .motion-film-poster{opacity:.25}
+.motion-film:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#08090bef 0%,#08090ba8 35%,#08090b18 72%,#08090b99),linear-gradient(0deg,#08090bb3 0%,transparent 25%,transparent 76%,#08090b66);pointer-events:none}
+.has-motion-film main,.motion-film~main,noscript~main{position:relative;z-index:1}
+.film-heading .film-word{display:inline-block;overflow:clip;vertical-align:top;padding-bottom:.09em;margin-bottom:-.09em;max-width:100%;line-height:inherit;letter-spacing:inherit}
+.film-heading .film-word,.film-heading .film-word-inner{font-family:inherit!important;font-style:inherit!important}
+.film-heading>.film-word{position:relative!important;inset:auto!important;font-size:inherit!important;font-weight:inherit!important;color:inherit!important}
+.film-word-inner{display:inline-block;transform:translateY(0);opacity:1;filter:blur(0);transition:transform .62s cubic-bezier(.16,.8,.24,1) var(--film-delay,0ms),opacity .5s ease var(--film-delay,0ms),filter .62s ease var(--film-delay,0ms)}
+.film-heading[data-film-ready=true]:not(.is-film-revealed) .film-word-inner{transform:translateY(108%);opacity:0;filter:blur(3px)}
+.motion-paused .film-heading .film-word-inner{transition:none!important;transform:none!important;opacity:1!important;filter:none!important}
+@media(max-width:760px){.motion-film-poster,.motion-film-video{object-position:72% center}.motion-film.is-film-playing .motion-film-video{opacity:.29}.motion-film:after{background:linear-gradient(90deg,#08090bca,#08090b75 72%,#08090bba),linear-gradient(0deg,#08090ba8,transparent 28%,transparent 75%,#08090b55)}}
+@media(prefers-reduced-motion:reduce){.motion-film-poster,.motion-film-video{transition:none}.film-heading .film-word-inner{transition:none!important;transform:none!important;opacity:1!important;filter:none!important}}

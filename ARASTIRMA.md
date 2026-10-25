@@ -133,3 +133,7 @@ Ayrıca [Awwwards ana sayfası](https://www.awwwards.com/) bu turda tarayıcıda
 `ProjectMotion`, bu ek galeri incelemesinden seçilen önizleme ile ayrıntı sahnesi arasındaki devamlılık ilkesini portföyün kendi çizimlerine uyarlar. Proje sahnesi büyük ayrıntı alanında sürer; proje değiştirme ve kapanış kesilebilir. Referansın fotoğrafları, kodu veya birebir sayfa düzeni kopyalanmadı. Kişisel panel ve proje geçişleri için normal bağlantı/düğme semantiği, Escape, odak dönüşü, duraklatma ve azaltılmış hareket karşılıkları kontrol edildi; bu kontroller referans sitelerin performans testi değildir.
 
 **Açık kalan referans:** YVL, kullanıcının ekran görüntüsündeki site için doğru referans değildir. O ekran görüntüsüne ait kesin URL henüz çözülemedi. Bu kaynağın görsel incelemesi ve eşleştirmesi tamamlanmış olarak kaydedilmez; video ve yukarıdaki ek galeri gözlemleri ayrı kaynaklardır.
+
+## 26 Ekim / Yeni motion kaynakları ve cümle rölesi
+
+Dribbble galerisi ve Kalerion, PortfolioSix, Mikan çalışmaları; Kaelorian, Webflow Rexton/Prosma canlı önizlemeleri ve Noctra bu turda ayrıca incelendi. Görülen durumlar, gözlem sınırları, tek cümleli Luci rölesi, kısa açılış döngüsü, SVG işaretler ve kendi arka plan filmimizin ayrıntıları [MOTION-ARASTIRMA.md](MOTION-ARASTIRMA.md) içindedir. Önceki tarihli notlar o sürümlerin kararlarını kaydeder; güncel davranış README ve yeni araştırma kaydında açıklanır.

@@ -74,7 +74,7 @@
     Y:['101','101','101','010','010','010','010'],Z:['111','001','001','010','100','100','111']
   };
   const SYNTAX = ['#9cdcfe','#4ec9b0','#dcdcaa','#ce9178','#f9a8d4'];
-  const FADE_MS = 1600, MIN_HOLD = 4200, READ_MS = 5000, STAGGER = 900, TRANSFER_MS = 700;
+  const READ_MS = 5000;
   const transliterate = value => String(value).replace(/[ıİ]/g,'I').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
   // Handwritten micro-dialogues, not portfolio claims or sentence permutations.
   const TOPICS = [
@@ -175,10 +175,6 @@
     [['DEAD','LOCK'],['Agree on lock order across the system.','A waiting cycle needs a path to recovery.'],['KILIT','DONGU'],['Sistem boyunca kilit sırasında anlaş.','Bekleme döngüsüne kurtarma yolu bırak.']],
     [['HEALTH','READY'],['Alive and ready are different conditions.','Accept traffic only when dependencies fit.'],['SAGLIK','HAZIR'],['Canlı olmakla hazır olmak farklıdır.','Bağımlılıklar uygunsa trafiği kabul et.']]
   ];
-  const ROUNDS = TOPICS.flatMap(topic => [
-    {lang:'EN',words:topic[0],thoughts:topic[1]},
-    {lang:'TR',words:topic[2],thoughts:topic[3]}
-  ]);
   function createTopicOrder(previous=-1,intro=false,random=Math.random) {
     const order=Array.from({length:TOPICS.length},(_,index)=>index);
     for(let index=order.length-1;index>0;index--){const other=Math.floor(random()*(index+1));[order[index],order[other]]=[order[other],order[index]];}
@@ -187,274 +183,197 @@
     [order[0],order[first]]=[order[first],order[0]];
     return order;
   }
-  function regionFor(side, round) {
-    // Both writers borrow the same matrix. Paired EN/TR scenes keep their
-    // geography; the next pair changes the boundary and periodically swaps it.
-    const pair = Math.floor(round / 2), split = [26,24,28,25,27][pair % 5];
-    const region = (side + Math.floor(pair / 2)) % 2;
-    // Two empty columns separate the current words. This breathing space moves
-    // with the split, so no columns are permanently excluded from writing.
-    return {start:region === 0 ? 0 : split+1,end:region === 0 ? split-1 : 52,region,pair};
-  }
-  function compileWord(value, side, round = 0) {
-    const word = transliterate(value), compact = word.length > 4;
-    const font = compact ? COMPACT : GLYPHS, glyphWidth = compact ? 3 : 5;
-    const width = word.length * (glyphWidth + 1) - 1;
-    const {start,end,region,pair} = regionFor(side,round), slack = end-start-width;
-    const alignment = (pair+side)%3;
-    const left = start + (alignment === 0 ? slack : alignment === 1 ? 0 : Math.floor(slack/2)), route = [];
-    [...word].forEach((letter, letterIndex) => {
-      const glyph = font[letter] || font.O;
-      for(let line = 0; line < 7; line++) {
-        const row = letterIndex % 2 ? 6 - line : line;
-        const offsets = Array.from({length:glyphWidth},(_,i)=>i);
-        if((line + letterIndex) % 2) offsets.reverse();
-        offsets.forEach(offset => {
-          if(glyph[row][offset] === '1') {
-            const column = left + letterIndex * (glyphWidth + 1) + offset;
-            route.push({column,row,index:column * 7 + row,letter:letterIndex});
-          }
-        });
+  // A short statement occupies one line. Spaces have their own two-column
+  // rhythm; the narrow I leaves room for readable phrases on the 52-cell grid.
+  const PHRASES = [
+    ['USE AN INDEX','INDEKS KULLAN'],['CHECK FOR NULL','BOSLUGU KORU'],['QUEUE THE JOB','ISI SIRAYA AL'],['KEEP IT FRESH','TAZE TUT'],
+    ['CHECK ACCESS','IZNI DOGRULA'],['CHECK INPUT','GIRDIYI SINA'],['KEEP ONE STATE','TEK DURUM TUT'],['RETRY GENTLY','YAVASCA DENE'],
+    ['TEST THE PATCH','YAMAYI SINA'],['BUILD THEN SHIP','DERLE YAYINLA'],['PARSE THE PATH','YOLU AYRISTIR'],['CATCH ERRORS','HATAYI YAKALA'],
+    ['FILTER ROWS','SATIRI SUZ'],['KEEP THE KEY','ANAHTARI TUT'],['DEFINE A TYPE','TURU BELIRLE'],['READ THE DIFF','FARKI OKU'],
+    ['LOCK BRIEFLY','KISA KILITLE'],['AWAIT THE JOB','ISI BEKLE'],['STREAM CHUNKS','PARCALA AKIT'],['RESET SAFELY','GUVENLE DON'],
+    ['PARSE FIRST','ONCE AYRISTIR'],['CHECK THE TYPE','TURU SINA'],['BOUND THE LIST','LISTEYI SINIRLA'],['WAIT THEN TRY','BEKLE VE DENE'],
+    ['UPDATE A ROW','SATIRI YENILE'],['CHECK THE PIPE','KANALI SINA'],['VERIFY ORIGIN','KOKENI SINA'],['PAINT A FRAME','KAREYI BOYA'],
+    ['ABORT THE JOB','ISI IPTAL ET'],['TRACE THE BUG','HATAYI IZLE'],['WARN WITH CARE','ANLAMLI UYAR'],['ASSERT A RULE','KURALI SINA'],
+    ['RESPECT TTL','SUREYI KORU'],['ORDER BYTES','BAYTI SIRALA'],['VERIFY TRUST','GUVENI SINA'],['MATCH THE TAG','ETIKETI ESLE'],
+    ['CONTROL FLOW','AKISI YONET'],['PARSE THE URL','ADRESI AYRISTIR'],['PARSE THE JSON','JSON AYRISTIR'],['CHECK STATUS','DURUMU SINA'],
+    ['CLEAN UP WORK','ISI TEMIZLE'],['BOUND THE WAIT','SUREYI SINIRLA'],['SPREAD RETRIES','TEKRARI DAGIT'],['READ THE HEAD','BASLIGI OKU'],
+    ['READ A RANGE','ARALIGI OKU'],['DEDUP THE JOB','TEKRARI ELE'],['VERIFY PROXY','VEKILI DOGRULA'],['HANDLE CLOSE','KOPUSU YONET'],
+    ['INDEX THE JOIN','JOINI INDEKSLE'],['CHECK A KEY','ANAHTARI SINA'],['BEGIN THEN END','BASLAT BITIR'],['KEEP IT UNIQUE','TEKIL TUT'],
+    ['UPSERT THE ROW','ESLE VE YAZ'],['READ WITH WAL','WAL ILE OKU'],['SAVE SNAPSHOT','GORUNUMU TUT'],['READ THE PLAN','PLANI OKU'],
+    ['STAGE ALTER','SEMAYI HAZIRLA'],['PAGE BY KEY','ANAHTARLA GEZ'],['COUNT THE ROWS','SATIRI SAY'],['KEEP THE RULE','KURALI KORU'],['STORE IN UTC','UTC ILE SAKLA'],
+    ['COUNT IN CENTS','KURUSLA OLC'],['TEST A BACKUP','YEDEGI SINA'],['ROLL IT BACK','ISLEMI GERI AL'],['PATCH THE DOM','DOMU GUNCELLE'],
+    ['FOLLOW EVENTS','OLAYI TAKIP ET'],['RETURN FOCUS','ODAGI GERI VER'],['NAME THE ICON','SIMGEYE AD VER'],['LABEL INPUTS','GIRDIYE AD VER'],
+    ['LAY OUT WELL','DUZENI KUR'],['CLAMP THE SIZE','BOYUTU SINIRLA'],['PAINT ON TIME','ZAMANINDA BOYA'],['READ THEN EDIT','OKU SONRA YAZ'],
+    ['RESERVE SPACE','ALANI AYIR'],['SCALE PIXELS','PIKSELI OLC'],['ALIGN THE TIP','UCU HIZALA'],['CHOOSE A PIVOT','MERKEZI SEC'],
+    ['DAMP A SPRING','YAYI SONUMLE'],['REDUCE MOTION','HAREKETI AZALT'],['CHECK A GLYPH','GLIFI SINA'],['ACK THE RESULT','SONUCU ONAYLA'],
+    ['ORDER EVENTS','OLAYI SIRALA'],['EXPIRE LEASES','IZNI SONLANDIR'],['WAIT FOR A BEAT','NABZI BEKLE'],['PROBE REPAIR','DONUSU YOKLA'],
+    ['CARRY A TRACE','IZI TASI'],['MEASURE A RATE','HIZI OLC'],['USE MONO TIME','TEK YONLU OLC'],['FREE THE HEAP','YIGINI BOSALT'],
+    ['CHECK A RANGE','ARALIGI SINA'],['WAIT FOR DRAIN','TAMPON BOSALT'],['POST A MESSAGE','ILETI GONDER'],['SWAP AT ONCE','ATOMIK DEGISTIR'],
+    ['RELEASE LOCKS','KILIDI BIRAK'],['BREAK A CYCLE','DONGUYU KIR'],['CHECK IF READY','HAZIRLIGI SINA']
+  ];
+  const HOLD_MS=2800, COLUMN_MS=132, LEAD_COLUMNS=3, ENTRY_MS=620, INK_FADE_MS=78;
+  function compileSentence(value, round=0) {
+    const sentence=transliterate(value), glyphs=[];let width=0;
+    for(const letter of sentence){
+      if(letter===' '){width+=2;continue;}
+      let glyph=COMPACT[letter]||GLYPHS[letter]||COMPACT.O;
+      if(letter==='I')glyph=['1','1','1','1','1','1','1'];
+      glyphs.push({letter,glyph,left:width,width:glyph[0].length});width+=glyph[0].length+1;
+    }
+    width=Math.max(1,width-1);
+    if(width>52)throw new Error('ActivityNarrator sentence exceeds matrix: '+sentence+' ('+width+')');
+    const slack=52-width,left=[0,Math.floor(slack/2),slack][Math.floor(round/2)%3],route=[];
+    for(let column=0;column<width;column++){
+      const glyph=glyphs.find(item=>column>=item.left&&column<item.left+item.width);
+      if(!glyph)continue;
+      for(let line=0;line<7;line++){
+        const row=column%2?6-line:line;
+        if(glyph.glyph[row][column-glyph.left]==='1')route.push({column:left+column,row,index:(left+column)*7+row});
       }
-    });
-    return {word,width,left,start,end,region,route,hop:clamp(route.length * 95,4200,6500) / route.length};
+    }
+    const buckets=new Map();route.forEach(point=>{if(!buckets.has(point.column))buckets.set(point.column,[]);buckets.get(point.column).push(point);});
+    buckets.forEach(bucket=>bucket.forEach((point,index)=>{point.at=point.column+(index+1)/bucket.length;}));
+    return {sentence,width,left,route};
   }
+  const SCENES=TOPICS.flatMap((topic,index)=>[0,1].map(language=>({
+    lang:language?'TR':'EN',sentence:PHRASES[index%PHRASES.length][language],thoughts:topic[language?3:1],topic:index
+  })));
   function mount(options) {
-    const {panel,grid,scroll} = options || {};
-    if(!panel || !grid || !scroll) throw new Error('ActivityNarrator: panel, grid ve scroll gerekli.');
-    if(mounted.has(panel)) mounted.get(panel).destroy();
-    const hadClass = panel.classList.contains('has-activity-narrator'); panel.classList.add('has-activity-narrator');
-    const root = element('div','activity-narrator');root.dataset.ready='false';root.dataset.active='false';
-    const tethers = vector('svg',{class:'narrator-tethers','aria-hidden':'true'});
-    root.append(tethers);
-    const fracture = element('span','narrator-fracture');fracture.setAttribute('aria-hidden','true');root.append(fracture);
-    const helper = element('span','narrator-sr','İki Luci aynı matrisi paylaşır ve yazarken yer değiştirir. Siyah Luci ve renkli yazar, İngilizce ve Türkçe teknik düşünceleri paylaşır. Renkli izler geçicidir; gerçek etkinlik kayıtları değişmez. Balona tıklamak, okunmakta olan düşünceyi kesmeden sıradakini kuyruğa alır.');
-    const announcement = element('span','narrator-sr');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.append(helper,announcement);panel.append(root);
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const cleanups = [], owners = new Map(), retired = [], errorInk = [];
-    let reduced = Boolean(options.reducedMotion) || media.matches, paused=false, visible=false, destroyed=false;
-    let frame=0,layoutFrame=0,previous=0,time=0,dirty=true,points=[],roundIndex=0,roundBorn=0,pendingRight=null,transitioning=false;
-    let wordsStarted=0,generationId=0,errorCount=0,panelFaultUntil=0;
-    let topicOrder=createTopicOrder(-1,true),cycle=1;
-    let box={width:820,size:42,pitch:14,gridTop:200,bubbleTop:24};
+    const {panel,grid,scroll}=options||{};
+    if(!panel||!grid||!scroll)throw new Error('ActivityNarrator: panel, grid ve scroll gerekli.');
+    if(mounted.has(panel))mounted.get(panel).destroy();
+    const hadClass=panel.classList.contains('has-activity-narrator');panel.classList.add('has-activity-narrator');
+    const root=element('div','activity-narrator');root.dataset.ready='false';root.dataset.active='false';root.dataset.mode='sentence-relay';
+    const tethers=vector('svg',{class:'narrator-tethers','aria-hidden':'true'}),fracture=element('span','narrator-fracture');fracture.setAttribute('aria-hidden','true');root.append(tethers,fracture);
+    const helper=element('span','narrator-sr','Tek cümle, iki Luci. İlk yazar cümleyi başlangıçtan silerken diğeri boşalan hücrelere yazar. Üç sütunluk aralık korunur. Her cümle tamamlanınca okunur; siyah Luci kimliğini korur. Geçici izler gerçek GitHub kayıtlarını değiştirmez.');
+    const announcement=element('span','narrator-sr');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.append(helper,announcement);panel.append(root);
+    const media=window.matchMedia('(prefers-reduced-motion: reduce)'),cleanups=[],owners=new Map(),errorInk=[];
+    let reduced=Boolean(options.reducedMotion)||media.matches,paused=false,visible=false,destroyed=false;
+    let frame=0,layoutFrame=0,previous=0,time=0,dirty=true,points=[],roundIndex=0,cycle=1,serial=1,phase='draw',phaseBorn=0,holdBorn=null;
+    let topicOrder=createTopicOrder(-1,true),current=null,incoming=null,writerSide=0,eraseSide=0,eraseFront=-1,writeFront=-1,error=null,errorCount=0,panelFaultUntil=0,collisions=0;
+    let box={width:820,size:42,pitch:14,gridTop:200};
     const data=(name,value)=>{const next=String(value);if(root.dataset[name]!==next)root.dataset[name]=next;};
-    data('bankSize',ROUNDS.length);data('thoughtCount',ROUNDS.length*2);data('topicCount',TOPICS.length);data('cycle',cycle);data('fadeMs',FADE_MS);data('holdMs',MIN_HOLD);data('errorCount',0);data('collisions',0);data('staggerMs',STAGGER);
-    function entryAt(index){return ROUNDS[topicOrder[Math.floor(index/2)]*2+index%2];}
-    function advanceIndex(){const next=(roundIndex+1)%ROUNDS.length;if(next===0){topicOrder=createTopicOrder(topicOrder.at(-1));data('cycle',++cycle);}return next;}
     function listen(target,type,fn,settings){target.addEventListener(type,fn,settings);cleanups.push(()=>target.removeEventListener(type,fn,settings));}
-    function createActor(side,color) {
-      const node=element('div','narrator-character');node.setAttribute('aria-hidden','true');node.dataset.zone=side===0?'left':'right';node.dataset.color=side===0?'black':color;
-      node.style.setProperty('--luci-body',side===0?'#050506':color);
+    function entryAt(index){return SCENES[topicOrder[Math.floor(index/2)]*2+index%2];}
+    function advanceIndex(){roundIndex=(roundIndex+1)%SCENES.length;if(!roundIndex){topicOrder=createTopicOrder(topicOrder.at(-1));data('cycle',++cycle);}return roundIndex;}
+    const actors=[0,1].map(side=>{
+      const node=element('div','narrator-character');node.setAttribute('aria-hidden','true');node.dataset.zone=side?'right':'left';node.dataset.color=side?SYNTAX[0]:'black';node.style.setProperty('--luci-body',side?SYNTAX[0]:'#050506');
       const drawing=luci(),shadow=element('span','narrator-shadow');node.append(drawing.svg);root.append(shadow,node);
-      return {node,drawing,shadow,side,color,current:(side===0?1:29)*7+6,direction:1,retire:null};
-    }
-    const zones=[0,1].map(side=>{
-      const bubble=element('button','narrator-thought');bubble.type='button';bubble.dataset.zone=side===0?'left':'right';
-      const terminal=element('span','narrator-terminal');terminal.setAttribute('aria-hidden','true');
-      const bar=element('span','narrator-terminal-bar'),led=element('i','narrator-led'),label=element('span','narrator-worker',`worker ${String(side+1).padStart(2,'0')}`),language=element('span','narrator-language'),status=element('span','narrator-status','RUN');
-      bar.append(led,label,language,status);
-      const line=element('span','narrator-line'),copy=element('span','narrator-copy'),caret=element('span','narrator-caret','▍');line.append(copy,caret);
-      const tip=element('span','narrator-tip','sıradaki ↵');terminal.append(bar,line,tip);bubble.append(terminal);
-      const tether=vector('path',{});tethers.append(tether);root.append(bubble);
-      const zone={side,bubble,copy,language,status,tip,tether,actor:createActor(side,SYNTAX[0]),generation:null,requested:false,bubbleX:0,bubbleY:0,bubbleWidth:250,bubbleHeight:110};
-      listen(bubble,'click',()=>{
-        if(reduced){resetRound(advanceIndex(),true);return;}
-        zone.requested=true;tip.textContent='okununca ↵';bubble.dataset.queued='true';
-        bubble.setAttribute('aria-label',`Düşünce: ${zone.generation.entry.thoughts[side]} Sıradaki düşünce kuyruğa alındı.`);
-      });
-      return zone;
+      return {side,node,drawing,shadow,color:side?SYNTAX[0]:'#ff6a35',current:(side?2:0)*7+6,direction:1};
     });
-    function removeActor(actor){actor.node.remove();actor.shadow.remove();}
-    function removeRecord(record){
-      record.node.remove();const list=owners.get(record.index);if(list){list.delete(record);if(!list.size)owners.delete(record.index);}
+    const zones=actors.map((actor,side)=>{
+      const bubble=element('button','narrator-thought');bubble.type='button';bubble.dataset.zone=side?'right':'left';
+      const terminal=element('span','narrator-terminal');terminal.setAttribute('aria-hidden','true');
+      const bar=element('span','narrator-terminal-bar'),led=element('i','narrator-led'),label=element('span','narrator-worker'),language=element('span','narrator-language'),status=element('span','narrator-status','READY');bar.append(led,label,language,status);
+      const line=element('span','narrator-line'),copy=element('span','narrator-copy'),caret=element('span','narrator-caret','▍');line.append(copy,caret);
+      const tip=element('span','narrator-tip','sonraki cümle');terminal.append(bar,line,tip);bubble.append(terminal);
+      const tether=vector('path',{});tethers.append(tether);root.append(bubble);
+      const zone={side,actor,bubble,copy,label,language,status,tip,tether,text:'',textBorn:0,fullAt:null,bubbleX:0,bubbleY:0,bubbleWidth:250,bubbleHeight:110};
+      listen(bubble,'click',()=>{if(reduced){advanceIndex();reset(true);return;}root.dataset.queued='true';tip.textContent='okununca sırada';});return zone;
+    });
+    function setThought(side,entry,role){
+      const zone=zones[side],text=entry.thoughts[side];zone.text=text;zone.textBorn=time;zone.fullAt=null;zone.copy.textContent='';zone.language.textContent=entry.lang;zone.label.textContent=side?'luci.color':'luci.black';zone.status.textContent=role;
+      zone.bubble.dataset.status=role.toLowerCase();zone.bubble.dataset.lang=entry.lang;zone.bubble.classList.add('is-typing');zone.bubble.style.setProperty('--narrator-accent',actors[side].color);zone.tip.textContent='sonraki cümle';
+      zone.bubble.setAttribute('aria-label',`Düşünce: ${text} Sonraki cümleyi okununca sıraya almak için tıkla.`);
     }
-    function clearGeneration(generation){if(!generation)return;generation.ink.forEach(removeRecord);generation.ink.clear();}
-    function clearAll(){
-      zones.forEach(zone=>clearGeneration(zone.generation));
-      retired.splice(0).forEach(entry=>{clearGeneration(entry.generation);if(entry.actor)removeActor(entry.actor);});
-      errorInk.splice(0).forEach(record=>record.node.remove());owners.clear();
+    function thoughts(){zones.forEach(zone=>{const count=reduced?zone.text.length:Math.min(zone.text.length,Math.max(0,Math.floor((time-zone.textBorn)/34)));zone.copy.textContent=zone.text.slice(0,count);if(count===zone.text.length){if(zone.fullAt===null)zone.fullAt=time;zone.bubble.classList.remove('is-typing');}});}
+    function generation(entry,index,side){return {entry,score:compileSentence(entry.sentence,index),side,ink:new Map(),step:0,lastIndex:actors[side].current};}
+    function removeInk(record){record.node.remove();owners.delete(record.index);}
+    function clearGeneration(g){if(!g)return;g.ink.forEach(removeInk);g.ink.clear();}
+    function addInk(g,point){
+      if(g.ink.has(point.index))return;
+      if(owners.has(point.index)){collisions++;return;}
+      const cell=points[point.index]?.cell;if(!cell)return;
+      const node=element('span','narrator-ink-layer');node.setAttribute('aria-hidden','true');node.dataset.zone=g.side?'right':'left';node.dataset.sentence=String(serial);node.style.background=actors[g.side].color;cell.append(node);
+      const record={node,index:point.index,column:point.column,row:point.row,at:point.at};owners.set(point.index,record);g.ink.set(point.index,record);
     }
-    function createGeneration(zone,index,born){
-      const entry=entryAt(index),score=compileWord(entry.words[zone.side],zone.side,index),serial=++wordsStarted;
-      const column=Math.floor(zone.actor.current/7),transfer=column<score.start||column>=score.end;
-      const generation={id:++generationId,round:index,entry,score,born,step:0,hopStart:null,hopFrom:zone.actor.current,ink:new Map(),doneAt:null,fullAt:null,letters:0,nextLetter:born+80,retire:null,error:null,errorDone:false,errorPlanned:serial%5===0,serial,entryFrom:zone.actor.current,entryStart:null,entryDone:!transfer};
-      zone.requested=false;zone.tip.textContent='sıradaki ↵';delete zone.bubble.dataset.queued;
-      zone.copy.textContent='';zone.language.textContent=entry.lang;zone.status.textContent='RUN';zone.bubble.dataset.status='run';zone.bubble.dataset.lang=entry.lang;
-      zone.bubble.setAttribute('aria-label',`Düşünce: ${entry.thoughts[zone.side]} Sonraki düşünceyi okununca sıraya almak için tıkla.`);
-      zone.bubble.style.setProperty('--narrator-accent',zone.side===0?'#ff6a35':zone.actor.color);
-      zone.bubble.classList.add('is-typing');zone.generation=generation;
-      return generation;
-    }
-    function announceRound(){const entry=entryAt(roundIndex);announcement.textContent=`${entry.lang}. ${entry.thoughts.join(' ')}`;}
-    function beginZone(zone,index,born,overlap){
-      const old=zone.generation;
-      if(old&&overlap){
-        old.retire=time;
-        if(zone.side===1){zone.actor.retire=time;zone.actor.node.classList.add('is-retiring');retired.push({generation:old,actor:zone.actor});zone.actor=createActor(1,SYNTAX[index%SYNTAX.length]);}
-        else retired.push({generation:old,actor:null});
-      } else if(old)clearGeneration(old);
-      createGeneration(zone,index,born);
-    }
-    function resetRound(index,instant){
-      clearAll();roundIndex=index;roundBorn=time;pendingRight=null;transitioning=false;panelFaultUntil=0;
-      panel.classList.remove('narrator-has-warning');root.classList.remove('is-faulting');
-      if(zones[1].actor.retire!==null){removeActor(zones[1].actor);zones[1].actor=createActor(1,SYNTAX[index%SYNTAX.length]);}
-      zones.forEach(zone=>beginZone(zone,index,time+(instant?0:zone.side*STAGGER),false));
-      if(instant)zones.forEach(zone=>staticWord(zone));announceRound();diagnostics();dirty=true;queueMeasure();
-    }
-    function nextRound(){
-      roundIndex=advanceIndex();roundBorn=time;transitioning=true;
-      beginZone(zones[0],roundIndex,time+600,true);pendingRight={index:roundIndex,at:time+STAGGER};announceRound();dirty=true;queueMeasure();
-    }
-    function addInk(zone,generation,point){
-      if(generation.ink.has(point.index))return;
-      const cell=points[point.index]&&points[point.index].cell;if(!cell)return;
-      const node=element('span','narrator-ink-layer');node.setAttribute('aria-hidden','true');node.dataset.zone=zone.side===0?'left':'right';node.dataset.generation=String(generation.id);node.style.background=zone.side===0?'#ff6a35':zone.actor.color;cell.append(node);
-      const record={node,index:point.index,column:point.column,row:point.row,opacity:1,generation:generation.id};generation.ink.set(point.index,record);
-      if(!owners.has(point.index))owners.set(point.index,new Set());owners.get(point.index).add(record);
-    }
-    function available(generation,point){const records=owners.get(point.index);return !records||[...records].every(record=>record.generation===generation.id||record.opacity<=.1);}
-    function paint(actor,x,y,scaleX=1,scaleY=1,tilt=0,arc=0){
-      const size=box.size;actor.node.style.transform=`translate3d(${(x-size*.5).toFixed(2)}px,${(y-size*.94).toFixed(2)}px,0)`;
-      actor.drawing.svg.style.transform=`rotate(${tilt.toFixed(2)}deg) scale(${(scaleX*actor.direction).toFixed(3)},${scaleY.toFixed(3)})`;
-      actor.shadow.style.transform=`translate3d(${x.toFixed(2)}px,${(y+arc*Math.min(22,box.pitch*1.4)).toFixed(2)}px,0) scale(${(1-arc*.4).toFixed(2)})`;
-      actor.shadow.style.opacity=String(.4-arc*.2);actor.node.classList.toggle('is-airborne',arc>.1);
-      const zone=zones[actor.side];
-      if(zone.actor===actor){
-        const startX=zone.bubbleX+zone.bubbleWidth*.5,startY=zone.bubbleY+zone.bubbleHeight+11,endY=y-size*.8;
-        zone.tether.setAttribute('d',`M${startX.toFixed(1)} ${startY.toFixed(1)}Q${startX.toFixed(1)} ${((startY+endY)*.5).toFixed(1)} ${x.toFixed(1)} ${endY.toFixed(1)}`);
-      }
+    function paint(actor,x,y,sx=1,sy=1,tilt=0,arc=0){
+      const size=box.size;actor.node.style.transform=`translate3d(${(x-size*.5).toFixed(2)}px,${(y-size*.94).toFixed(2)}px,0)`;actor.drawing.svg.style.transform=`rotate(${tilt.toFixed(2)}deg) scale(${(sx*actor.direction).toFixed(3)},${sy.toFixed(3)})`;
+      actor.shadow.style.transform=`translate3d(${x.toFixed(2)}px,${(y+arc*Math.min(22,box.pitch*1.4)).toFixed(2)}px,0) scale(${(1-arc*.4).toFixed(2)})`;actor.shadow.style.opacity=String(.4-arc*.2);actor.node.classList.toggle('is-airborne',arc>.1);
+      const zone=zones[actor.side],startX=zone.bubbleX+zone.bubbleWidth*.5,startY=zone.bubbleY+zone.bubbleHeight+11,endY=y-size*.8;zone.tether.setAttribute('d',`M${startX.toFixed(1)} ${startY.toFixed(1)}Q${startX.toFixed(1)} ${((startY+endY)*.5).toFixed(1)} ${x.toFixed(1)} ${endY.toFixed(1)}`);
     }
     function gaze(actor,dx,dy){actor.drawing.pupil.setAttribute('cx',(54+clamp(dx/60*actor.direction,-3,3)).toFixed(2));actor.drawing.pupil.setAttribute('cy',(47+clamp(dy/55,-2,2)).toFixed(2));}
-    function idlePose(zone){const p=points[zone.actor.current];if(p){gaze(zone.actor,zone.bubbleX+zone.bubbleWidth*.5-p.x,zone.bubbleY-p.y);paint(zone.actor,p.x,p.y);}}
-    function hopPose(zone,from,to,progress,warning=false){
-      const actor=zone.actor,a=points[from],b=points[to];if(!a||!b)return;
-      const travel=progress*progress*(3-2*progress),arc=Math.sin(Math.PI*progress);
-      actor.direction=b.x===a.x?actor.direction:b.x>a.x?1:-1;
-      gaze(actor,b.x-a.x,b.y-a.y);
-      const distance=Math.hypot(b.x-a.x,b.y-a.y),height=Math.min(box.size*.52,Math.max(box.pitch*.78,distance*.14))*(warning?1.15:1);
-      paint(actor,a.x+(b.x-a.x)*travel,a.y+(b.y-a.y)*travel-arc*height,1-arc*.045,1+arc*.065,actor.direction*arc*(warning?12:7),arc);
+    function idle(actor){const p=points[actor.current];if(p){const zone=zones[actor.side];gaze(actor,zone.bubbleX+zone.bubbleWidth*.5-p.x,zone.bubbleY-p.y);paint(actor,p.x,p.y);}}
+    function hop(actor,from,to,progress,warning=false){
+      const a=points[from],b=points[to];if(!a||!b)return;const travel=progress*progress*(3-2*progress),arc=Math.sin(Math.PI*progress);actor.direction=b.x===a.x?actor.direction:b.x>a.x?1:-1;gaze(actor,b.x-a.x,b.y-a.y);
+      const distance=Math.hypot(b.x-a.x,b.y-a.y),height=Math.min(box.size*.52,Math.max(box.pitch*.78,distance*.14))*(warning?1.15:1);paint(actor,a.x+(b.x-a.x)*travel,a.y+(b.y-a.y)*travel-arc*height,1-arc*.045,1+arc*.065,actor.direction*arc*(warning?12:7),arc);
     }
-    function errorPath(zone,generation){
-      const routeSet=new Set(generation.score.route.map(point=>point.index)),current=zone.actor.current,col=Math.floor(current/7),row=current%7,{start,end}=generation.score,candidates=[];
-      for(let radius=1;radius<6;radius++)for(let dc=-radius;dc<=radius;dc++)for(let dr=-radius;dr<=radius;dr++){
-        if(Math.max(Math.abs(dc),Math.abs(dr))!==radius)continue;
-        const c=col+dc,r=row+dr,index=c*7+r;
-        if(c<start||c>=end||r<0||r>6||routeSet.has(index)||owners.has(index)||candidates.includes(index))continue;
-        candidates.push(index);if(candidates.length===3)return candidates;
-      }
-      return candidates;
+    function actorAtFront(actor,route,front){
+      if(!route.length){idle(actor);return;}
+      const column=Math.floor(front),bucket=route.filter(point=>point.column===column),prior=route.filter(point=>point.column<column).at(-1);
+      if(!bucket.length){if(prior)actor.current=prior.index;idle(actor);return;}
+      const progress=clamp(front-column,0,.999)*bucket.length,step=Math.floor(progress),from=step?bucket[step-1]:prior;
+      hop(actor,from?.index??actor.current,bucket[step].index,progress-step);if(step)actor.current=bucket[step-1].index;
     }
-    function startError(zone,generation){
-      const route=errorPath(zone,generation);generation.errorDone=true;if(route.length<3)return;
-      generation.error={since:time,route,step:0,origin:zone.actor.current,from:zone.actor.current};generation.hopStart=null;
-      errorCount++;data('errorCount',errorCount);data('error','warn');
-      zone.bubble.dataset.status='warn';zone.status.textContent='WARN';zone.actor.node.classList.add('is-warning');
-      panelFaultUntil=time+900;panel.classList.add('narrator-has-warning');root.classList.add('is-faulting');
-      const point=points[route[0]];if(point)root.style.setProperty('--fault-y',point.y.toFixed(1)+'px');
+    function updateWrite(g,front){
+      while(g.step<g.score.route.length){const point=g.score.route[g.step];if(point.at>front)break;if(owners.has(point.index)&&!g.ink.has(point.index))break;addInk(g,point);actors[g.side].current=point.index;g.step++;}
+      actorAtFront(actors[g.side],g.score.route,front);
     }
-    function markError(index){
-      const cell=points[index]&&points[index].cell;if(!cell)return;
-      const node=element('span','narrator-error-ink');node.setAttribute('aria-hidden','true');cell.append(node);errorInk.push({node,born:time,index});
+    function beginHold(){phase='hold';phaseBorn=time;holdBorn=time;current.step=current.score.route.length;eraseFront=52;writeFront=52;current.score.route.forEach(point=>addInk(current,point));actors[current.side].current=current.score.route.at(-1).index;zones.forEach(zone=>{zone.status.textContent='READ';zone.bubble.dataset.status='read';});announcement.textContent=`${current.entry.lang}. ${current.entry.sentence}.`;}
+    function reset(instant=false){
+      clearGeneration(current);clearGeneration(incoming);owners.clear();errorInk.splice(0).forEach(record=>record.node.remove());error=null;panelFaultUntil=0;panel.classList.remove('narrator-has-warning');root.classList.remove('is-faulting');actors.forEach(actor=>actor.node.classList.remove('is-warning'));
+      writerSide=0;eraseSide=1;current=generation(entryAt(roundIndex),roundIndex,writerSide);incoming=null;phase=instant?'hold':'draw';phaseBorn=time;holdBorn=null;eraseFront=writeFront=-1;
+      zones.forEach(zone=>setThought(zone.side,current.entry,zone.side===writerSide?'WRITE':'READY'));if(instant){thoughts();beginHold();}dirty=true;queueMeasure();diagnostics();
     }
-    function updateError(zone,generation){
-      const error=generation.error,elapsed=time-error.since;
-      if(elapsed<510){
-        const step=Math.min(2,Math.floor(elapsed/170));
-        while(error.step<step){const landed=error.route[error.step++];markError(landed);error.from=landed;zone.actor.current=landed;}
-        hopPose(zone,error.from,error.route[step],clamp((elapsed-step*170)/170,0,1),true);
-      } else if(elapsed<790){
-        while(error.step<3){const landed=error.route[error.step++];markError(landed);zone.actor.current=landed;}
-        zone.status.textContent='RECOVER';zone.bubble.dataset.status='recover';
-        hopPose(zone,error.route[2],error.origin,clamp((elapsed-510)/280,0,1),true);
-      } else {
-        zone.actor.current=error.origin;generation.error=null;generation.hopStart=null;zone.actor.node.classList.remove('is-warning');zone.status.textContent='RUN';zone.bubble.dataset.status='run';idlePose(zone);
-      }
+    function beginRelay(){
+      eraseSide=current.side;writerSide=1-eraseSide;advanceIndex();serial++;
+      if(writerSide===1){const color=SYNTAX[Math.floor(roundIndex/2)%SYNTAX.length];actors[1].color=color;actors[1].node.dataset.color=color;actors[1].node.style.setProperty('--luci-body',color);}
+      incoming=generation(entryAt(roundIndex),roundIndex,writerSide);phase='handoff';phaseBorn=time;eraseFront=writeFront=-1;delete root.dataset.queued;
+      actors.forEach(actor=>actor.entryFrom=actor.current);setThought(eraseSide,current.entry,'ERASE');setThought(writerSide,incoming.entry,'WRITE');
     }
-    function updateThought(zone,generation){
-      const text=generation.entry.thoughts[zone.side];
-      if(time<generation.born||generation.letters>=text.length)return;
-      while(generation.letters<text.length&&time>=generation.nextLetter){generation.letters++;generation.nextLetter+=29;}
-      zone.copy.textContent=text.slice(0,generation.letters);
-      if(generation.letters===text.length){generation.fullAt=time;zone.bubble.classList.remove('is-typing');}
+    function errorPath(){
+      const actor=actors[writerSide],col=Math.floor(actor.current/7),row=actor.current%7,result=[];
+      for(let distance=1;distance<6;distance++)for(let dc=-distance;dc<=distance;dc++)for(let dr=-distance;dr<=distance;dr++){
+        const c=col+dc,r=row+dr,index=c*7+r;if(c<0||c>=52||r<0||r>6||owners.has(index)||result.includes(index))continue;
+        if(Math.max(Math.abs(dc),Math.abs(dr))!==distance)continue;result.push(index);if(result.length===3)return result;
+      }return result;
     }
-    function updateZone(zone){
-      const generation=zone.generation;updateThought(zone,generation);
-      if(time<generation.born){idlePose(zone);return;}
-      if(generation.error){updateError(zone,generation);return;}
-      const route=generation.score.route;
-      if(!generation.entryDone){
-        // A side exchange is a visible leap, not a one-frame teleport. The
-        // previous writer must release this landing cell before takeoff.
-        if(generation.entryStart===null){if(!available(generation,route[0])){idlePose(zone);return;}generation.entryStart=time;}
-        const progress=clamp((time-generation.entryStart)/TRANSFER_MS,0,1);
-        hopPose(zone,generation.entryFrom,route[0].index,progress);
-        if(progress>=1&&available(generation,route[0])){addInk(zone,generation,route[0]);zone.actor.current=route[0].index;generation.step=1;generation.entryDone=true;}
-        return;
-      }
-      if(generation.step>=route.length){if(generation.doneAt===null)generation.doneAt=time;idlePose(zone);return;}
-      if(generation.errorPlanned&&!generation.errorDone&&generation.step>=Math.floor(route.length*.42)){startError(zone,generation);if(generation.error){updateError(zone,generation);return;}}
-      const point=route[generation.step];
-      if(!available(generation,point)){generation.hopStart=null;idlePose(zone);return;}
-      if(generation.hopStart===null){
-        generation.hopStart=time;generation.hopFrom=zone.actor.current;
-      }
-      const progress=clamp((time-generation.hopStart)/generation.score.hop,0,1);
-      hopPose(zone,generation.hopFrom,point.index,progress);
-      if(progress>=1){
-        // The old generation can only fade while a hop is in flight; it cannot
-        // acquire new ink. Check again anyway so ownership is explicit.
-        if(available(generation,point)){addInk(zone,generation,point);zone.actor.current=point.index;generation.step++;}
-        generation.hopStart+=generation.score.hop;generation.hopFrom=zone.actor.current;
-        if(generation.step===route.length)generation.doneAt=time;
-      }
+    function startError(){
+      const route=errorPath();if(route.length<3)return;
+      error={born:time,route,origin:actors[writerSide].current,step:0};errorCount++;const zone=zones[writerSide];zone.status.textContent='WARN';zone.bubble.dataset.status='warn';zone.actor.node.classList.add('is-warning');panelFaultUntil=time+900;panel.classList.add('narrator-has-warning');root.classList.add('is-faulting');const point=points[route[0]];if(point)root.style.setProperty('--fault-y',point.y.toFixed(1)+'px');
     }
-    function ready(zone){const g=zone.generation;return g.doneAt!==null&&g.fullAt!==null&&time>=g.doneAt+MIN_HOLD+(zone.requested?0:1000)&&time>=g.fullAt+Math.max(READ_MS,g.entry.thoughts[zone.side].length*88);}
-    function fadeRetired(){
-      for(let i=retired.length-1;i>=0;i--){
-        const entry=retired[i],g=entry.generation,elapsed=time-g.retire;
-        g.ink.forEach(record=>{
-          const stagger=(record.column-g.score.left)/Math.max(1,g.score.width-1)*600;
-          const opacity=clamp(1-(elapsed-stagger)/1000,0,1);record.opacity=opacity;record.node.style.opacity=opacity.toFixed(3);
-        });
-        if(entry.actor){const opacity=clamp(1-elapsed/FADE_MS,0,1);entry.actor.node.style.opacity=opacity.toFixed(3);entry.actor.shadow.style.opacity=String(opacity*.3);}
-        if(elapsed>=FADE_MS){clearGeneration(g);if(entry.actor)removeActor(entry.actor);retired.splice(i,1);}
-      }
-    }
-    function fadeErrors(){for(let i=errorInk.length-1;i>=0;i--){const record=errorInk[i],age=time-record.born;record.node.style.opacity=String(clamp(1-(age-600)/700,0,1));if(age>=1300){record.node.remove();errorInk.splice(i,1);}}}
-    function staticWord(zone){const g=zone.generation;g.score.route.forEach(point=>addInk(zone,g,point));g.step=g.score.route.length;g.doneAt=time;g.fullAt=time;g.entryDone=true;g.letters=g.entry.thoughts[zone.side].length;zone.copy.textContent=g.entry.thoughts[zone.side];zone.bubble.classList.remove('is-typing');zone.actor.current=g.score.route.at(-1).index;idlePose(zone);}
-    function diagnostics(){
-      const phase=[];
-      zones.forEach(zone=>{
-        const g=zone.generation,key=zone.side===0?'left':'right',currentPhase=g.error?'warn':time<g.born?'enter':!g.entryDone?'travel':g.doneAt!==null?'hold':'draw';
-        data(key+'Word',g.score.word);data(key+'Phase',currentPhase);data(key+'Lang',g.entry.lang);data(key+'Ink',g.ink.size);data(key+'Step',g.step);data(key+'Serial',g.serial);data(key+'Body',zone.side===0?'#050506':zone.actor.color);data(key+'ColumnStart',g.score.start);data(key+'ColumnEnd',g.score.end);data(key+'Region',g.score.region);
-        data(key+'ReadMs',g.fullAt===null?0:Math.round(time-g.fullAt));data(key+'HoldMs',g.doneAt===null?0:Math.round(time-g.doneAt));phase.push(currentPhase);
-      });
-      data('phase',phase.includes('warn')?'warn':retired.length?'overlap':phase.includes('draw')||phase.includes('enter')||phase.includes('travel')?'draw':'hold');
-      data('error',zones.some(zone=>zone.generation.error)?'warn':errorInk.length?'recover':'none');
-      data('actors',2+retired.filter(entry=>entry.actor).length);data('round',roundIndex+1);data('lang',zones[0].generation.entry.lang===zones[1].generation.entry.lang?zones[0].generation.entry.lang:'mixed');
-      data('message',zones.map(zone=>zone.generation.score.word).join(' / '));data('inkCount',zones.reduce((sum,zone)=>sum+zone.generation.ink.size,0));data('elapsed',Math.round(time));
+    function markError(index){const cell=points[index]?.cell;if(!cell)return;const node=element('span','narrator-error-ink');node.setAttribute('aria-hidden','true');cell.append(node);errorInk.push({node,born:time,index});}
+    function updateError(){
+      const elapsed=time-error.born,actor=actors[writerSide];
+      if(elapsed<510){const step=Math.min(2,Math.floor(elapsed/170));while(error.step<step){markError(error.route[error.step]);actor.current=error.route[error.step++];}hop(actor,step?error.route[step-1]:error.origin,error.route[step],clamp((elapsed-step*170)/170,0,1),true);}
+      else if(elapsed<790){while(error.step<3)markError(error.route[error.step++]);zones[writerSide].status.textContent='RECOVER';zones[writerSide].bubble.dataset.status='recover';hop(actor,error.route[2],error.origin,clamp((elapsed-510)/280,0,1),true);}
+      else{actor.current=error.origin;phaseBorn+=time-error.born;error=null;zones[writerSide].status.textContent='WRITE';zones[writerSide].bubble.dataset.status='write';actor.node.classList.remove('is-warning');}
+      idle(actors[eraseSide]);
     }
     function update(){
-      fadeRetired();fadeErrors();
-      if(pendingRight&&time>=pendingRight.at){beginZone(zones[1],pendingRight.index,time+600,true);pendingRight=null;transitioning=false;}
-      zones.forEach(updateZone);
+      thoughts();
+      for(let i=errorInk.length-1;i>=0;i--){const record=errorInk[i],age=time-record.born;record.node.style.opacity=String(clamp(1-(age-600)/700,0,1));if(age>=1300){record.node.remove();errorInk.splice(i,1);}}
       if(panelFaultUntil&&time>=panelFaultUntil){panelFaultUntil=0;panel.classList.remove('narrator-has-warning');root.classList.remove('is-faulting');}
-      if(!transitioning&&!pendingRight&&zones.every(ready))nextRound();
+      if(error){updateError();diagnostics();return;}
+      const elapsed=time-phaseBorn;
+      if(phase==='draw'){
+        writeFront=-1+elapsed/COLUMN_MS;updateWrite(current,writeFront);idle(actors[1-current.side]);if(writeFront>52)beginHold();
+      }else if(phase==='hold'){
+        actors.forEach(idle);const readable=zones.every(zone=>zone.fullAt!==null&&time-zone.fullAt>=READ_MS);
+        if(time-holdBorn>=HOLD_MS&&readable)beginRelay();
+      }else if(phase==='handoff'){
+        const progress=clamp(elapsed/ENTRY_MS,0,1);hop(actors[eraseSide],actors[eraseSide].entryFrom,current.score.route[0].index,progress);hop(actors[writerSide],actors[writerSide].entryFrom,incoming.score.route[0].index,progress);
+        if(progress===1){actors[eraseSide].current=current.score.route[0].index;actors[writerSide].current=incoming.score.route[0].index;phase='relay';phaseBorn=time;current.errorPlanned=serial%5===0;}
+      }else if(phase==='relay'){
+        eraseFront=clamp(elapsed/COLUMN_MS,0,56);writeFront=clamp(eraseFront-LEAD_COLUMNS,-1,53);
+        // The old line disappears from its beginning. A full three-column gap
+        // opens before the next writer enters, and ownership is never shared.
+        current.ink.forEach((record,index)=>{const opacity=clamp(1-(eraseFront-record.at)*COLUMN_MS/INK_FADE_MS,0,1);record.node.style.opacity=opacity.toFixed(3);if(opacity===0){removeInk(record);current.ink.delete(index);}});
+        actorAtFront(actors[eraseSide],current.score.route,eraseFront);updateWrite(incoming,writeFront);
+        if(current.errorPlanned&&writeFront>=23){current.errorPlanned=false;startError();}
+        if(elapsed>=(52+LEAD_COLUMNS+1)*COLUMN_MS){clearGeneration(current);current=incoming;incoming=null;beginHold();}
+      }
       diagnostics();
     }
+    function diagnostics(){
+      data('phase',error?'warn':phase);data('actors',2);data('round',roundIndex+1);data('cycle',cycle);data('lang',(incoming||current).entry.lang);data('message',(incoming||current).entry.sentence);data('oldSentence',current.entry.sentence);data('nextSentence',incoming?.entry.sentence||'');
+      data('bankSize',SCENES.length);data('topicCount',TOPICS.length);data('thoughtCount',SCENES.length*2);data('holdMs',HOLD_MS);data('readMs',READ_MS);data('leadColumns',LEAD_COLUMNS);data('columnMs',COLUMN_MS);data('collisions',collisions);data('errorCount',errorCount);data('error',error?'warn':errorInk.length?'recover':'none');data('eraseFront',eraseFront.toFixed(3));data('writeFront',writeFront.toFixed(3));data('writer',writerSide?'color':'black');data('eraser',eraseSide?'color':'black');data('serial',serial);data('elapsed',Math.round(time));data('holdElapsed',holdBorn===null?0:Math.round(time-holdBorn));data('inkCount',owners.size);data('oldInk',current.ink.size);data('newInk',incoming?.ink.size||0);
+      zones.forEach(zone=>{const key=zone.side?'right':'left';data(key+'Body',zone.side?actors[1].color:'#050506');data(key+'Role',phase==='hold'?'read':phase==='draw'?(zone.side===current.side?'write':'ready'):zone.side===eraseSide?'erase':'write');data(key+'ReadMs',zone.fullAt===null?0:Math.round(time-zone.fullAt));data(key+'Thought',zone.text);});
+    }
     function measure(){
-      dirty=false;const panelRect=panel.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();
-      points=[...grid.querySelectorAll('.rhythm-cell')].map(cell=>{const rect=cell.getBoundingClientRect();return {cell,x:rect.left+rect.width/2-panelRect.left,y:rect.top+rect.height*.65-panelRect.top};});
-      box={width:panel.clientWidth,size:zones[0].actor.node.offsetWidth||42,pitch:gridRect.width/52,gridTop:gridRect.top-panelRect.top};
-      const availableWidth=gridRect.width*.5,bubbleWidth=Math.min(280,Math.max(100,availableWidth-8));
-      zones.forEach(zone=>{
-        zone.bubble.style.width=bubbleWidth.toFixed(2)+'px';zone.bubbleWidth=bubbleWidth;zone.bubbleHeight=zone.bubble.offsetHeight;
-        const region=regionFor(zone.side,roundIndex);
-        const center=gridRect.left-panelRect.left+gridRect.width*((region.start+region.end)/104);
-        zone.bubbleX=clamp(center-bubbleWidth/2,8,Math.max(8,box.width-bubbleWidth-8));zone.bubbleY=Math.max(14,box.gridTop-zone.bubbleHeight-35);
-        zone.bubble.style.transform=`translate3d(${zone.bubbleX.toFixed(2)}px,${zone.bubbleY.toFixed(2)}px,0)`;idlePose(zone);
-      });
+      dirty=false;const panelRect=panel.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();points=[...grid.querySelectorAll('.rhythm-cell')].map(cell=>{const rect=cell.getBoundingClientRect();return {cell,x:rect.left+rect.width/2-panelRect.left,y:rect.top+rect.height*.65-panelRect.top};});
+      box={width:panel.clientWidth,size:actors[0].node.offsetWidth||42,pitch:gridRect.width/52,gridTop:gridRect.top-panelRect.top};const bubbleWidth=Math.min(280,Math.max(100,gridRect.width*.5-8));
+      zones.forEach(zone=>{zone.bubble.style.width=bubbleWidth.toFixed(2)+'px';zone.bubbleWidth=bubbleWidth;zone.bubbleHeight=zone.bubble.offsetHeight;const center=gridRect.left-panelRect.left+gridRect.width*(zone.side?.76:.24);zone.bubbleX=clamp(center-bubbleWidth/2,8,Math.max(8,box.width-bubbleWidth-8));zone.bubbleY=Math.max(14,box.gridTop-zone.bubbleHeight-35);zone.bubble.style.transform=`translate3d(${zone.bubbleX.toFixed(2)}px,${zone.bubbleY.toFixed(2)}px,0)`;idle(zone.actor);});
       data('ready',points.length===364);root.style.setProperty('--narrator-grid-top',box.gridTop.toFixed(2)+'px');
     }
     function activeMotion(){return !destroyed&&!paused&&!reduced&&visible&&!document.hidden&&points.length===364;}
@@ -462,18 +381,13 @@
     function tick(now){frame=0;if(dirty)measure();if(!activeMotion()){sync();return;}time+=previous?Math.min(50,now-previous):0;previous=now;update();frame=requestAnimationFrame(tick);}
     function sync(){const on=activeMotion();data('active',on);data('reduced',reduced);if(on&&!frame){previous=0;frame=requestAnimationFrame(tick);}if(!on){if(frame)cancelAnimationFrame(frame);frame=0;previous=0;}}
     function inViewport(){const rect=panel.getBoundingClientRect();return rect.bottom>0&&rect.top<window.innerHeight;}
-    function changeMotion(event){reduced=event.matches;resetRound(roundIndex,reduced);measure();diagnostics();sync();}
+    function changeMotion(event){reduced=event.matches;reset(reduced);measure();diagnostics();sync();}
     listen(scroll,'scroll',queueMeasure,{passive:true});listen(window,'resize',queueMeasure,{passive:true});listen(document,'visibilitychange',sync);
-    if('IntersectionObserver'in window){const io=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)queueMeasure();sync();},{threshold:.02});io.observe(panel);cleanups.push(()=>io.disconnect());}
-    else listen(window,'scroll',()=>{visible=inViewport();queueMeasure();sync();},{passive:true});
+    if('IntersectionObserver'in window){const io=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)queueMeasure();sync();},{threshold:.02});io.observe(panel);cleanups.push(()=>io.disconnect());}else listen(window,'scroll',()=>{visible=inViewport();queueMeasure();sync();},{passive:true});
     if('ResizeObserver'in window){const ro=new ResizeObserver(queueMeasure);[panel,grid,scroll,...zones.map(zone=>zone.bubble)].forEach(node=>ro.observe(node));cleanups.push(()=>ro.disconnect());}
-    const mo=new MutationObserver(queueMeasure);mo.observe(grid,{childList:true});cleanups.push(()=>mo.disconnect());
-    if(media.addEventListener){media.addEventListener('change',changeMotion);cleanups.push(()=>media.removeEventListener('change',changeMotion));}
-    else if(media.addListener){media.addListener(changeMotion);cleanups.push(()=>media.removeListener(changeMotion));}
-    zones.forEach(zone=>createGeneration(zone,0,zone.side*STAGGER));visible=inViewport();measure();
-    if(reduced)zones.forEach(staticWord);announceRound();diagnostics();sync();
-    const api=Object.freeze({setPaused(value){paused=Boolean(value);sync();},destroy(){if(destroyed)return;destroyed=true;sync();if(layoutFrame)cancelAnimationFrame(layoutFrame);cleanups.forEach(cleanup=>cleanup());clearAll();zones.forEach(zone=>removeActor(zone.actor));root.remove();panel.classList.remove('narrator-has-warning');if(!hadClass)panel.classList.remove('has-activity-narrator');mounted.delete(panel);}});
-    mounted.set(panel,api);return api;
+    const mo=new MutationObserver(queueMeasure);mo.observe(grid,{childList:true});cleanups.push(()=>mo.disconnect());if(media.addEventListener)listen(media,'change',changeMotion);else if(media.addListener){media.addListener(changeMotion);cleanups.push(()=>media.removeListener(changeMotion));}
+    visible=inViewport();reset(reduced);measure();if(reduced)beginHold();diagnostics();sync();
+    const api=Object.freeze({setPaused(value){paused=Boolean(value);sync();},destroy(){if(destroyed)return;destroyed=true;sync();if(layoutFrame)cancelAnimationFrame(layoutFrame);cleanups.forEach(cleanup=>cleanup());clearGeneration(current);clearGeneration(incoming);errorInk.splice(0).forEach(record=>record.node.remove());actors.forEach(actor=>{actor.node.remove();actor.shadow.remove();});root.remove();panel.classList.remove('narrator-has-warning');if(!hadClass)panel.classList.remove('has-activity-narrator');mounted.delete(panel);}});mounted.set(panel,api);return api;
   }
   window.ActivityNarrator=Object.freeze({mount});
 })();

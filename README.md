@@ -38,9 +38,18 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 - `capability-map.js/css`: sekiz yetenek alanını ilgili gerçek proje ayrıntılarına bağlayan harita.
 - `personal-dock.js/css`: sabit bölüm bağlantıları ve gerçek profil içeriğini kullanan küçük kişisel panel.
 - `project-motion.js/css`: proje önizlemesiyle ayrıntı dialogu arasında görsel devamlılık, kesilebilir proje değişimi ve geri dönüş.
+- `ui-icons.js/css`: mobilde emojiye dönüşmeyen SVG yön ve durum işaretleri.
+- `motion-film.js/css`: kendi kısa arka plan filmi, sabit poster ve kelime bütünlüğünü koruyan başlık girişleri.
+- `MOTION-ARASTIRMA.md`: Dribbble, Webflow ve Noctra incelemeleri; açılan canlı örnekler, uygulama kararları ve sınırlar.
 - `ARASTIRMA.md`: tasarım kaynakları, ayrı video/site gözlemleri, gözlem sınırları ve özgün uygulama kararları.
 
-Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. Bu portföy için yeni görsel üretimi kullanılmadı; sahne ve akışlar kodla çizilir.
+Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. Sahne, arka plan filmi ve akışlar kendi kodumuzla çizilir; üretken görsel API'si kullanılmadı.
+
+## Arka plan ve ziyaretçi akışı
+
+7,2 saniyelik yerel WebM, kendi parametrik şerit geometrimizden üretilmiştir; 54 KB dosya ve SVG poster kullanır. Görünmezlik, dialog, duraklatma ve azaltılmış hareket durumları oynatımı durdurur. Beş portföy başlığı kelime maskeleriyle bir kez açılır. Kodla üretim için `scripts/render-motion-film.py` kullanılabilir.
+
+Sistemler bölümünde her örnek somut bir işle başlar. Girdi ve ana eylem yan yanadır; Enter da çalışır. Sonuç kartı yazılan başlığı ve gerçek yerel kaydı gösterir. JSON ve işlem izi, kapalı gelen **Teknik ayrıntılar** içinde bulunur. Yeni kaynakların gözlemleri [motion araştırmasında](MOTION-ARASTIRMA.md) kayıtlıdır.
 
 ## Kişisel Dock ve proje ayrıntıları
 
@@ -79,15 +88,15 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 
 ## Luci’nin piksel sahnesi
 
-52 × 7 matris ortak bir sahnedir. Siyah Luci kimliğini korur; ikinci yazar cyan, turkuaz, kehribar, coral ve pembe syntax tonlarıyla değişir. Yazım sınırı her EN/TR çiftinde kayar, yazarlar dört turda bir taraf değiştirir. İki kelime arasında okuma için iki sütun bırakılır; bu boşluk da yer değiştirir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır. Aynı anda en fazla üç karakter görünür. İkinci yazar 900 ms sonra başlar; ikisi de kendi kelimesini tamamlar. Tam kelime en az 4,2 saniye, tamamen yazılmış düşünce en az 5 saniye okunur. Sonraki yazım, önceki kelimenin 1,6 saniyelik silinmesiyle örtüşür; hücre kilidi yazı çarpışmasını önler.
+52 × 7 matris tek cümle için ortak bir sahnedir. İki kalıcı Luci sırayla yazar ve siler. Tam cümle 2,8 saniye okunur; mevcut yazar başlangıçtan silmeye başladığında diğeri boşalan hücrelere yeni cümleyi yazar. İki uç aynı saatle, üç sütunluk aralıkla ilerler. Hücre sahipliği eski ve yeni yazının çarpışmasını önler. Siyah Luci kimliğini korur; ikinci karakter syntax tonlarıyla değişir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır.
 
-96 teknik konu, dönüşümlü EN/TR 192 sahne ve 384 özgün kısa düşünce içerir. İsim ve tekstil metinleri yoktur; sorgular, durum, asenkron işler, hata kodları ve küçük kod satırları gösterilir. Yaklaşık her beş kelimede bir yanlış iniş, üç kırmızı iz, WARN/RECOVER ve tek hafif panel kırılması oluşur. Gerçek etkinlik verileri değişmez. Balona basmak sonraki düşünceyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
+96 teknik konu, dönüşümlü EN/TR 192 özgün kısa cümle ve 384 düşünce içerir. Düşünceler en az 5 saniye okunur. Yanlış iniş sırasında iki uç birlikte durur; kırmızı iz, WARN/RECOVER ve küçük panel kırılmasının ardından aynı yerden devam eder. Gerçek etkinlik verileri değişmez. Balona basmak sonraki cümleyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
-Taraf değiştirirken karakter 700 ms'lik bir sıçramayla yeni yerine geçer; balonlar birlikte yer değiştirir. Telefon dahil düşünce gövdesi 12 px, terminal başlıkları en az 8 px'tir. Uzun teknik terimler balonun dışına taşmadan satıra bölünür.
+Telefon dahil düşünce gövdesi 12 px'tir. Balonlarda gereksiz boşluk azaltıldı; uzun teknik terimler dışarı taşmadan satıra bölünür. Yeni cümle için karakterler başlangıca döner, roller yer değiştirir.
 
 ## mk.desktop / 32 tuş
 
-Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 12, bilgisayar 18 saniye görünür. Pointer, odak, basılı tutma ve büyütülmüş ekran sırasında sahne sabit kalır; otomatik tur etkileşimden 14 saniye sonra devam eder. Üstteki genel hareket düğmesi tüm sahneleri durdurur.
+Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 4,2, bilgisayar 5,8 saniye görünür. Fare alanın üzerindeyken tur ve ilerleme göstergesi donar; çıkınca kalan süre 320 ms sonra devam eder. Klavye odağı, yazı alanları, basılı tutma ve büyütülmüş ekran da sahneyi korur. Üstteki genel hareket düğmesi tüm sahneleri durdurur.
 
 Bilgisayarın 8 × 4 gri tuşu yazısızdır. Hover veya klavye odağında işlev adı görünür; oklarla gezin, Enter/Space ile çalıştır. Terminal, düzenlenebilir arayüz, yerel API, gerçek SQLite sorguları/ilişkileri/transaction, proje akışları, kod farkı, sürümler, testler, kuyruk/cache/yetkiler, motion/renk/piksel araçları ve iki küçük oyun bulunur. **Ekranı büyüt** aynı uygulamanın durumunu korur. Deneyler bu tarayıcıda çalışır; gerçek servis veya hesaplarda işlem yapmaz.
 

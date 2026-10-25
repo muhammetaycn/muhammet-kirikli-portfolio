@@ -2,13 +2,13 @@
   'use strict';
   const SVG = 'http://www.w3.org/2000/svg';
   const FLOWS = {
-    fullstack: {title:'Full-stack · istekten kayda', description:'Bir başlık gönder. Doğrulamayı izle, kayda dönüşmeden önce karar ver.', sample:'Etkileşimli portföy', nodes:['İstek','Doğrulama','Onay','Yerel kayıt'], kind:'request', output:'Yerel proje kaydı'},
-    automation: {title:'Otomasyon · olaydan kuyruğa', description:'Bir olay yaz. Kural girdiyi hazırlasın; kuyruğa ekleme kararı sende kalsın.', sample:'Yeni içerik taslağı', nodes:['Olay','Kural','Kontrol','Kuyruk'], kind:'job', output:'Yerel iş kuyruğu'},
-    mobile: {title:'Mobil · formdan görünüme', description:'Bir form değeri gir. Aynı verinin doğrulama ve yerel görünüm adımlarını karşılaştır.', sample:'Yakındaki yerleri keşfet', nodes:['Form','Yerel durum','Onay','Görünüm'], kind:'form', output:'Yerel görünüm kaydı'},
-    event: {title:'Etkinlik · paylaşımdan sahneye', description:'Örnek paylaşım metnini değiştir. Onay vermeden yerel galeriye eklenmez.', sample:'Sahneden bir an', nodes:['Paylaşım','Doğrula','Onay','Yerel galeri'], kind:'submission', output:'Yerel galeri kaydı'},
-    textile: {title:'Operasyon · siparişten panoya', description:'Bir sipariş referansı gir. Hazırlık ve kalite kararından sonra yerel panoya taşınsın.', sample:'SIP-024 / örnek sipariş', nodes:['Sipariş','Plan','Kalite','Yerel pano'], kind:'order', output:'Yerel pano kaydı'},
-    content: {title:'İçerik · taslaktan kuyruğa', description:'Taslağın başlığını yaz. Kontrol noktasında durdur veya yerel kuyruğa bırak.', sample:'Bir fikrin ilk sürümü', nodes:['Taslak','Hazırlık','Onay','Yerel kuyruk'], kind:'draft', output:'Yerel içerik kuyruğu'},
-    community: {title:'Topluluk · olaydan karara', description:'Bir olay metni gir. Kuralın hazırladığı kaydı incele; gerçek hesaplara işlem gönderilmez.', sample:'Yeni bir topluluk fikri', nodes:['Olay','Kural','Onay','Yerel kayıt'], kind:'event', output:'Yerel olay kaydı'}
+    fullstack: {title:'Bir fikri kayda dönüştür.', description:'Projeye bir ad ver. Kontrol edelim, son kararı sen ver.', field:'Projeye ne ad verelim?', sample:'Etkileşimli portföy', action:'Fikri hazırla', approval:'Bu fikir proje listene eklensin mi?', commit:'Projeye dönüştür', before:'Fikrin kontrol edilir. Onaylarsan bu oturumdaki proje listesine eklenir.', doneTitle:'Fikrin artık listede.', done:'Onayladığın fikir bu oturumda bir proje kaydına dönüştü.', nodes:['Fikir','Kontrol','Kararın','Proje'], kind:'request', output:'Yerel proje kaydı'},
+    automation: {title:'Tekrarlayan işi sıraya bırak.', description:'Yapılacak işi yaz. Hazırlandığında kuyruğa girip girmeyeceğini seç.', field:'Hangi işi hazırlayalım?', sample:'Haftalık içerik özetini hazırla', action:'İşi hazırla', approval:'Bu iş sıraya alınsın mı?', commit:'Kuyruğa ekle', before:'İşin hazırlanır; sen onaylamadan kuyruğa girmez.', doneTitle:'İşin sırada.', done:'İş bu oturumdaki yerel kuyruğa eklendi. Dışarıya bir istek gönderilmedi.', nodes:['İş','Hazırlık','Kararın','Kuyruk'], kind:'job', output:'Yerel iş kuyruğu'},
+    mobile: {title:'Bir keşif kartı oluştur.', description:'Telefonda görmek istediğin fikri yaz. Küçük bir görünüm kaydına dönüştürelim.', field:'Keşif kartında ne yazsın?', sample:'Yakındaki kahvecileri keşfet', action:'Kartı hazırla', approval:'Bu kart görünüme eklensin mi?', commit:'Kartı ekle', before:'Başlık kontrol edilir. Onayladığında bu oturumda bir görünüm kaydı oluşur.', doneTitle:'Keşif kartın hazır.', done:'Kartın başlığı bu oturumdaki mobil görünüm kaydında.', nodes:['Başlık','Kontrol','Kararın','Kart'], kind:'form', output:'Yerel görünüm kaydı'},
+    event: {title:'Bir anı galeriye taşı.', description:'Bir etkinlik paylaşımına başlık ver. Galeriye girmeden önce sen onayla.', field:'Bu anın başlığı ne olsun?', sample:'Sahneden bir an', action:'Paylaşımı hazırla', approval:'Bu an yerel galeriye eklensin mi?', commit:'Galeriye ekle', before:'Paylaşımın hazırlanır, onayın gelene kadar galerinin dışında kalır.', doneTitle:'Bu an galeride.', done:'Onayladığın başlık bu oturumdaki yerel galeriye eklendi.', nodes:['An','Kontrol','Kararın','Galeri'], kind:'submission', output:'Yerel galeri kaydı'},
+    textile: {title:'Bir siparişi panoya taşı.', description:'Örnek siparişini yaz. Hazırlık ve kalite kontrolünden sonra panoya al.', field:'Siparişin referansı nedir?', sample:'SIP-024 / örnek sipariş', action:'Siparişi hazırla', approval:'Sipariş panoya alınsın mı?', commit:'Panoya taşı', before:'Sipariş hazırlanır. Kalite kararını verdiğinde yerel panoya geçer.', doneTitle:'Sipariş panoda.', done:'Onayladığın sipariş bu oturumdaki yerel panoya eklendi.', nodes:['Sipariş','Hazırlık','Kalite','Pano'], kind:'order', output:'Yerel pano kaydı'},
+    content: {title:'Bir taslağı sıraya koy.', description:'İçerik fikrine bir başlık ver. Hazır taslak için son karar sende.', field:'Taslağının başlığı ne olsun?', sample:'Bir fikrin ilk sürümü', action:'Taslağı hazırla', approval:'Bu taslak içerik kuyruğuna girsin mi?', commit:'Sıraya koy', before:'Taslak hazırlanır. Onaylarsan yerel içerik kuyruğuna eklenir.', doneTitle:'Taslağın sırada.', done:'Taslak bu oturumdaki kuyruğa eklendi. Herhangi bir yerde yayımlanmadı.', nodes:['Taslak','Hazırlık','Kararın','Kuyruk'], kind:'draft', output:'Yerel içerik kuyruğu'},
+    community: {title:'Bir topluluk fikrini değerlendir.', description:'Öneriyi yaz. Kontrol edildikten sonra kabul et veya durdur.', field:'Topluluğa ne önerelim?', sample:'Birlikte bir kod atölyesi yapalım', action:'Öneriyi hazırla', approval:'Bu öneri kabul edilsin mi?', commit:'Öneriyi kabul et', before:'Öneri hazırlanır. Sen onayladığında bu oturumda kayda geçer.', doneTitle:'Önerin kabul edildi.', done:'Kararın bu oturumdaki yerel kayıtta. Gerçek bir hesaba işlem yapılmadı.', nodes:['Öneri','Kontrol','Kararın','Kayıt'], kind:'event', output:'Yerel olay kaydı'}
   };
   let serial = 0;
   const clamp = (value,min,max) => Math.max(min,Math.min(max,value));
@@ -28,25 +28,29 @@
     let destroyed=false,paused=false,visible=true,generation=0,runSerial=0,recordSerial=0,clock=0,previous=0,frame=0;
     let phase='idle',current=null,travel=null,selectedStep=0,inspectorPinned=false,nodes=[],connections=[],packet=null;
     let snapshots=Array(4).fill(null),states=Array(4).fill('idle');
-    const viewport=stage.parentNode,viewportParent=viewport.parentNode,viewportNext=viewport.nextSibling;
+    const viewport=stage.parentNode,viewportParent=viewport.parentNode,viewportNext=viewport.nextSibling,runParent=runButton.parentNode,runNext=runButton.nextSibling;
     const workbench=element('div','lab-workbench'),flowPanel=element('div','lab-flow-panel'),editor=element('div','lab-inputs');
-    const sampleLabel=element('label','lab-field'),sampleCaption=element('span','','Örnek veri'),sample=element('input','lab-sample');
+    const sampleLabel=element('label','lab-field'),sampleCaption=element('span','',FLOWS[selected].field),sample=element('input','lab-sample');
     sample.id=prefix+'-sample';sample.type='text';sample.maxLength=80;sample.autocomplete='off';sample.spellcheck=false;sample.value=FLOWS[selected].sample;sampleLabel.append(sampleCaption,sample);
     const scenarioLabel=element('label','lab-field'),scenario=element('select','lab-scenario');
-    scenario.id=prefix+'-scenario';scenarioLabel.append(element('span','','Bir durum dene'),scenario);
-    [['valid','Geçerli girdi'],['missing','Eksik girdi'],['repeat','Aynı girdiyi tekrar dene']].forEach(([value,text])=>{const option=element('option','',text);option.value=value;scenario.append(option);});scenario.value='valid';
-    editor.append(sampleLabel,scenarioLabel);
+    scenario.id=prefix+'-scenario';scenarioLabel.append(element('span','','Bir de bunu dene'),scenario);
+    [['valid','Normal bir deneme'],['missing','Başlığı boş bırak'],['repeat','Aynı şeyi tekrar gönder']].forEach(([value,text])=>{const option=element('option','',text);option.value=value;scenario.append(option);});scenario.value='valid';
+    const start=element('div','lab-start');start.append(runButton);editor.append(sampleLabel,scenarioLabel,start);
     const choice=element('div','lab-choice');choice.hidden=true;
-    const choiceCopy=element('p','','Veri hazır. Bu oturumdaki kayda geçsin mi?'),choiceActions=element('div','lab-choice-actions');
-    const approve=element('button','lab-approve','Devam et →'),reject=element('button','lab-reject','Durdur');approve.type=reject.type='button';
+    const choiceCopy=element('p','',''),choiceActions=element('div','lab-choice-actions');
+    const approve=element('button','lab-approve',FLOWS[selected].commit),reject=element('button','lab-reject','Şimdilik vazgeç');approve.type=reject.type='button';
     choiceActions.append(approve,reject);choice.append(choiceCopy,choiceActions);
+    const outcome=element('div','lab-outcome'),outcomeEyebrow=element('span','lab-outcome-eyebrow','BİR KÜÇÜK DENEY'),outcomeTitle=element('h4','lab-outcome-title'),outcomeSource=element('p','lab-outcome-source'),outcomeHint=element('p','lab-outcome-hint'),outcomeMeta=element('div','lab-outcome-meta');
+    outcome.append(outcomeEyebrow,outcomeTitle,outcomeSource,outcomeHint,choice,outcomeMeta);
+    const technical=element('details','lab-technical'),technicalSummary=element('summary','lab-technical-summary','Teknik ayrıntılar');technical.open=false;
+    const disclosureIcon=svg('svg',{viewBox:'0 0 16 16','aria-hidden':'true'});disclosureIcon.append(svg('path',{d:'M3 8h10M8 3v10',fill:'none',stroke:'currentColor','stroke-width':1.2}));technicalSummary.append(disclosureIcon);technical.append(technicalSummary);
     const inspector=element('aside','lab-inspector'),inspectorTop=element('div','lab-inspector-top'),inspectorTitle=element('h4','','01 / Girdi');
     const countWrap=element('div','lab-record-count'),count=element('strong','','0');countWrap.append(count,element('span','','bu oturumdaki kayıt'));
-    inspectorTop.append(inspectorTitle,countWrap);
+    inspectorTop.append(inspectorTitle);outcomeMeta.append(countWrap);
     const json=element('pre','lab-json');json.setAttribute('tabindex','0');json.setAttribute('aria-label','Seçilen aşamanın yerel verisi');
     const traceLabel=element('span','lab-trace-label','AKIŞ İZİ'),trace=element('ol','lab-trace');
     const recordNote=element('p','lab-record-note','Henüz yerel kayıt yok.');inspector.append(inspectorTop,json,traceLabel,trace,recordNote);
-    viewportParent.insertBefore(workbench,viewport);flowPanel.append(editor,viewport,choice);workbench.append(flowPanel,inspector);host.classList.add('has-live-lab');
+    technical.append(inspector);viewportParent.insertBefore(workbench,viewport);flowPanel.append(editor,viewport);workbench.append(flowPanel,outcome,technical);host.classList.add('has-live-lab');
     result.setAttribute('role','status');result.setAttribute('aria-live','polite');result.setAttribute('aria-atomic','true');
 
     function listen(target,type,fn,list=cleanups) {target.addEventListener(type,fn);list.push(()=>target.removeEventListener(type,fn));}
@@ -62,15 +66,27 @@
     }
     function preview(index) {return snapshots[index]||{stage:index+1,name:FLOWS[selected].nodes[index],status:'henüz çalıştırılmadı',input:sample.value};}
     function inspect(index,pin) {
-      selectedStep=index;if(pin)inspectorPinned=true;
+      selectedStep=index;if(pin){inspectorPinned=true;technical.open=true;}
       inspectorTitle.textContent=String(index+1).padStart(2,'0')+' / '+FLOWS[selected].nodes[index];json.textContent=JSON.stringify(preview(index),null,2);
       nodes.forEach((node,i)=>{node.group.setAttribute('aria-pressed',String(i===index));node.group.classList.toggle('is-inspected',i===index);});host.dataset.inspected=String(index);
     }
     function setState(index,state) {states[index]=state;if(nodes[index])nodes[index].group.dataset.state=state;}
+    function updateOutcome() {
+      const flow=FLOWS[selected],source=current?.source||sample.value.trim(),record=snapshots[3]?.record;
+      let label='SENİN DENEMEN',heading='Sonuç burada şekillenecek.',note=flow.before;
+      if(phase==='travel'){label='HAZIRLANIYOR';heading=travel?.to===3?'Kaydın oluşturuluyor.':'Girdin kontrol ediliyor.';note='Birkaç küçük adım; son karar yine sende.';}
+      if(phase==='awaiting'){label='KARAR SENDE';heading=flow.approval;note='Devam edersen aşağıdaki kayıt bu oturumda oluşturulacak.';}
+      if(phase==='complete'){label='TAMAMLANDI';heading=flow.doneTitle;note=flow.done;}
+      if(phase==='duplicate'){label='ZATEN BURADA';heading='Bir kez eklemek yeterli.';note='Bu başlık daha önce kaydedildi. Aynı kaydı tekrar oluşturmuyoruz.';}
+      if(phase==='stopped'){label=states[1]==='error'?'KÜÇÜK BİR EKSİK':'SEN DURDURDUN';heading=states[1]==='error'?'Başlığı biraz tamamla.':'Bu adım sende kaldı.';note=states[1]==='error'?'En az 3 karakter yazıp yeniden deneyebilirsin.':'Hiçbir kayıt eklenmedi. İstediğinde yeniden deneyebilirsin.';}
+      outcome.dataset.state=phase;outcomeEyebrow.textContent=label;outcomeTitle.textContent=heading;outcomeSource.textContent=source||'Başlık burada görünecek';outcomeHint.textContent=note;
+      outcomeSource.classList.toggle('is-empty',!source);outcomeSource.dataset.recordId=record?.id||'';choiceCopy.textContent='';approve.textContent=flow.commit;
+      sample.setAttribute('aria-invalid',String(phase==='stopped'&&states[1]==='error'));host.dataset.detailsOpen=String(technical.open);
+    }
     function updateDiagnostics() {
       host.dataset.flow=selected;host.dataset.phase=phase;host.dataset.running=String(phase==='travel'||phase==='awaiting');host.dataset.elapsed=String(Math.round(clock));host.dataset.awaiting=String(phase==='awaiting');stage.dataset.running=host.dataset.running;
-      runButton.disabled=phase==='travel'||phase==='awaiting';runButton.textContent=phase==='travel'?'Veri ilerliyor…':phase==='awaiting'?'Kararını bekliyor':'Akışı çalıştır →';
-      choice.hidden=phase!=='awaiting';sample.disabled=false;scenario.disabled=false;updateCounts();
+      runButton.disabled=phase==='travel'||phase==='awaiting';runButton.textContent=phase==='travel'?'Hazırlanıyor…':phase==='awaiting'?'Kararını bekliyor':FLOWS[selected].action;
+      choice.hidden=phase!=='awaiting';sample.disabled=false;scenario.disabled=false;updateCounts();updateOutcome();
     }
     function stopFrame() {if(frame)cancelAnimationFrame(frame);frame=0;previous=0;}
     function cancel(text) {
@@ -118,7 +134,7 @@
         current.prepared=prepare(current.source);snapshots[1]=current.prepared;traceEvent('Girdi doğrulandı; yerel veri hazırlandı.','good');if(!inspectorPinned)inspect(1);transit(2);return;
       }
       if(index===2){
-        phase='awaiting';stopFrame();snapshots[2]={...current.prepared,approval:{required:true,state:'pending'},stored:false};setState(2,'awaiting');traceEvent('İnsan kararı bekleniyor. Henüz kayıt yok.','warn');status('Kontrol noktası · Veriyi incele. Devam et veya durdur.');if(!inspectorPinned)inspect(2);updateDiagnostics();return;
+        phase='awaiting';stopFrame();snapshots[2]={...current.prepared,approval:{required:true,state:'pending'},stored:false};setState(2,'awaiting');traceEvent('İnsan kararı bekleniyor. Henüz kayıt yok.','warn');status('Son karar sende. Onayla veya şimdilik vazgeç.');if(!inspectorPinned)inspect(2);updateDiagnostics();return;
       }
       if(index===3){
         if(!current.approved){stopAt(3,'Onay olmadan kayıt eklenmedi.','error');return;}
@@ -139,11 +155,11 @@
     }
     function draw() {
       graphCleanups.splice(0).forEach(remove=>remove());stage.replaceChildren();nodes=[];connections=[];
-      const mobile=small.matches,width=mobile?360:760,height=mobile?326:360,cardWidth=mobile?158:145,cardHeight=94;
-      const positions=mobile?[{x:12,y:48},{x:190,y:48},{x:190,y:204},{x:12,y:204}]:[{x:20,y:56},{x:205,y:180},{x:390,y:56},{x:575,y:180}];
-      stage.setAttribute('viewBox',`0 0 ${width} ${height}`);stage.setAttribute('role','group');stage.removeAttribute('aria-labelledby');stage.setAttribute('aria-label',FLOWS[selected].title+'. Dört aşama. Aşamalara basarak yerel veriyi incele.');stage.setAttribute('preserveAspectRatio','xMidYMid meet');stage.dataset.layout=mobile?'grid':'serpentine';
+      const mobile=small.matches,width=mobile?360:760,height=mobile?252:174,cardWidth=mobile?158:160,cardHeight=74;
+      const positions=mobile?[{x:12,y:40},{x:190,y:40},{x:190,y:158},{x:12,y:158}]:[{x:12,y:64},{x:204,y:64},{x:396,y:64},{x:588,y:64}];
+      stage.setAttribute('viewBox',`0 0 ${width} ${height}`);stage.setAttribute('role','group');stage.removeAttribute('aria-labelledby');stage.setAttribute('aria-label',FLOWS[selected].title+'. Dört küçük adım. Bir adıma basarak teknik ayrıntılarını aç.');stage.setAttribute('preserveAspectRatio','xMidYMid meet');stage.dataset.layout=mobile?'grid':'row';
       stage.append(svg('title',{},FLOWS[selected].title),svg('desc',{},'Yerel bir deney. Veriyi değiştir, kontrol noktasında karar ver, aynı girdinin tekrar eklenmediğini gör.'));
-      stage.append(svg('text',{x:mobile?12:20,y:23,class:'lab-flow-caption'},'04 AŞAMA / VERİYE DOKUN'));
+      stage.append(svg('text',{x:12,y:23,class:'lab-flow-caption'},'FİKİRDEN SONUCA / 4 ADIM'));
       positions.slice(0,-1).forEach((point,index)=>{
         const next=positions[index+1],vertical=mobile&&point.x===next.x;let a,d,b,c;
         if(vertical){a={x:point.x+cardWidth/2,y:point.y+cardHeight};d={x:next.x+cardWidth/2,y:next.y};const middle=(a.y+d.y)/2;b={x:a.x,y:middle};c={x:d.x,y:middle};}
@@ -153,19 +169,21 @@
       packet=svg('circle',{class:'lab-flow-packet',r:4,opacity:0});stage.append(packet);
       positions.forEach((point,index)=>{
         const group=svg('g',{class:'lab-flow-node',transform:`translate(${point.x} ${point.y})`,role:'button',tabindex:0,'aria-label':`${index+1}. ${FLOWS[selected].nodes[index]}. Veriyi incele.`, 'aria-pressed':String(selectedStep===index)});group.dataset.labStep=String(index);group.dataset.state=states[index];
-        group.append(svg('rect',{width:cardWidth,height:cardHeight,rx:16}),svg('text',{x:14,y:24,class:'lab-flow-number'},String(index+1).padStart(2,'0')),svg('circle',{cx:cardWidth-17,cy:20,r:3,class:'lab-flow-led'}),svg('text',{x:14,y:54,class:'lab-flow-name'},FLOWS[selected].nodes[index]),svg('text',{x:14,y:77,class:'lab-flow-kind'},['GİRDİ','KONTROL','SENİN KARARIN','YEREL ÇIKTI'][index]));
+        group.append(svg('rect',{width:cardWidth,height:cardHeight,rx:12}),svg('text',{x:14,y:23,class:'lab-flow-number'},String(index+1).padStart(2,'0')),svg('circle',{cx:cardWidth-17,cy:20,r:3,class:'lab-flow-led'}),svg('text',{x:14,y:54,class:'lab-flow-name'},FLOWS[selected].nodes[index]));
         listen(group,'click',()=>inspect(index,true),graphCleanups);listen(group,'keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();inspect(index,true);}},graphCleanups);nodes.push({group});stage.append(group);
       });
       inspect(selectedStep);if(travel){connections[travel.from].path.dataset.state='active';paintPacket();}
     }
     function selectFlow(key) {
-      if(!FLOWS[key]||destroyed)return;cancel();selected=key;sample.value=FLOWS[key].sample;scenario.value='valid';title.textContent=FLOWS[key].title;description.textContent=FLOWS[key].description;
-      tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.labProject===key)));draw();updateDiagnostics();status('Girdiyi değiştir veya bir durum seç. Aşamalara basıp veriyi inceleyebilirsin.');
+      if(!FLOWS[key]||destroyed)return;cancel();selected=key;sample.value=FLOWS[key].sample;sampleCaption.textContent=FLOWS[key].field;scenario.value='valid';title.textContent=FLOWS[key].title;description.textContent=FLOWS[key].description;technical.open=false;
+      tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.labProject===key)));draw();updateDiagnostics();status('Başlığı değiştirebilir veya hazır örnekle deneyebilirsin.');
     }
     tabs.forEach(tab=>listen(tab,'click',()=>selectFlow(tab.dataset.labProject)));
     listen(runButton,'click',run);listen(resetButton,'click',()=>{cancel('Akış sıfırlandı. Bu oturumdaki önceki kayıtlar korunuyor.');});
     listen(approve,'click',()=>decision(true));listen(reject,'click',()=>decision(false));
     listen(sample,'input',()=>{scenario.value='valid';cancel('Girdi değişti. Yeni değerle akışı başlatabilirsin.');});
+    listen(sample,'keydown',event=>{if(event.key==='Enter'&&!event.isComposing){event.preventDefault();run();}});
+    listen(technical,'toggle',()=>{host.dataset.detailsOpen=String(technical.open);});
     listen(scenario,'change',()=>{const mode=scenario.value,last=[...records.get(selected).values()].at(-1);sample.value=mode==='missing'?'':mode==='repeat'?(last?.source||FLOWS[selected].sample):FLOWS[selected].sample;cancel(mode==='repeat'?'Aynı girdiyi çalıştır. Daha önce kaydedildiyse ikinci kayıt eklenmez.':'Bu girdiyi çalıştırıp kontrol sonucunu izle.');});
     listen(document,'visibilitychange',sync);listen(window,'resize',draw);
     const preferenceChanged=()=>{if(motion.matches&&phase==='travel'&&travel){const target=travel.to;connections[travel.from].path.dataset.state='done';travel=null;stopFrame();arrive(target);}else sync();};
@@ -175,7 +193,7 @@
     visible=inViewport();selectFlow(selected);
     function destroy() {
       if(destroyed)return;destroyed=true;generation++;stopFrame();cleanups.splice(0).forEach(remove=>remove());graphCleanups.splice(0).forEach(remove=>remove());travel=null;current=null;
-      if(viewportParent){if(viewportNext&&viewportNext.parentNode===viewportParent)viewportParent.insertBefore(viewport,viewportNext);else viewportParent.append(viewport);}workbench.remove();host.classList.remove('has-live-lab');runButton.disabled=false;
+      if(viewportParent){if(viewportNext&&viewportNext.parentNode===viewportParent)viewportParent.insertBefore(viewport,viewportNext);else viewportParent.append(viewport);}if(runParent){if(runNext&&runNext.parentNode===runParent)runParent.insertBefore(runButton,runNext);else runParent.append(runButton);}workbench.remove();host.classList.remove('has-live-lab');runButton.disabled=false;
     }
     destroy.destroy=destroy;destroy.setPaused=value=>{paused=Boolean(value);sync();};return destroy;
   }
