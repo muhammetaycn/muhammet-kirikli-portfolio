@@ -1,0 +1,21 @@
+.menu-dialog.has-menu-motion[open]{display:flex;flex-direction:column;animation:none;background:#0b0d0e;height:100dvh;overflow:auto}
+.has-menu-motion .menu-top{flex:none;position:sticky;top:0;z-index:1;background:#0b0d0e;padding:24px 5vw;color:#b5aea1;letter-spacing:.08em}
+.has-menu-motion .dialog-close{width:44px;height:44px;min-width:44px;min-height:44px}
+.has-menu-motion nav{flex:1 0 auto;width:min(1120px,100%);max-width:none;margin:0 auto;padding:24px 7vw;display:flex;flex-direction:column;justify-content:center}
+.has-menu-motion nav a{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) 36px;gap:18px;align-items:center;min-height:64px;padding:10px 0;font-size:clamp(36px,min(5.8vw,9.5svh),86px);line-height:1.04;font-weight:450;letter-spacing:-.06em;color:#b7b4aa;border-bottom:1px solid #e7e3db1f;transition:color .2s,padding .3s cubic-bezier(.22,.75,.2,1)}
+.has-menu-motion nav small{align-self:center;margin:0;font:10px/1.4 Consolas,"Courier New",monospace;letter-spacing:0;color:#8e8b80;position:relative}
+.has-menu-motion nav a>span{margin:0;justify-self:end;font-size:.44em;line-height:1;color:#8e8b80;transition:transform .25s ease,color .2s}
+.has-menu-motion nav a[aria-current=location]{color:#eee6d4}
+.has-menu-motion nav a[aria-current=location] small{color:#e7bd94}
+.has-menu-motion nav a[aria-current=location] small:after{content:"";position:absolute;width:4px;height:4px;left:0;top:calc(100% + 5px);border-radius:50%;background:#ff8758}
+.has-menu-motion nav a:hover,.has-menu-motion nav a:focus-visible{padding-left:8px;color:#f1e9d9}
+.has-menu-motion nav a:hover>span,.has-menu-motion nav a:focus-visible>span{color:#ff8758;transform:translate(2px,-2px)}
+.has-menu-motion nav a:focus-visible{outline:1px solid #ff8758;outline-offset:4px}
+.has-menu-motion .menu-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;flex:none;margin:0 5vw;padding:18px 0 24px;font:8px/1.6 Consolas,"Courier New",monospace;letter-spacing:.04em;border-top:1px solid #e7e3db1c;color:#928d80}
+.menu-escape{flex:none;white-space:nowrap;color:#b8b09f;letter-spacing:0}
+.menu-escape kbd{display:inline-block;padding:3px 6px;margin-right:5px;border:1px solid #e7e3db2d;border-radius:4px;font:9px/1.3 Consolas,"Courier New",monospace;background:#e7e3db05;color:#d7ccba}
+.has-menu-motion.menu-motion-paused *{animation:none!important;transition:none!important}
+@media(max-width:760px){.has-menu-motion .menu-top{padding:18px 6vw;font-size:8px}.has-menu-motion nav{padding:18px 7vw}.has-menu-motion nav a{grid-template-columns:23px minmax(0,1fr) 24px;min-height:58px;gap:13px;padding:10px 0;font-size:clamp(30px,min(10vw,8.2svh),58px)}.has-menu-motion nav small{font-size:9px}.has-menu-motion .menu-bottom{font-size:7px;margin:0 6vw;gap:14px;padding:15px 0 22px;flex-wrap:wrap}.menu-escape kbd{font-size:9px}}
+@media(max-height:560px) and (min-width:761px){.has-menu-motion .menu-top{padding-block:14px}.has-menu-motion nav{padding-block:10px}.has-menu-motion nav a{min-height:48px;padding-block:6px;font-size:min(6vw,8svh)}.has-menu-motion .menu-bottom{padding-block:12px}}
+@media(hover:none){.menu-escape{display:none}}
+@media(prefers-reduced-motion:reduce){.has-menu-motion,.has-menu-motion *{animation:none!important;transition:none!important}}

@@ -78,4 +78,6 @@
   .narrator-tethers path{stroke-width:1;stroke-dasharray:1 6}
 }
 @media(max-width:380px){.narrator-terminal{padding-inline:6px}.narrator-terminal-bar{column-gap:4px}}
+@media(min-width:761px) and (max-height:740px){.rhythm-section{padding-top:30px!important}.rhythm-heading{margin-top:22px;margin-bottom:26px}.rhythm-heading .log-title{font-size:clamp(64px,10vh,78px)!important}}
+@media(max-width:760px) and (max-height:740px){.rhythm-section{padding-top:28px!important}.rhythm-heading{margin-top:20px;margin-bottom:24px}.rhythm-heading .log-title{font-size:58px!important}.rhythm-heading>p{margin-top:14px}}
 @media(prefers-reduced-motion:reduce){.activity-narrator *,.narrator-has-warning{animation:none!important;transition:none!important}.narrator-caret,.narrator-fracture{visibility:hidden}}

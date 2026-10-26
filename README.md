@@ -38,6 +38,8 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 - `capability-map.js/css`: sekiz yetenek alanını ilgili gerçek proje ayrıntılarına bağlayan harita.
 - `personal-dock.js/css`: sabit bölüm bağlantıları ve gerçek profil içeriğini kullanan küçük kişisel panel.
 - `project-motion.js/css`: proje önizlemesiyle ayrıntı dialogu arasında görsel devamlılık, kesilebilir proje değişimi ve geri dönüş.
+- `project-gallery.js/css`: dört proje arasında dokunma ve klavyeyle seçim, konum göstergesi ve kesilebilir görsel–açıklama geçişi.
+- `menu-motion.js/css`: beş gerçek bölüm bağlantısı, maskeli açılış, kısa kapanış, güncel bölüm ve güvenli odak dönüşü.
 - `ui-icons.js/css`: mobilde emojiye dönüşmeyen SVG yön ve durum işaretleri.
 - `motion-film.js/css`: kendi kısa arka plan filmi, sabit poster ve kelime bütünlüğünü koruyan başlık girişleri.
 - `MOTION-ARASTIRMA.md`: Dribbble, Webflow ve Noctra incelemeleri; açılan canlı örnekler, uygulama kararları ve sınırlar.
@@ -56,6 +58,8 @@ Sistemler bölümünde her örnek somut bir işle başlar. Girdi ve ana eylem ya
 Alttaki kompakt Dock; Başlangıç, Çalışmalar, Sistemler ve Kod günlüğüne normal bölüm bağlantılarıyla gider. Küçük `mk` düğmesi, Muhammet Kırıklı'nın adını, Türkiye/İstanbul saatini, `content.js` içindeki gerçek proje ve yetenek sayılarını gösteren kişisel paneli açar. GitHub ve LinkedIn bağlantıları aynı kimlik kaynağından gelir. Geliştirme kartı, yalnız bu portföyün kaynak deposuyla eşleşen commit günlüğünü kabul eder; ilk halinde doğrudan kaynak depoya bağlanır.
 
 Proje ayrıntısında seçilen çalışmanın kodla çizilmiş önizlemesi büyük sahneye taşınır. Açılış, başka projeye geçiş ve kapanış birbirini kesebilir; eski animasyon yeni seçimi değiştiremez. Escape, kapatma kontrolü ve klavye odağı yerel dialog davranışıyla çalışır. Genel duraklatma ve azaltılmış hareket seçimi, bu geçişlerin sabit karşılığını kullanır. Dar ekranlarda Dock'un dış sosyal kısayolları gizlenir; sosyal bağlantılar kişisel panelde bulunur.
+
+Önizlemedeki önceki/sonraki düğmeleri projeleri sırayla açar; Sol/Sağ/Home/End bu kontrollerde aynı seçimi yapar. Sayaç, kısa ad ve dört parçalı konum birlikte değişir. Otomatik proje geçişi yoktur. Tam ekran menü, Canlı günlük dahil beş normal bölüm bağlantısını gösterir; bölüm seçimi odağı menüye veya profil düğmesine geri taşımaz. Kısa masaüstünde önizleme ve Luci başlık aralıkları, alt Dock'un kontrolleri kapatmaması için daralır.
 
 Bu uyarlama, videodaki küçük kişisel alan ile ayrıca incelenen proje galerisi örneğinden gelir. Kullanıcının ekran görüntüsündeki sitenin kesin URL'si henüz çözülmedi; o siteyle eşleştirme tamamlanmış sayılmaz. Kaynakların ayrımı [ARASTIRMA.md](ARASTIRMA.md) ve [istek durumu](ISTEK-DURUMU.md) içinde kayıtlıdır.
 

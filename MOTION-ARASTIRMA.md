@@ -1,6 +1,6 @@
 # Motion araştırması — 26 Ekim 2026
 
-Bu kayıt, gönderilen yeni kaynaklarda gerçekten açılan sayfaları, görülen hareketleri ve portföye uygulanan kararları ayırır. Galerilerdeki bütün ticari şablonlar tek tek denetlenmiş değildir. Bu turda iki galeri, üç Dribbble çalışması, iki Webflow canlı şablonu, Kaelorian'ın canlı sitesi ve Noctra incelendi. Görsel kaynaklar portföyün dağıtım paketine kopyalanmadı.
+Bu kayıt, gönderilen yeni kaynaklarda gerçekten açılan sayfaları, görülen hareketleri ve portföye uygulanan kararları ayırır. Galerilerdeki bütün ticari şablonlar tek tek denetlenmiş değildir. İlk inceleme ve devam turunda iki galeri, beş Dribbble çalışması, iki Webflow canlı şablonu, Kaelorian'ın canlı sitesi ve Noctra incelendi. Görsel kaynaklar portföyün dağıtım paketine kopyalanmadı.
 
 ## Açılan kaynaklar ve gözlemler
 
@@ -16,6 +16,8 @@ Bu kayıt, gönderilen yeni kaynaklarda gerçekten açılan sayfaları, görüle
 | [Prosma / canlı önizleme](https://prosma.webflow.io/) | Açık renk büyük tipografili açılış, siyah büyük menü panelinin açılıp kapanması, proje bölümünde soldaki büyük ad ile sağdaki fotoğraf ve fotoğrafın dilimler halinde görünmesi incelendi. | Metin–görsel eşleşmesini korumak; geçişte başlık ve nesneyi birbirinden koparmamak. Kendi şerit geometrimiz ve proje çizimlerimiz kullanılır. |
 | [Noctra](https://getnoctra.com/) | Yükleme sahnesindeki ay, sıcak kenar ışığı, yörünge işaretleri, başlık, sabit üst gezinme; kaydırmada nesnenin küçülmesi ve başlık maskesi gözlendi. Daha ileri kaydırmada tarayıcı sekmesi yanıt vermedi; sonraki bölümler tamamlanmış inceleme olarak kaydedilmez. | Tek bir ışık ve derinlik dili; içerik üstüne binmeyen arka plan. Bizim uygulamada ağır bir ek 3B motor yerine küçük bir yerel video kullanmak. |
 | [Noctra / Launcher](https://getnoctra.com/launcher) | Ayrı sayfanın açılışı, içerik alanına kaydırma ve Library → Settings sekmesi çalıştırıldı. Açıklamanın altında aynı pencere alanında farklı uygulama ekran görüntüleri gösteriliyor. | Tek bir sunum alanında bağlamı koruyarak içerik değiştirmek. Buradaki ekran görüntüleri çalışan launcher uygulamasının kendisi olarak yorumlanmadı; yazılım indirilmedi. |
+| [Francesco Zagami / Portfolio Carousel Animation](https://dribbble.com/shots/8575201-Portfolio-Carousel-Animation) | Galeriden açılan 7,47 saniyelik video oynatıldı. Sony ve Oculus sahneleri; büyük proje adı, görselin maskeden geçişi, 1/6 ilerleme işareti ve ayrı keşif eylemi görüldü. | Proje adı, çizim ve ilerleme birlikte değişmeli. Portföyde otomatik sürüklenen bir vitrin yerine açık önceki/sonraki kontrolleri ve dört konumlu ilerleme kullanılır. Görsel, marka ve dairesel yazı alınmadı. |
+| [Norman Dubois / Developer Portfolio — Animation](https://dribbble.com/shots/4884149-Developer-Portfolio-Animation) | Hareketli GIF'in farklı karelerinde büyük kırmızı baş harfler, küçük geliştirici kimliği ve eğimli proje kolajı görüldü. Video süresi veya canlı site etkileşimi doğrulanmış değildir. | Kişisel kimlikle projeleri aynı görsel akışta bağlamak; hareketi ayrı bir süs katmanı olarak bırakmamak. Portföyün kendi çizimleri ve tipografisi korunur. |
 
 Webflow'un sayfa araçları ilk yüklemede oturum hatası verdi; katalog hazır olduktan sonra görünen bağlantılar üzerinden normal tarayıcı akışıyla devam edildi. Şablon satın alınmadı, hesaba giriş yapılmadı ve formlara veri gönderilmedi.
 
@@ -48,6 +50,16 @@ Bu deneyler tarayıcı oturumundadır. Canlı ürün hesabı, harici servis veya
 ### Cihazdan bağımsız işaretler
 
 Gezinmedeki oklar ve durum işaretleri kendi SVG çizgilerimizdir. Mobil işletim sisteminin renkli emoji fontuna bağlı değildir. Dinamik düğme yazıları da işlenir; asıl düğme, olay dinleyicisi ve erişilebilir etiket korunur. Kod, terminal, metin alanları ve düşünce metinleri bu dönüştürmenin dışındadır. CSS ile çizilen proje akışı okları da yerel SVG maskeleri kullanır.
+
+### Devam turu: proje keşfi ve menü
+
+Proje önizlemesine iki adet 44 px önceki/sonraki düğmesi, seçili proje adı, 01/04 sayacı ve dört parçalı konum göstergesi eklendi. Fareyle listedeki projeye gitmek, düğmeye basmak ve kontrollerde Sol/Sağ/Home/End kullanmak aynı seçimi değiştirir. Otomatik proje değiştirme yoktur. Görsel ve açıklama 280/220 ms içinde birlikte yerleşir; art arda komutlarda eski animasyon yeni projeyi geri getiremez. Ayrıntı düğmesi aynı DOM düğmesidir; seçili projenin mevcut ayrıntı sahnesini açar. Ekran okuyucu duyurusu yalnız açık düğme/klavye seçimiyle yapılır; fareyle listeyi taramak duyuru yağmuruna dönüşmez.
+
+Kaelorian ve Prosma'da incelenen büyük menü, beş normal bölüm bağlantısıyla özgün olarak uyarlandı. Canlı günlük menüden doğrudan açılır. Satırlar 350 ms maskeli giriş, 45 ms sıra farkı ve 180 ms kapanış kullanır. Escape, 44 px kapatma düğmesi, klavyeyle odak, hızlı yeniden açma, genel duraklatma ve azaltılmış hareket ayrı ayrı ele alındı. Bölüm bağlantısına gidildiğinde kapanış odağı geriye çekmez; aynı düzeltme kişisel paneldeki Yeteneklerim/Projelerim bağlantılarına da uygulandı.
+
+894 × 668 görünümde alt Dock'un Luci matrisini ve yeni galeri düğmelerini örtmesi ölçüldü. Kısa masaüstünde başlık boşlukları daraltıldı; galeri yüksekliği görünümden 228 px çıkarılarak sınırlandı. Metin ve 44 px kontroller kırpılmaz. Daha kısa masaüstünde kart normal kaydırmaya döner. 320 px menüde beş bağlantı, kapatma hedefi ve yatay taşma ayrıca kontrol edildi. Dar ekranda düşünce yazıları 12 px kalır; bütün içeriğe normal kaydırmayla erişilir.
+
+Canlı hareket tercihi de düzeltildi: sayfa azaltılmış hareketle açılıp işletim sistemi tercihi sonradan normale döndüğünde şerit ve bilgisayar başlangıç durumuna takılı kalmaz. Ziyaretçinin kendi duraklatma seçimi, işletim sistemi tercihi gidip geldiğinde korunur. Sahnenin otomatik tur seçimi ayrıca değiştirilmez.
 
 ## Doğrulama ve sınırlar
 

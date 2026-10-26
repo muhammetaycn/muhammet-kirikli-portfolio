@@ -25,6 +25,8 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | Profili destekleyen gerçek üretim izi | Bu deponun tarihli GitHub commitleri ve açılabilir değişiklik kayıtları |
 | Videodaki kompakt kişisel alan ve alt Dock | Normal bölüm bağlantıları, küçük profil dialogu, doğru ad/kimlik, gerçek proje ve yetenek sayıları, İstanbul saati ve kaynak depoya bağlı geliştirme kartı |
 | Proje keşfinde hareket ve sahne devamlılığı | Ek Awwwards/Brandon Yasin galeri incelemesinden uyarlanan, kendi çizimlerini büyüten proje dialogu; kesilebilir açılış, proje değiştirme ve kapanış |
+| Projelere fare, dokunma ve klavyeyle ulaşma | 44 px önceki/sonraki kontrolleri, 01/04 sayacı, konum göstergesi, birlikte değişen çizim/açıklama ve kısa ekranlarda Dock boşluğu |
+| Menüde bütünlük ve açık gezinme | Canlı günlük dahil beş gerçek bölüm bağlantısı, kısa maskeli giriş/kapanış, Escape ve bölüm geçişinde odak çalmayan kapanış |
 | Ekran görüntüsündeki siteyi doğru referansla eşleme | Açık: kesin URL henüz çözülmedi. YVL doğru referans değil; bu sitenin incelendiği veya eşleştirmenin tamamlandığı iddia edilmiyor |
 | Açık kaynak, GitHub üzerinden site | MIT kod lisansı, main dalından GitHub Pages yayını |
 

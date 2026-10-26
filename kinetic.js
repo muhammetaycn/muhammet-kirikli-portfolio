@@ -364,7 +364,7 @@
     }
 
     function updateReduced() {
-      reduced=options.reducedMotion===true || !!(media && media.matches);
+      reduced=media ? media.matches : options.reducedMotion===true;
       if(reduced) {pointer.inside=false;params=Object.assign({},target);draw(0,true);}
       sync();
     }

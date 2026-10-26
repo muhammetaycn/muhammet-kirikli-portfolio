@@ -6,6 +6,7 @@
   const projects = data.projects;
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   let moving = !media.matches;
+  let userPaused = false;
   let selected = 0;
   let caseIndex = 0;
   let scene;
@@ -18,6 +19,8 @@
   let personalDock;
   let projectMotion;
   let motionFilm;
+  let menuMotion;
+  let projectGallery;
   let requestedCaseIndex=0;
   const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
@@ -37,6 +40,7 @@
     $('#preview-status').textContent = project.status.toLocaleUpperCase('tr-TR');
     $('.project-preview').dataset.project = project.visual || project.id;
     $('#preview-open').setAttribute('aria-label', project.title + ' detaylarını aç');
+    projectGallery?.show(index);
   }
   const featured = projects.filter(project => project.featured !== false);
   $('#archive-count').textContent = String(projects.length - featured.length).padStart(2,'0');
@@ -66,6 +70,7 @@
   });
   $('#preview-open').addEventListener('click', () => openProject(selected,$('.project-preview')));
   selectProject(0);
+  if(window.ProjectGallery){projectGallery=window.ProjectGallery.mount({preview:$('.project-preview'),projects,onSelect:selectProject,canMove:()=>moving});projectGallery.show(selected);cleanups.push(()=>projectGallery.destroy());}
 
   const projectDialog = $('#project-dialog');
   if(window.ProjectMotion){projectMotion=window.ProjectMotion.mount({dialog:projectDialog,content:$('.case-content'),heading:$('.case-heading'),preview:$('.project-preview'),canMove:()=>moving});cleanups.push(()=>projectMotion.destroy());}
@@ -115,10 +120,11 @@
   });
 
   const menu = $('#menu-dialog');
-  $('#menu-open').addEventListener('click', () => { menu.showModal(); document.body.classList.add('modal-open'); syncSurfaces(); });
-  $('#menu-close').addEventListener('click', () => menu.close());
+  if(window.MenuMotion){menuMotion=window.MenuMotion.mount({dialog:menu,canMove:()=>moving});cleanups.push(()=>menuMotion.destroy());}
+  $('#menu-open').addEventListener('click', () => { if(menuMotion)menuMotion.open($('#menu-open'));else menu.showModal();syncSurfaces(); });
+  $('#menu-close').addEventListener('click', () => {if(menuMotion)menuMotion.close();else menu.close();});
   menu.addEventListener('close', () => { document.body.classList.remove('modal-open'); syncSurfaces(); });
-  menu.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', () => menu.close()));
+  if(!menuMotion)menu.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', () => menu.close()));
   $('#back-top').addEventListener('click', () => window.scrollTo({top: 0, behavior: moving ? 'smooth' : 'instant'}));
 
   data.capabilities.forEach((capability, index) => {
@@ -196,6 +202,8 @@
     personalDock?.setPaused(!moving);
     projectMotion?.setPaused(!moving);
     motionFilm?.setPaused(!moving);
+    menuMotion?.setPaused(!moving);
+    projectGallery?.setPaused(!moving||covered);
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
@@ -208,8 +216,8 @@
     if (!moving && svg.pauseAnimations) svg.pauseAnimations();
     if (moving && svg.unpauseAnimations) svg.unpauseAnimations();
   }
-  $('#motion-toggle').addEventListener('click', () => { moving = !moving; applyMotion(); });
-  media.addEventListener('change', e => { moving = !e.matches; applyMotion(); });
+  $('#motion-toggle').addEventListener('click', () => { userPaused = moving; moving = !userPaused && !media.matches; applyMotion(); });
+  media.addEventListener('change', e => { computerScene?.setReducedMotion(e.matches); moving = !e.matches && !userPaused; applyMotion(); });
   applyMotion();
   const dialogObserver=new MutationObserver(syncSurfaces);
   dialogObserver.observe(document.body,{subtree:true,attributes:true,attributeFilter:['open']});
@@ -242,7 +250,7 @@
     let daily = new Map(), events = new Map(), buildLog = false;
     const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json?v=20261026b');
+      const response = await fetch('data/activity.json?v=20261026c');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
       personalDock?.setBuildLog(json);
