@@ -2,7 +2,8 @@
 .computer-scene{position:absolute;inset:0;isolation:isolate;perspective:1200px;color:#e7e3db;--case-light:#f1ecdf;--case-mid:#c4bdaf;--case-dark:#807a72;--key-ink:#656560;--computer-scale:1}
 .computer-world{position:absolute;left:62%;top:calc(50% - 34px);width:430px;height:620px;transform:translate(-50%,-50%) scale(var(--computer-scale,1));transform-origin:50% 50%}
 .computer-float{position:absolute;inset:0;animation:computer-float 7s ease-in-out infinite;will-change:transform}
-.computer-object{position:absolute;inset:0;transform-style:preserve-3d;--computer-light-x:50%;--computer-light-y:40%}
+/* Hardware keeps its own 3D depth; sibling labels and thoughts compose in front. */
+.computer-object{position:absolute;inset:0;transform-style:flat;--computer-light-x:50%;--computer-light-y:40%}
 .computer-scene.is-pointer-inside .computer-float,.computer-scene:focus-within .computer-float{animation-play-state:paused}
 .computer-scene.is-pointer-inside .computer-ground-shadow,.computer-scene:focus-within .computer-ground-shadow{animation-play-state:paused}
 .computer-object-label{position:absolute;top:0;left:31px;font:8px/1.6 Consolas,monospace;letter-spacing:.1em;color:#8e8980}
@@ -68,7 +69,7 @@
 .computer-companion.is-looking .computer-luci-arm{transform:rotate(-20deg)}
 .computer-companion[data-attention=screen] .computer-luci-arm{transform:rotate(-34deg)}
 .computer-companion.is-excited{animation:computer-luci-hop .48s cubic-bezier(.2,.7,.2,1)}
-.computer-thought{position:absolute;left:38px;top:278px;width:286px;min-height:75px;z-index:5;padding:8px 11px 8px;background:#121416f7;border:1px solid #8073656b;border-radius:11px 11px 5px 11px;box-shadow:2px 5px 12px #0007;transform:rotate(-3deg);pointer-events:none}
+.computer-thought{position:absolute;left:38px;top:278px;width:286px;min-height:75px;z-index:5;padding:8px 11px 8px;background:#121416;border:1px solid #8073656b;border-radius:11px 11px 5px 11px;box-shadow:2px 5px 12px #0007;transform:rotate(-3deg);pointer-events:none}
 .computer-thought:before,.computer-thought:after{content:"";position:absolute;right:-12px;top:13px;width:5px;height:5px;background:#121416;border:1px solid #80736577;border-radius:50%}
 .computer-thought:after{right:-20px;top:8px;width:3px;height:3px}
 .computer-thought-header{display:flex;justify-content:space-between;align-items:center;font:calc(8px * var(--computer-text-scale,1))/1 Consolas,monospace;letter-spacing:.07em;color:#a8a195;margin-bottom:6px}
