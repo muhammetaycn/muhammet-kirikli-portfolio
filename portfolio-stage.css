@@ -87,7 +87,7 @@ body>.motion-film{opacity:.18;transition:opacity .55s ease}
 .product-scene *{animation-play-state:paused!important}
 body.stage-motion-on.work-stage-visible #work .product-scene *,body.stage-motion-on .case-visual .product-scene *{animation-play-state:running!important}
 body #work .project-preview.project-gallery-paused .product-scene *{animation-play-state:paused!important}
-.project-preview[data-project=discussion] .product-social,.project-preview[data-project=textile] .product-erp,.project-preview[data-project=mobile] .product-mobile,.project-preview[data-project=portfolio] .product-code{display:flex;animation:none!important}
+.project-preview[data-project=discussion] .mini-discussion,.project-preview[data-project=textile] .mini-textile,.project-preview[data-project=mobile] .mini-mobile,.project-preview[data-project=portfolio] .mini-portfolio{display:flex;animation:none!important}
 .case-visual .product-scene{inset:5% 5%;font-size:16px}.case-visual .product-window{max-width:510px}.case-visual .product-device{width:210px;height:350px}
 #project-dialog .case-visual[data-project=gorgez] .mini-mobile,#project-dialog .case-visual[data-project=paulukizlar] .mini-discussion{display:none}
 #project-dialog .case-visual[data-project=gorgez] .mini-gorgez,#project-dialog .case-visual[data-project=paulukizlar] .mini-paulu{display:flex;animation:none}
