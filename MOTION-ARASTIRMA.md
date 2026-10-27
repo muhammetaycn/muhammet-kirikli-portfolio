@@ -2,6 +2,8 @@
 
 Bu kayıt, gönderilen yeni kaynaklarda gerçekten açılan sayfaları, görülen hareketleri ve portföye uygulanan kararları ayırır. Galerilerdeki bütün ticari şablonlar tek tek denetlenmiş değildir. İlk inceleme ve devam turunda iki galeri, beş Dribbble çalışması, iki Webflow canlı şablonu, Kaelorian'ın canlı sitesi ve Noctra incelendi. Görsel kaynaklar portföyün dağıtım paketine kopyalanmadı.
 
+27 Ekim'deki [LinuxOfficial incelemesi ve zamanlama düzeltmeleri](ARASTIRMA-2026-10-27.md) ayrı kayıttadır; önceki kaynaklarla birlikte değerlendirilir.
+
 ## Açılan kaynaklar ve gözlemler
 
 | Kaynak | İncelenen durumlar | Uygulamaya dönük çıkarım |
@@ -25,13 +27,13 @@ Webflow'un sayfa araçları ilk yüklemede oturum hatası verdi; katalog hazır 
 
 ### Tek cümle / sil–yaz sahnesi
 
-52 × 7 matris artık iki bağımsız kelime alanı değildir. Bir tam cümle yazılır; tamamı 2,8 saniye okunur. Sonra mevcut yazar eski cümleyi başlangıçtan silerken ikinci Luci boşalan hücrelere yeni cümleyi yazar. Silme ve yazma uçları aynı saatle ilerler. Üç sütunluk öncü aralık, 132 ms/sütun hızında yaklaşık 396 ms'dir; 78 ms'lik hücre silinmesi yeni yazımdan önce tamamlanır. Mürekkep sahipliği çarpışmayı önler.
+52 × 7 matris artık iki bağımsız kelime alanı değildir. 27 Ekim düzeltmesinde bir tam cümle tamamlandıktan sonra 3,6 saniye okunur. Sonra mevcut yazar eski cümleyi başlangıçtan silerken ikinci Luci boşalan hücrelere yeni cümleyi yazar. Sabit 132 ms/sütun hesabı, yoğun bir sütunda basışı 19 ms'ye kadar indiriyordu. Yeni ortak saat, silinen ve yazılan sütunların yoğunluğunun büyüğünü alır; gerçek basış en az 90 ms, boş sütun 36 ms'dir. Aralık en az üç sütun/108 ms olduğundan 78 ms hücre sönümü önce biter. Hizalama değiştiğinde de ilk silme yeni yazmadan önce başlar. Mürekkep sahipliği çarpışmayı önler.
 
 İki karakter kalıcıdır. Siyah Luci'nin gövdesi değişmez; renkli karakter syntax tonları taşır. Roller sonraki cümlede yer değiştirir. 96 konuya bağlı 192 özgün EN/TR kısa cümle ve 384 düşünce vardır. Hata sırasında iki uç birlikte durur; yanlış iniş, kırmızı iz ve toparlanma aynı akışa aittir. Ekran dışında geçen süre animasyonu ilerletmez. Matrisin geçici izleri gerçek GitHub kayıtlarından ayrıdır.
 
 ### Daha kısa açılış döngüsü
 
-Şerit 4,2, bilgisayar 5,8 saniye görünür: toplam yaklaşık 10 saniyelik tur. Fare tüm sahne alanına girdiğinde görülen nesne ve tur ilerlemesi tutulur. Çıkınca kalan süre 320 ms sonra devam eder. Klavye odağı, yazı alanı, basılı tutma ve büyütülmüş bilgisayar ayrı kilitlerdir; etkileşimi bitirmeden sahne değiştirilmez.
+Şerit 4,2 saniye görünür. Bilgisayarın 5,8 saniyelik taban süresi, 27 Ekim düzeltmesiyle başlangıç, işlem ve sonuç okumasına bağlıdır: her ziyaret tek bir terminal, SQLite veya sürüm bölümünü tamamlar. Hazır sonuçtan sonra 3,4–3,6 saniye görünür okuma gerekir; yükleme bu süreyi tüketmez. Fare tüm sahne alanına girdiğinde görülen nesne ve tur ilerlemesi tutulur. Çıkınca kalan süre 320 ms sonra devam eder. Klavye odağı, yazı alanı, basılı tutma ve büyütülmüş bilgisayar ayrı kilitlerdir. Monitörün üzerinden geçmek otomasyonu kalıcı iptal etmez; gerçek girdi kullanıcıya kontrol verir.
 
 ### Hafif arka plan filmi ve başlıklar
 

@@ -172,6 +172,7 @@
     if(window.ComputerScene) computerScene=window.ComputerScene.mount($('#computer-host'),{
       reducedMotion:media.matches,
       onActivity:()=>deck?.activity(),
+      onPresentation:value=>deck?.setPresentation(value),
       onProject:value=>{const index=typeof value==='number'?value:projects.findIndex(project=>project.id===value);if(index>=0&&index<projects.length)openProject(index);}
     });
     if(window.HeroDeck&&computerScene) deck=window.HeroDeck.mount({art:$('.hero-art'),ribbon:$('#ribbon-host'),computer:$('#computer-host'),scene,computerScene,reducedMotion:media.matches});
@@ -250,7 +251,7 @@
     let daily = new Map(), events = new Map(), buildLog = false;
     const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json?v=20261026c');
+      const response = await fetch('data/activity.json?v=20261027d');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
       personalDock?.setBuildLog(json);

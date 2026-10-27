@@ -211,7 +211,7 @@
     ['CHECK A RANGE','ARALIGI SINA'],['WAIT FOR DRAIN','TAMPON BOSALT'],['POST A MESSAGE','ILETI GONDER'],['SWAP AT ONCE','ATOMIK DEGISTIR'],
     ['RELEASE LOCKS','KILIDI BIRAK'],['BREAK A CYCLE','DONGUYU KIR'],['CHECK IF READY','HAZIRLIGI SINA']
   ];
-  const HOLD_MS=2800, COLUMN_MS=132, LEAD_COLUMNS=3, ENTRY_MS=620, INK_FADE_MS=78;
+  const HOLD_MS=3600, MIN_HOLD_MS=2200, HOP_MS=90, EMPTY_COLUMN_MS=36, LEAD_COLUMNS=3, ENTRY_MS=620, INK_FADE_MS=78;
   function compileSentence(value, round=0) {
     const sentence=transliterate(value), glyphs=[];let width=0;
     for(const letter of sentence){
@@ -233,7 +233,21 @@
     }
     const buckets=new Map();route.forEach(point=>{if(!buckets.has(point.column))buckets.set(point.column,[]);buckets.get(point.column).push(point);});
     buckets.forEach(bucket=>bucket.forEach((point,index)=>{point.at=point.column+(index+1)/bucket.length;}));
-    return {sentence,width,left,route};
+    return {sentence,width,left,route,start:route[0].column,end:route.at(-1).column+1,buckets};
+  }
+  function createColumnClock(score,next=null) {
+    const writerOffset=next?Math.max(LEAD_COLUMNS,score.start+LEAD_COLUMNS-next.start):0;
+    const start=score.start,end=Math.max(score.end,next?next.end+writerOffset:score.end),segments=[];
+    let duration=0,minHopMs=Infinity;
+    for(let column=start;column<end;column++){
+      const count=Math.max(score.buckets.get(column)?.length||0,next?.buckets.get(column-writerOffset)?.length||0);
+      const span=count?count*HOP_MS:EMPTY_COLUMN_MS;
+      segments.push({column,at:duration,span,count});duration+=span;if(count)minHopMs=Math.min(minHopMs,span/count);
+    }
+    return {start,end,duration,minHopMs,writerOffset,
+      frontAt(elapsed){if(elapsed<=0)return start;if(elapsed>=duration)return end;const segment=segments.find(item=>elapsed<item.at+item.span);return segment.column+(elapsed-segment.at)/segment.span;},
+      timeAt(front){if(front<=start)return 0;if(front>=end)return duration;const segment=segments[Math.floor(front)-start];return segment.at+(front-segment.column)*segment.span;}
+    };
   }
   const SCENES=TOPICS.flatMap((topic,index)=>[0,1].map(language=>({
     lang:language?'TR':'EN',sentence:PHRASES[index%PHRASES.length][language],thoughts:topic[language?3:1],topic:index
@@ -245,12 +259,12 @@
     const hadClass=panel.classList.contains('has-activity-narrator');panel.classList.add('has-activity-narrator');
     const root=element('div','activity-narrator');root.dataset.ready='false';root.dataset.active='false';root.dataset.mode='sentence-relay';
     const tethers=vector('svg',{class:'narrator-tethers','aria-hidden':'true'}),fracture=element('span','narrator-fracture');fracture.setAttribute('aria-hidden','true');root.append(tethers,fracture);
-    const helper=element('span','narrator-sr','Tek cümle, iki Luci. İlk yazar cümleyi başlangıçtan silerken diğeri boşalan hücrelere yazar. Üç sütunluk aralık korunur. Her cümle tamamlanınca okunur; siyah Luci kimliğini korur. Geçici izler gerçek GitHub kayıtlarını değiştirmez.');
+    const helper=element('span','narrator-sr','Tek cümle, iki Luci. İlk yazar cümleyi başlangıçtan silerken diğeri boşalan hücrelere yazar. En az üç sütunluk güvenli aralık korunur; hizalama değişse de önce eski cümle silinmeye başlar. Her cümle tamamlanınca okunur; siyah Luci kimliğini korur. Geçici izler gerçek GitHub kayıtlarını değiştirmez.');
     const announcement=element('span','narrator-sr');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.append(helper,announcement);panel.append(root);
     const media=window.matchMedia('(prefers-reduced-motion: reduce)'),cleanups=[],owners=new Map(),errorInk=[];
     let reduced=Boolean(options.reducedMotion)||media.matches,paused=false,visible=false,destroyed=false;
     let frame=0,layoutFrame=0,previous=0,time=0,dirty=true,points=[],roundIndex=0,cycle=1,serial=1,phase='draw',phaseBorn=0,holdBorn=null;
-    let topicOrder=createTopicOrder(-1,true),current=null,incoming=null,writerSide=0,eraseSide=0,eraseFront=-1,writeFront=-1,error=null,errorCount=0,panelFaultUntil=0,collisions=0;
+    let topicOrder=createTopicOrder(-1,true),current=null,incoming=null,writerSide=0,eraseSide=0,eraseFront=-1,writeFront=-1,error=null,errorCount=0,panelFaultUntil=0,collisions=0,relayClock=null,queued=false;
     let box={width:820,size:42,pitch:14,gridTop:200};
     const data=(name,value)=>{const next=String(value);if(root.dataset[name]!==next)root.dataset[name]=next;};
     function listen(target,type,fn,settings){target.addEventListener(type,fn,settings);cleanups.push(()=>target.removeEventListener(type,fn,settings));}
@@ -269,57 +283,68 @@
       const tip=element('span','narrator-tip','sonraki cümle');terminal.append(bar,line,tip);bubble.append(terminal);
       const tether=vector('path',{});tethers.append(tether);root.append(bubble);
       const zone={side,actor,bubble,copy,label,language,status,tip,tether,text:'',textBorn:0,fullAt:null,bubbleX:0,bubbleY:0,bubbleWidth:250,bubbleHeight:110};
-      listen(bubble,'click',()=>{if(reduced){advanceIndex();reset(true);return;}root.dataset.queued='true';tip.textContent='okununca sırada';});return zone;
+      listen(bubble,'click',()=>{if(reduced||paused){advanceIndex();serial++;reset(true);return;}queued=true;data('queued',true);zones.forEach(item=>{item.tip.textContent='okununca sırada';item.bubble.dataset.queued='true';});});return zone;
     });
     function setThought(side,entry,role){
-      const zone=zones[side],text=entry.thoughts[side];zone.text=text;zone.textBorn=time;zone.fullAt=null;zone.copy.textContent='';zone.language.textContent=entry.lang;zone.label.textContent=side?'luci.color':'luci.black';zone.status.textContent=role;
-      zone.bubble.dataset.status=role.toLowerCase();zone.bubble.dataset.lang=entry.lang;zone.bubble.classList.add('is-typing');zone.bubble.style.setProperty('--narrator-accent',actors[side].color);zone.tip.textContent='sonraki cümle';
-      zone.bubble.setAttribute('aria-label',`Düşünce: ${text} Sonraki cümleyi okununca sıraya almak için tıkla.`);
+      const zone=zones[side],text=entry.thoughts[side],same=zone.text===text&&zone.language.textContent===entry.lang;
+      if(!same){zone.text=text;zone.textBorn=time;zone.fullAt=null;zone.copy.textContent='';zone.bubble.classList.add('is-typing');}
+      zone.language.textContent=entry.lang;zone.label.textContent=side?'luci.color':'luci.black';zone.status.textContent=role;
+      zone.bubble.dataset.status=role.toLowerCase();zone.bubble.dataset.lang=entry.lang;zone.bubble.setAttribute('lang',entry.lang.toLowerCase());zone.bubble.style.setProperty('--narrator-accent',actors[side].color);zone.tip.textContent='sonraki cümle';delete zone.bubble.dataset.queued;
+      zone.bubble.setAttribute('aria-label',`Düşünce: ${text} Sonraki cümle: hareket durduysa hemen göster; hareketliyse okununca sıraya al.`);
     }
-    function thoughts(){zones.forEach(zone=>{const count=reduced?zone.text.length:Math.min(zone.text.length,Math.max(0,Math.floor((time-zone.textBorn)/34)));zone.copy.textContent=zone.text.slice(0,count);if(count===zone.text.length){if(zone.fullAt===null)zone.fullAt=time;zone.bubble.classList.remove('is-typing');}});}
-    function generation(entry,index,side){return {entry,score:compileSentence(entry.sentence,index),side,ink:new Map(),step:0,lastIndex:actors[side].current};}
+    function thoughts(instant=false){zones.forEach(zone=>{const count=reduced||instant?zone.text.length:Math.min(zone.text.length,Math.max(0,Math.floor((time-zone.textBorn)/34)));zone.copy.textContent=zone.text.slice(0,count);if(count===zone.text.length){if(zone.fullAt===null)zone.fullAt=time;zone.bubble.classList.remove('is-typing');}});}
+    function generation(entry,index,side){const score=compileSentence(entry.sentence,index);return {entry,score,clock:createColumnClock(score),side,serial,ink:new Map(),step:0,lastIndex:actors[side].current};}
     function removeInk(record){record.node.remove();owners.delete(record.index);}
     function clearGeneration(g){if(!g)return;g.ink.forEach(removeInk);g.ink.clear();}
     function addInk(g,point){
       if(g.ink.has(point.index))return;
       if(owners.has(point.index)){collisions++;return;}
       const cell=points[point.index]?.cell;if(!cell)return;
-      const node=element('span','narrator-ink-layer');node.setAttribute('aria-hidden','true');node.dataset.zone=g.side?'right':'left';node.dataset.sentence=String(serial);node.style.background=actors[g.side].color;cell.append(node);
+      const node=element('span','narrator-ink-layer');node.setAttribute('aria-hidden','true');node.dataset.zone=g.side?'right':'left';node.dataset.sentence=String(g.serial);node.style.background=actors[g.side].color;cell.append(node);
       const record={node,index:point.index,column:point.column,row:point.row,at:point.at};owners.set(point.index,record);g.ink.set(point.index,record);
     }
     function paint(actor,x,y,sx=1,sy=1,tilt=0,arc=0){
+      actor.pose={x,y,sx,sy,tilt,arc};
+      actor.node.dataset.x=x.toFixed(2);actor.node.dataset.y=y.toFixed(2);actor.node.dataset.cell=String(actor.current);
       const size=box.size;actor.node.style.transform=`translate3d(${(x-size*.5).toFixed(2)}px,${(y-size*.94).toFixed(2)}px,0)`;actor.drawing.svg.style.transform=`rotate(${tilt.toFixed(2)}deg) scale(${(sx*actor.direction).toFixed(3)},${sy.toFixed(3)})`;
       actor.shadow.style.transform=`translate3d(${x.toFixed(2)}px,${(y+arc*Math.min(22,box.pitch*1.4)).toFixed(2)}px,0) scale(${(1-arc*.4).toFixed(2)})`;actor.shadow.style.opacity=String(.4-arc*.2);actor.node.classList.toggle('is-airborne',arc>.1);
       const zone=zones[actor.side],startX=zone.bubbleX+zone.bubbleWidth*.5,startY=zone.bubbleY+zone.bubbleHeight+11,endY=y-size*.8;zone.tether.setAttribute('d',`M${startX.toFixed(1)} ${startY.toFixed(1)}Q${startX.toFixed(1)} ${((startY+endY)*.5).toFixed(1)} ${x.toFixed(1)} ${endY.toFixed(1)}`);
     }
     function gaze(actor,dx,dy){actor.drawing.pupil.setAttribute('cx',(54+clamp(dx/60*actor.direction,-3,3)).toFixed(2));actor.drawing.pupil.setAttribute('cy',(47+clamp(dy/55,-2,2)).toFixed(2));}
     function idle(actor){const p=points[actor.current];if(p){const zone=zones[actor.side];gaze(actor,zone.bubbleX+zone.bubbleWidth*.5-p.x,zone.bubbleY-p.y);paint(actor,p.x,p.y);}}
-    function hop(actor,from,to,progress,warning=false){
-      const a=points[from],b=points[to];if(!a||!b)return;const travel=progress*progress*(3-2*progress),arc=Math.sin(Math.PI*progress);actor.direction=b.x===a.x?actor.direction:b.x>a.x?1:-1;gaze(actor,b.x-a.x,b.y-a.y);
+    function hopBetween(actor,a,b,progress,warning=false){
+      if(!a||!b)return;const travel=progress*progress*(3-2*progress),arc=Math.sin(Math.PI*progress);actor.direction=b.x===a.x?actor.direction:b.x>a.x?1:-1;gaze(actor,b.x-a.x,b.y-a.y);
       const distance=Math.hypot(b.x-a.x,b.y-a.y),height=Math.min(box.size*.52,Math.max(box.pitch*.78,distance*.14))*(warning?1.15:1);paint(actor,a.x+(b.x-a.x)*travel,a.y+(b.y-a.y)*travel-arc*height,1-arc*.045,1+arc*.065,actor.direction*arc*(warning?12:7),arc);
     }
+    function hop(actor,from,to,progress,warning=false){hopBetween(actor,points[from],points[to],progress,warning);}
+    function pose(actor,saved){if(saved)paint(actor,saved.x,saved.y,saved.sx,saved.sy,saved.tilt,saved.arc);else idle(actor);}
     function actorAtFront(actor,route,front){
       if(!route.length){idle(actor);return;}
       const column=Math.floor(front),bucket=route.filter(point=>point.column===column),prior=route.filter(point=>point.column<column).at(-1);
-      if(!bucket.length){if(prior)actor.current=prior.index;idle(actor);return;}
+      if(!bucket.length){if(prior){actor.current=prior.index;idle(actor);}else pose(actor,actor.routeOrigin);return;}
       const progress=clamp(front-column,0,.999)*bucket.length,step=Math.floor(progress),from=step?bucket[step-1]:prior;
-      hop(actor,from?.index??actor.current,bucket[step].index,progress-step);if(step)actor.current=bucket[step-1].index;
+      hopBetween(actor,from?points[from.index]:actor.routeOrigin||points[actor.current],points[bucket[step].index],progress-step);if(step)actor.current=bucket[step-1].index;
     }
     function updateWrite(g,front){
       while(g.step<g.score.route.length){const point=g.score.route[g.step];if(point.at>front)break;if(owners.has(point.index)&&!g.ink.has(point.index))break;addInk(g,point);actors[g.side].current=point.index;g.step++;}
       actorAtFront(actors[g.side],g.score.route,front);
     }
-    function beginHold(){phase='hold';phaseBorn=time;holdBorn=time;current.step=current.score.route.length;eraseFront=52;writeFront=52;current.score.route.forEach(point=>addInk(current,point));actors[current.side].current=current.score.route.at(-1).index;zones.forEach(zone=>{zone.status.textContent='READ';zone.bubble.dataset.status='read';});announcement.textContent=`${current.entry.lang}. ${current.entry.sentence}.`;}
+    function beginHold(){phase='hold';phaseBorn=time;holdBorn=time;current.step=current.score.route.length;eraseFront=writeFront=current.score.end;current.score.route.forEach(point=>addInk(current,point));actors[current.side].current=current.score.route.at(-1).index;actors.forEach(actor=>{actor.routeOrigin=null;});zones.forEach(zone=>{zone.status.textContent='READ';zone.bubble.dataset.status='read';});announcement.textContent=`${current.entry.lang}. ${current.entry.sentence}.`;}
     function reset(instant=false){
       clearGeneration(current);clearGeneration(incoming);owners.clear();errorInk.splice(0).forEach(record=>record.node.remove());error=null;panelFaultUntil=0;panel.classList.remove('narrator-has-warning');root.classList.remove('is-faulting');actors.forEach(actor=>actor.node.classList.remove('is-warning'));
-      writerSide=0;eraseSide=1;current=generation(entryAt(roundIndex),roundIndex,writerSide);incoming=null;phase=instant?'hold':'draw';phaseBorn=time;holdBorn=null;eraseFront=writeFront=-1;
-      zones.forEach(zone=>setThought(zone.side,current.entry,zone.side===writerSide?'WRITE':'READY'));if(instant){thoughts();beginHold();}dirty=true;queueMeasure();diagnostics();
+      writerSide=roundIndex%2;eraseSide=1-writerSide;queued=false;delete root.dataset.queued;relayClock=null;actors.forEach(actor=>{actor.routeOrigin=null;});
+      if(writerSide===1){const color=SYNTAX[Math.floor(roundIndex/2)%SYNTAX.length];actors[1].color=color;actors[1].node.dataset.color=color;actors[1].node.style.setProperty('--luci-body',color);}
+      current=generation(entryAt(roundIndex),roundIndex,writerSide);incoming=null;phase=instant?'hold':'draw';phaseBorn=time;holdBorn=null;eraseFront=writeFront=-1;
+      zones.forEach(zone=>setThought(zone.side,current.entry,zone.side===writerSide?'WRITE':'READY'));if(instant){thoughts(true);beginHold();}dirty=true;queueMeasure();diagnostics();
     }
     function beginRelay(){
       eraseSide=current.side;writerSide=1-eraseSide;advanceIndex();serial++;
       if(writerSide===1){const color=SYNTAX[Math.floor(roundIndex/2)%SYNTAX.length];actors[1].color=color;actors[1].node.dataset.color=color;actors[1].node.style.setProperty('--luci-body',color);}
-      incoming=generation(entryAt(roundIndex),roundIndex,writerSide);phase='handoff';phaseBorn=time;eraseFront=writeFront=-1;delete root.dataset.queued;
-      actors.forEach(actor=>actor.entryFrom=actor.current);setThought(eraseSide,current.entry,'ERASE');setThought(writerSide,incoming.entry,'WRITE');
+      incoming=generation(entryAt(roundIndex),roundIndex,writerSide);relayClock=createColumnClock(current.score,incoming.score);current.ink.forEach(record=>{record.eraseAt=relayClock.timeAt(record.at);});
+      phase='handoff';phaseBorn=time;eraseFront=writeFront=-1;queued=false;delete root.dataset.queued;
+      actors.forEach(actor=>{actor.entryFrom=actor.pose||points[actor.current];});
+      const first=points[incoming.score.route[0].index];actors[writerSide].routeOrigin={x:clamp(first.x-box.pitch*2.1,box.size*.6,box.width-box.size*.6),y:first.y+box.pitch*2};
+      actors[eraseSide].routeOrigin=null;setThought(eraseSide,current.entry,'ERASE');setThought(writerSide,incoming.entry,'WRITE');
     }
     function errorPath(){
       const actor=actors[writerSide],col=Math.floor(actor.current/7),row=actor.current%7,result=[];
@@ -330,15 +355,15 @@
     }
     function startError(){
       const route=errorPath();if(route.length<3)return;
-      error={born:time,route,origin:actors[writerSide].current,step:0};errorCount++;const zone=zones[writerSide];zone.status.textContent='WARN';zone.bubble.dataset.status='warn';zone.actor.node.classList.add('is-warning');panelFaultUntil=time+900;panel.classList.add('narrator-has-warning');root.classList.add('is-faulting');const point=points[route[0]];if(point)root.style.setProperty('--fault-y',point.y.toFixed(1)+'px');
+      error={born:time,route,origin:actors[writerSide].current,pose:actors[writerSide].pose,eraserPose:actors[eraseSide].pose,step:0};errorCount++;const zone=zones[writerSide];zone.status.textContent='WARN';zone.bubble.dataset.status='warn';zone.actor.node.classList.add('is-warning');panelFaultUntil=time+900;panel.classList.add('narrator-has-warning');root.classList.add('is-faulting');const point=points[route[0]];if(point)root.style.setProperty('--fault-y',point.y.toFixed(1)+'px');
     }
     function markError(index){const cell=points[index]?.cell;if(!cell)return;const node=element('span','narrator-error-ink');node.setAttribute('aria-hidden','true');cell.append(node);errorInk.push({node,born:time,index});}
     function updateError(){
       const elapsed=time-error.born,actor=actors[writerSide];
-      if(elapsed<510){const step=Math.min(2,Math.floor(elapsed/170));while(error.step<step){markError(error.route[error.step]);actor.current=error.route[error.step++];}hop(actor,step?error.route[step-1]:error.origin,error.route[step],clamp((elapsed-step*170)/170,0,1),true);}
-      else if(elapsed<790){while(error.step<3)markError(error.route[error.step++]);zones[writerSide].status.textContent='RECOVER';zones[writerSide].bubble.dataset.status='recover';hop(actor,error.route[2],error.origin,clamp((elapsed-510)/280,0,1),true);}
-      else{actor.current=error.origin;phaseBorn+=time-error.born;error=null;zones[writerSide].status.textContent='WRITE';zones[writerSide].bubble.dataset.status='write';actor.node.classList.remove('is-warning');}
-      idle(actors[eraseSide]);
+      if(elapsed<510){const step=Math.min(2,Math.floor(elapsed/170));while(error.step<step){markError(error.route[error.step]);actor.current=error.route[error.step++];}hopBetween(actor,step?points[error.route[step-1]]:error.pose,points[error.route[step]],clamp((elapsed-step*170)/170,0,1),true);}
+      else if(elapsed<790){while(error.step<3)markError(error.route[error.step++]);zones[writerSide].status.textContent='RECOVER';zones[writerSide].bubble.dataset.status='recover';hopBetween(actor,points[error.route[2]],error.pose,clamp((elapsed-510)/280,0,1),true);}
+      else{actor.current=error.origin;phaseBorn+=time-error.born;pose(actor,error.pose);zones[writerSide].status.textContent='WRITE';zones[writerSide].bubble.dataset.status='write';actor.node.classList.remove('is-warning');}
+      pose(actors[eraseSide],error.eraserPose);if(elapsed>=790)error=null;
     }
     function update(){
       thoughts();
@@ -347,28 +372,29 @@
       if(error){updateError();diagnostics();return;}
       const elapsed=time-phaseBorn;
       if(phase==='draw'){
-        writeFront=-1+elapsed/COLUMN_MS;updateWrite(current,writeFront);idle(actors[1-current.side]);if(writeFront>52)beginHold();
+        writeFront=current.clock.frontAt(elapsed);updateWrite(current,writeFront);idle(actors[1-current.side]);if(elapsed>=current.clock.duration)beginHold();
       }else if(phase==='hold'){
         actors.forEach(idle);const readable=zones.every(zone=>zone.fullAt!==null&&time-zone.fullAt>=READ_MS);
-        if(time-holdBorn>=HOLD_MS&&readable)beginRelay();
+        if(time-holdBorn>=(queued?MIN_HOLD_MS:HOLD_MS)&&readable)beginRelay();
       }else if(phase==='handoff'){
-        const progress=clamp(elapsed/ENTRY_MS,0,1);hop(actors[eraseSide],actors[eraseSide].entryFrom,current.score.route[0].index,progress);hop(actors[writerSide],actors[writerSide].entryFrom,incoming.score.route[0].index,progress);
-        if(progress===1){actors[eraseSide].current=current.score.route[0].index;actors[writerSide].current=incoming.score.route[0].index;phase='relay';phaseBorn=time;current.errorPlanned=serial%5===0;}
+        const progress=clamp(elapsed/ENTRY_MS,0,1);hopBetween(actors[eraseSide],actors[eraseSide].entryFrom,points[current.score.route[0].index],progress);hopBetween(actors[writerSide],actors[writerSide].entryFrom,actors[writerSide].routeOrigin,progress);
+        if(progress===1){actors[eraseSide].current=current.score.route[0].index;phase='relay';phaseBorn=time;eraseFront=relayClock.start;writeFront=eraseFront-relayClock.writerOffset;current.errorPlanned=serial%5===0;}
       }else if(phase==='relay'){
-        eraseFront=clamp(elapsed/COLUMN_MS,0,56);writeFront=clamp(eraseFront-LEAD_COLUMNS,-1,53);
-        // The old line disappears from its beginning. A full three-column gap
-        // opens before the next writer enters, and ownership is never shared.
-        current.ink.forEach((record,index)=>{const opacity=clamp(1-(eraseFront-record.at)*COLUMN_MS/INK_FADE_MS,0,1);record.node.style.opacity=opacity.toFixed(3);if(opacity===0){removeInk(record);current.ink.delete(index);}});
+        eraseFront=relayClock.frontAt(elapsed);writeFront=eraseFront-relayClock.writerOffset;
+        // The old line starts erasing before the incoming line can land.
+        // A minimum three-column gap protects ownership even across alignment changes.
+        current.ink.forEach((record,index)=>{const opacity=clamp(1-(elapsed-record.eraseAt)/INK_FADE_MS,0,1);record.node.style.opacity=opacity.toFixed(3);if(opacity===0){removeInk(record);current.ink.delete(index);}});
         actorAtFront(actors[eraseSide],current.score.route,eraseFront);updateWrite(incoming,writeFront);
-        if(current.errorPlanned&&writeFront>=23){current.errorPlanned=false;startError();}
-        if(elapsed>=(52+LEAD_COLUMNS+1)*COLUMN_MS){clearGeneration(current);current=incoming;incoming=null;beginHold();}
+        if(current.errorPlanned&&elapsed>=relayClock.duration*.48){current.errorPlanned=false;startError();}
+        if(elapsed>=relayClock.duration+INK_FADE_MS){clearGeneration(current);current=incoming;incoming=null;beginHold();}
       }
       diagnostics();
     }
     function diagnostics(){
-      data('phase',error?'warn':phase);data('actors',2);data('round',roundIndex+1);data('cycle',cycle);data('lang',(incoming||current).entry.lang);data('message',(incoming||current).entry.sentence);data('oldSentence',current.entry.sentence);data('nextSentence',incoming?.entry.sentence||'');
-      data('bankSize',SCENES.length);data('topicCount',TOPICS.length);data('thoughtCount',SCENES.length*2);data('holdMs',HOLD_MS);data('readMs',READ_MS);data('leadColumns',LEAD_COLUMNS);data('columnMs',COLUMN_MS);data('collisions',collisions);data('errorCount',errorCount);data('error',error?'warn':errorInk.length?'recover':'none');data('eraseFront',eraseFront.toFixed(3));data('writeFront',writeFront.toFixed(3));data('writer',writerSide?'color':'black');data('eraser',eraseSide?'color':'black');data('serial',serial);data('elapsed',Math.round(time));data('holdElapsed',holdBorn===null?0:Math.round(time-holdBorn));data('inkCount',owners.size);data('oldInk',current.ink.size);data('newInk',incoming?.ink.size||0);
-      zones.forEach(zone=>{const key=zone.side?'right':'left';data(key+'Body',zone.side?actors[1].color:'#050506');data(key+'Role',phase==='hold'?'read':phase==='draw'?(zone.side===current.side?'write':'ready'):zone.side===eraseSide?'erase':'write');data(key+'ReadMs',zone.fullAt===null?0:Math.round(time-zone.fullAt));data(key+'Thought',zone.text);});
+      data('writeOffsetColumns',relayClock?.writerOffset??LEAD_COLUMNS);
+      data('phase',error?'warn':phase);data('phaseElapsed',Math.round(time-phaseBorn));data('actors',2);data('round',roundIndex+1);data('cycle',cycle);data('lang',(incoming||current).entry.lang);data('message',(incoming||current).entry.sentence);data('oldSentence',current.entry.sentence);data('nextSentence',incoming?.entry.sentence||'');
+      data('bankSize',SCENES.length);data('topicCount',TOPICS.length);data('thoughtCount',SCENES.length*2);data('holdMs',HOLD_MS);data('minHoldMs',MIN_HOLD_MS);data('readMs',READ_MS);data('leadColumns',LEAD_COLUMNS);data('hopMs',HOP_MS);data('actualHopMs',(relayClock||current.clock).minHopMs);data('emptyColumnMs',EMPTY_COLUMN_MS);data('drawDurationMs',current.clock.duration);data('relayDurationMs',relayClock?relayClock.duration+INK_FADE_MS:0);data('scoreStart',current.score.start);data('scoreEnd',current.score.end);data('nextScoreStart',incoming?.score.start??'');data('nextScoreEnd',incoming?.score.end??'');data('collisions',collisions);data('errorCount',errorCount);data('error',error?'warn':errorInk.length?'recover':'none');data('eraseFront',eraseFront.toFixed(3));data('writeFront',writeFront.toFixed(3));data('writer',writerSide?'color':'black');data('eraser',eraseSide?'color':'black');data('serial',serial);data('elapsed',Math.round(time));data('holdElapsed',holdBorn===null?0:Math.round(time-holdBorn));data('inkCount',owners.size);data('oldInk',current.ink.size);data('newInk',incoming?.ink.size||0);
+      zones.forEach(zone=>{const key=zone.side?'right':'left';data(key+'Body',zone.side?actors[1].color:'#050506');data(key+'Role',zone.bubble.dataset.status);data(key+'Lang',zone.language.textContent);data(key+'ReadMs',zone.fullAt===null?0:Math.round(time-zone.fullAt));data(key+'Thought',zone.text);});
     }
     function measure(){
       dirty=false;const panelRect=panel.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();points=[...grid.querySelectorAll('.rhythm-cell')].map(cell=>{const rect=cell.getBoundingClientRect();return {cell,x:rect.left+rect.width/2-panelRect.left,y:rect.top+rect.height*.65-panelRect.top};});

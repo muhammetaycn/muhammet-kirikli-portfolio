@@ -76,8 +76,10 @@
     const settings = options || {}, data = global.PORTFOLIO || {projects: [], identity: {}}, projects = data.projects || [];
     const skills = Array.from(new Set(projects.flatMap(function (project) { return project.stack || []; }))).sort(function (a,b) { return a.localeCompare(b,'tr'); });
     let destroyed = false, paused = !!settings.reducedMotion, powered = true, active = 1, generation = 0, cleanups = [], frame = 0, frameFn, frameTime = 0, widgetTime = 0, demoRunning = false, autoDispatch = false;
-    let tour = null, tourConsumed = false, humanUsed = false, terminalControl = null, sqlControl = null, versionControl = null;
+    let tour = null, tourChapter = 0, humanUsed = false, terminalControl = null, sqlControl = null, versionControl = null;
+    let presentation = {busy:false,phase:'idle',readMs:0}, manualRead = 0, manualBusy = 0, manualAt = 0;
     const desktopApps = new Map();
+    const terminalHistory = [];
     const db = global.ComputerDB ? global.ComputerDB.create(data) : null;
     const state = {threads: [{id:1,parent:0,title:'Bir fikir nasıl ürüne dönüşür?'},{id:2,parent:1,title:'Önce küçük bir akışı deneyerek.'}], gallery:['pending','pending','approved'], orders:[0,1,2], drafts:[], jobs:[{name:'Koordinat doğrulama',status:'bekliyor',attempt:0},{name:'Galeri önizlemesi',status:'bekliyor',attempt:0},{name:'İçerik dizini',status:'bekliyor',attempt:0}], cache:new Map(), cacheHits:0, cacheMisses:0, events:[], counter:0};
     const shell = el('div','cos-shell'), chrome = el('header','cos-chrome'), title = el('span','cos-window-title','mk / masaüstü');
@@ -97,8 +99,16 @@
     function pickApp(){runKey(Number(appPicker.value));}
     appPicker.addEventListener('change',pickApp);close.type='button'; dialogBar.append(dialogLabel,appPicker,close); dialog.append(dialogBar,stage); document.body.append(dialog);
     function activity() { if(autoDispatch)return;humanUsed=true;cancelTour('interrupted');if (settings.onActivity) settings.onActivity(); }
-    function setStatus(text, tone) { status.textContent = text; status.dataset.tone = tone || ''; }
-    function listen(node,event,fn) { node.addEventListener(event,fn); cleanups.push(function(){node.removeEventListener(event,fn);}); }
+    function emitPresentation() {
+      const suspended=paused||document.hidden||destroyed;
+      const remaining=tour&&tour.readyAt!==null&&tour.steps[tour.index]?.phase==='result'?Math.max(0,tour.steps[tour.index].duration-(tour.age-tour.readyAt)):presentation.readMs;
+      settings.onPresentation?.(suspended?{busy:false,phase:'idle',readMs:0}:{busy:presentation.busy,phase:presentation.phase,readMs:manualRead||remaining});
+    }
+    function present(busy,phase,readMs) {presentation={busy:!!busy,phase:phase,readMs:readMs||0};manualBusy=0;manualRead=busy?0:presentation.readMs;manualAt=performance.now();emitPresentation();schedule();}
+    function manualResult() {if(humanUsed&&!autoDispatch&&!tour&&!destroyed)present(false,'result',3500);}
+    function manualPending() {if(humanUsed&&!autoDispatch&&!tour&&!destroyed){present(true,'opening',0);manualBusy=8000;schedule();}}
+    function setStatus(text, tone) { status.textContent = text; status.dataset.tone = tone || ''; manualResult(); }
+    function listen(node,event,fn) { const handler=function(eventObject){const result=fn(eventObject);if(!manualBusy&&/^(click|submit|change|input)$/.test(event))manualResult();return result;};node.addEventListener(event,handler);cleanups.push(function(){node.removeEventListener(event,handler);}); }
     function button(text,fn,cls) { const node=el('button','cos-button'+(cls?' '+cls:''),text); node.type='button'; listen(node,'click',fn); return node; }
     function note(text,cls) { const node=el('p','cos-note'+(cls?' '+cls:''),text); body.append(node); return node; }
     function heading(text,sub) { const head=el('div','cos-app-heading'); head.append(el('h2','',text)); if(sub)head.append(el('p','',sub)); body.append(head); }
@@ -111,19 +121,27 @@
     function list(items,parent) { const node=el('div','cos-list');items.forEach(function(text){node.append(el('div','cos-list-row',text));});(parent||body).append(node);return node; }
     function card(label,value,parent) {const node=el('div','cos-metric');node.append(el('small','',label),el('strong','',String(value)));(parent||body).append(node);return node;}
     function resetWidget() { generation++; cleanups.forEach(function(cleanup){cleanup();}); cleanups=[];if(frame)cancelAnimationFrame(frame);frame=0;frameFn=null;widgetTime=0;terminalControl=sqlControl=versionControl=null;desktopApps.clear();body.replaceChildren();body.scrollTop=0; }
-    function schedule() {if(!destroyed&&!paused&&!document.hidden&&!frame&&(frameFn||tour)){frameTime=performance.now();frame=requestAnimationFrame(tick);}}
-    function tick(now) { frame=0;if(destroyed||paused||document.hidden||(!frameFn&&!tour))return;const dt=Math.min(50,Math.max(0,now-frameTime));frameTime=now;widgetTime+=dt;if(frameFn)frameFn(widgetTime,dt);if(tour)tickTour(dt);schedule(); }
+    function schedule() {if(!destroyed&&!paused&&!document.hidden&&!frame&&(frameFn||tour||manualRead||manualBusy)){frameTime=performance.now();frame=requestAnimationFrame(tick);}}
+    function tick(now) {
+      frame=0;if(destroyed||paused||document.hidden||(!frameFn&&!tour&&!manualRead&&!manualBusy))return;
+      // Presentation time follows visible elapsed time, even at a low frame rate.
+      // Physics retains its small integration step; a late result starts its own clock.
+      const activeDt=Math.min(1000,Math.max(0,now-frameTime)),dt=Math.min(50,activeDt),manualDt=Math.min(activeDt,Math.max(0,now-manualAt));frameTime=now;manualAt=now;widgetTime+=dt;
+      if(manualBusy){manualBusy=Math.max(0,manualBusy-manualDt);if(!manualBusy)setStatus('İşlem sürüyor. Sonuç hazır olunca burada görünecek.');}
+      else if(manualRead){manualRead=Math.max(0,manualRead-manualDt);if(!manualRead)present(false,'idle',0);}
+      if(frameFn)frameFn(widgetTime,dt);if(tour)tickTour(activeDt);schedule();
+    }
     function animate(fn) {frameFn=fn;fn(widgetTime,0);schedule();}
     function projectAction(id) {if(dialog.open)dialog.close();if(settings.onProject)settings.onProject(id);}
     let expandedOpener;
     function openExpanded() {if(destroyed||dialog.open)return;activity();expandedOpener=document.activeElement;stage.append(screen);screen.dataset.cosExpanded='true';dialog.showModal();if(settings.onExpanded)settings.onExpanded(true);close.focus();}
     function restore() {if(dialog.open)return;cancelTour('closed');if(marker.parentNode)marker.parentNode.insertBefore(screen,marker.nextSibling);delete screen.dataset.cosExpanded;if(settings.onExpanded)settings.onExpanded(false);if(!destroyed){const target=expandedOpener?.isConnected&&!expandedOpener.closest?.('[inert],dialog:not([open])')?expandedOpener:expand;target.focus({preventScroll:true});}expandedOpener=null;}
     expand.addEventListener('click',openExpanded);close.addEventListener('click',function(){dialog.close();});dialog.addEventListener('close',restore);
-    const humanEvents=['pointermove','pointerdown','keydown','input','wheel','focusin'];
+    const humanEvents=['pointerdown','keydown','input','change','wheel','focusin'];
     humanEvents.forEach(function(event){shell.addEventListener(event,activity,true);});
-    function visibility(){if(document.hidden){cancelTour('hidden');if(frame)cancelAnimationFrame(frame);frame=0;}else schedule();}
+    function visibility(){emitPresentation();if(document.hidden){if(frame)cancelAnimationFrame(frame);frame=0;}else schedule();}
     document.addEventListener('visibilitychange',visibility);
-    function dbReady(callback) {const token=generation;if(!db){note('SQLite bağlayıcısı yüklenemedi.','cos-error');setStatus('SQLite kullanılamıyor','error');return;}setStatus('SQLite modülü yükleniyor…');db.ready().then(function(){if(destroyed||token!==generation)return;setStatus('SQLite · gerçek bellek veritabanı','good');callback(token);}).catch(function(error){if(destroyed||token!==generation)return;note(error.message,'cos-error');setStatus('SQLite yüklenemedi','error');body.append(button('Tekrar dene',function(){runKey(active);}));});}
+    function dbReady(callback) {const token=generation;if(!db){note('SQLite bağlayıcısı yüklenemedi.','cos-error');setStatus('SQLite kullanılamıyor','error');return;}setStatus('SQLite modülü yükleniyor…');manualPending();db.ready().then(function(){if(destroyed||token!==generation)return;setStatus('SQLite · gerçek bellek veritabanı','good');callback(token);}).catch(function(error){if(destroyed||token!==generation)return;note(error.message,'cos-error');setStatus('SQLite yüklenemedi','error');body.append(button('Tekrar dene',function(){runKey(active);}));});}
     function localPoint(node, ancestor) {
       if(!node)return null;
       let x=(node.offsetWidth||0)/2,y=(node.offsetHeight||0)/2,current=node,count=0;
@@ -152,15 +170,19 @@
       if(!tour)return;
       clearTourTarget();if(sqlControl)sqlControl.cancel();tour=null;demoRunning=false;
       tourLayer.classList.remove('is-active');tourLabel.textContent='';shell.dataset.demoState=reason||'interrupted';
+      present(false,'idle',0);
       if(!frameFn&&frame){cancelAnimationFrame(frame);frame=0;}
     }
     function tourStep() {
       if(!tour)return;
-      clearTourTarget();tour.index++;tour.age=0;tour.from={...tour.point};
+      clearTourTarget();tour.index++;tour.age=0;tour.readyAt=null;tour.from={...tour.point};
       const step=tour.steps[tour.index];
-      if(!step){cancelTour('complete');setStatus('Keşif sende · gri tuşlardan veya uygulamalardan devam et.','good');return;}
+      if(!step){tourChapter=(tourChapter+1)%3;cancelTour('complete');setStatus('Keşif sende · gri tuşlarla devam et.','good');return;}
+      if(step.skip&&step.skip()){tourStep();return;}
       shell.dataset.demoState=step.name;tourLabel.textContent='auto / '+step.label;
       if(step.enter)step.enter();
+      if(!step.ready)tour.readyAt=0;
+      present(true,step.ready?'opening':step.phase||'opening',!step.ready&&step.phase==='result'?step.duration:0);
     }
     function tickTour(dt) {
       if(!tour)return;
@@ -182,37 +204,50 @@
       shell.dataset.demoCursorX=String(round(current.point.x));shell.dataset.demoCursorY=String(round(current.point.y));
       if(step.update)step.update(current.age);
       if(tour!==current)return;
-      if(current.age>=(step.duration||0)&&(!step.ready||step.ready()||current.age>=(step.timeout||4500))){if(step.ready&&!step.ready()&&step.timeoutAction)step.timeoutAction();if(step.done)step.done();if(tour===current)tourStep();}
+      if(current.readyAt===null){
+        if(!step.ready()&&current.age<(step.timeout||4500))return;
+        if(!step.ready()&&step.timeoutAction)step.timeoutAction();
+        if(tour!==current)return;
+        // Loading and querying never consume the time reserved for reading a result.
+        current.readyAt=current.age;
+        present(true,step.phase||'opening',step.phase==='result'?step.duration:0);
+      }
+      if(current.age-current.readyAt>=(step.duration||0)){if(step.done)step.done();if(tour===current)tourStep();}
     }
     function startTour() {
-      if(destroyed||paused||document.hidden||settings.reducedMotion||tourConsumed||humanUsed)return false;
-      tourConsumed=true;demoRunning=true;runKey(1,true);
+      if(destroyed||paused||document.hidden||tour||humanUsed)return false;
+      demoRunning=true;runKey(1,true);
       const open=function(index,thought){runKey(index,true);if(thought&&settings.onThought)settings.onThought(thought);};
       const app=function(index){return()=>desktopApps.get(index);}, terminalInput=()=>terminalControl?.input, terminalSubmit=()=>terminalControl?.submit, sqlRun=()=>sqlControl?.run, versionPick=()=>versionControl?.pick;
-      const steps=[
-        {name:'desktop',label:'masaüstü',duration:300},
-        {name:'move-terminal',label:'terminal',duration:700,target:app(2)},
-        {name:'press-terminal',label:'terminal',duration:160,target:app(2),press:true,done:()=>open(2,'Önce komut. Sonra gerçek proje kayıtları.')},
-        {name:'terminal-input',label:'komut satırı',duration:450,target:terminalInput},
-        {name:'type-command',label:'projects',duration:640,target:terminalInput,update:age=>{if(terminalControl)terminalControl.input.value='projects'.slice(0,Math.floor(age/80));}},
-        {name:'move-submit',label:'komutu çalıştır',duration:420,target:terminalSubmit},
-        {name:'press-submit',label:'gerçek portföy verisi',duration:160,target:terminalSubmit,press:true,done:()=>terminalControl?.execute('projects')},
-        {name:'terminal-result',label:'proje kayıtları',duration:1800,done:()=>open(1)},
-        {name:'move-sqlite',label:'SQLite',duration:700,target:app(5)},
-        {name:'press-sqlite',label:'SQLite',duration:160,target:app(5),press:true,done:()=>open(5,'Sorgu bellekte çalışır. Sonuç gerçek veridir.')},
-        {name:'database-ready',label:'veritabanı',duration:300,ready:()=>Boolean(sqlControl?.ready),timeout:4500,timeoutAction:()=>{if(tour)tour.skipSql=true;}},
-        {name:'move-query',label:'ilişki sorgusu',duration:600,skip:()=>tour.skipSql,target:sqlRun,enter:()=>sqlControl?.selectJoin()},
+      const chapters=[[
+        {name:'desktop',label:'masaüstü',duration:250},
+        {name:'move-terminal',label:'terminal',duration:550,target:app(2)},
+        {name:'press-terminal',label:'terminal',duration:160,target:app(2),press:true,done:()=>open(2,'Bir komut. İki satırda kimlik.')},
+        {name:'terminal-input',label:'komut satırı',duration:250,target:terminalInput},
+        {name:'type-command',label:'whoami',phase:'typing',duration:540,target:terminalInput,update:age=>{if(terminalControl)terminalControl.input.value='whoami'.slice(0,Math.floor(age/90));}},
+        {name:'move-submit',label:'komutu çalıştır',duration:300,target:terminalSubmit},
+        {name:'press-submit',label:'whoami',duration:160,target:terminalSubmit,press:true,done:()=>terminalControl?.execute('whoami')},
+        {name:'terminal-result',label:'Muhammet Kırıklı',phase:'result',duration:3400}
+      ],[
+        {name:'desktop',label:'masaüstü',duration:250},
+        {name:'move-sqlite',label:'SQLite',duration:550,target:app(5)},
+        {name:'press-sqlite',label:'SQLite',duration:160,target:app(5),press:true,done:()=>open(5,'SQL çalışır. İlişkiler görünür olur.')},
+        {name:'database-ready',label:'veritabanı',duration:150,ready:()=>Boolean(sqlControl?.ready),timeout:4500,timeoutAction:()=>{if(tour){tour.skipSql=true;setStatus('SQLite henüz hazır değil. Daha sonra tekrar deneyebilirsin.','error');}}},
+        {name:'move-query',label:'ilişki sorgusu',duration:400,skip:()=>tour.skipSql,target:sqlRun,enter:()=>sqlControl?.selectJoin()},
         {name:'press-query',label:'SELECT / JOIN',duration:160,skip:()=>tour.skipSql,target:sqlRun,press:true,done:()=>{const current=tour;current.queryDone=false;sqlControl.execute().finally(()=>{if(tour===current)current.queryDone=true;});}},
-        {name:'query-result',label:'ilişkili kayıtlar',duration:1800,skip:()=>tour.skipSql,ready:()=>Boolean(tour.queryDone),timeout:4000},
-        {name:'return-desktop',label:'masaüstü',duration:250,enter:()=>open(1)},
-        {name:'move-versions',label:'sürümler',duration:700,target:app(18)},
-        {name:'press-versions',label:'sürümler',duration:160,target:app(18),press:true,done:()=>open(18,'Şema büyüdükçe ilişkiler görünür olur.')},
+        {name:'query-result',label:'ilişkili kayıtlar',phase:'result',duration:3600,skip:()=>tour.skipSql,ready:()=>Boolean(tour.queryDone),timeout:5000,timeoutAction:()=>{sqlControl?.cancel();setStatus('Sorgu beklenenden uzun sürüyor. Elle yeniden çalıştırabilirsin.','error');}},
+        {name:'database-unavailable',label:'yeniden dene',phase:'result',duration:3400,skip:()=>!tour.skipSql}
+      ],[
+        {name:'desktop',label:'masaüstü',duration:250},
+        {name:'move-versions',label:'sürümler',duration:550,target:app(18)},
+        {name:'press-versions',label:'sürümler',duration:160,target:app(18),press:true,done:()=>open(18,'Bir şema, adım adım büyür.')},
         {name:'version-before',label:'ilk şema',duration:1000},
-        {name:'move-version',label:'sonraki yapı',duration:600,target:versionPick},
+        {name:'move-version',label:'sonraki yapı',duration:450,target:versionPick},
         {name:'press-version',label:'v0.3 / ilişkiler',duration:160,target:versionPick,press:true,done:()=>versionControl?.selectLatest()},
-        {name:'version-result',label:'ilişki şeması',duration:2000}
-      ];
-      tour={steps:steps,index:-1,age:0,target:null,point:{x:(shell.clientWidth||200)*.78,y:(shell.clientHeight||150)*.72},from:null,skipSql:false,queryDone:false};
+        {name:'version-result',label:'ilişki şeması',phase:'result',duration:3400}
+      ]];
+      tour={steps:chapters[tourChapter],index:-1,age:0,readyAt:null,target:null,point:{x:(shell.clientWidth||200)*.78,y:(shell.clientHeight||150)*.72},from:null,skipSql:false,queryDone:false};
+      shell.dataset.demoChapter=String(tourChapter+1);
       tourLayer.classList.add('is-active');tourStep();schedule();return true;
     }
     function desktop() {
@@ -226,7 +261,27 @@
       function print(text,kind){output.append(el('div',kind||'',text));while(output.children.length>50)output.firstElementChild.remove();output.scrollTop=output.scrollHeight;}
       print('mk.local:~ $ help');print('Bir komut yaz. Örn: projects veya skills react');
       const form=el('form','cos-terminal-form'), label=el('label','cos-terminal-label'), input=el('input','cos-input');label.append(el('span','cos-sr','Terminal komutu'),input);input.setAttribute('aria-label','Terminal komutu');input.autocomplete='off';input.spellcheck=false;const submit=el('button','cos-button','↵');submit.type='submit';submit.setAttribute('aria-label','Komutu çalıştır');form.append(el('span','','$'),label,submit);body.append(form);
-      function execute(command){command=String(command).trim();if(!command)return;print('$ '+command,'cos-terminal-command');const parts=command.split(/\s+/), action=parts.shift().toLowerCase(), query=parts.join(' ').toLocaleLowerCase('tr-TR');input.value='';if(action==='clear'){output.replaceChildren();return;}if(action==='help')print('projects [kelime] → projeler\nskills [kelime] → araçlar\nwhoami → kimlik\nclear → temizle');else if(action==='projects')print(projects.filter(function(p){return(p.title+' '+p.category).toLocaleLowerCase('tr-TR').includes(query);}).map(function(p){return p.title+' / '+p.status;}).join('\n')||'Eşleşme yok.');else if(action==='skills')print(skills.filter(function(s){return s.toLocaleLowerCase('tr-TR').includes(query);}).join(' · ')||'Eşleşme yok.');else if(action==='whoami')print((data.identity.displayName||'Muhammet Kırıklı')+'\nYazılım · Sistemler · Tasarım');else print('Komut bulunamadı: '+action+'. help ile komutlara bak.','cos-error');}
+      body.append(el('p','cos-note','Yukarı/Aşağı: geçmiş. Tab: komut adını tamamla.'));
+      let historyIndex=terminalHistory.length,draft='';
+      const commands=['help','projects','skills','whoami','clear'];
+      listen(input,'input',function(){historyIndex=terminalHistory.length;draft=input.value;});
+      listen(input,'keydown',function(event){
+        if(event.altKey||event.ctrlKey||event.metaKey||event.shiftKey)return;
+        if(event.key==='ArrowUp'||event.key==='ArrowDown'){
+          if(!terminalHistory.length)return;
+          event.preventDefault();if(historyIndex===terminalHistory.length)draft=input.value;
+          historyIndex=event.key==='ArrowUp'?Math.max(0,historyIndex-1):Math.min(terminalHistory.length,historyIndex+1);
+          input.value=historyIndex===terminalHistory.length?draft:terminalHistory[historyIndex];return;
+        }
+        if(event.key!=='Tab'||!/^[a-z]+$/i.test(input.value))return;
+        if(typeof input.selectionStart==='number'&&(input.selectionStart!==input.value.length||input.selectionEnd!==input.value.length))return;
+        const matches=commands.filter(command=>command.startsWith(input.value.toLowerCase()));
+        if(matches.length!==1)return;
+        event.preventDefault();input.value=matches[0]+' ';historyIndex=terminalHistory.length;draft=input.value;
+      });
+      function execute(command){command=String(command).trim();if(!command)return;
+        if(humanUsed&&!tour&&!autoDispatch&&terminalHistory.at(-1)!==command){terminalHistory.push(command);if(terminalHistory.length>32)terminalHistory.shift();}
+        historyIndex=terminalHistory.length;draft='';print('$ '+command,'cos-terminal-command');const parts=command.split(/\s+/), action=parts.shift().toLowerCase(), query=parts.join(' ').toLocaleLowerCase('tr-TR');input.value='';if(action==='clear'){output.replaceChildren();return;}if(action==='help')print('projects [kelime] → projeler\nskills [kelime] → araçlar\nwhoami → kimlik\nclear → temizle');else if(action==='projects')print(projects.filter(function(p){return(p.title+' '+p.category).toLocaleLowerCase('tr-TR').includes(query);}).map(function(p){return p.title+' / '+p.status;}).join('\n')||'Eşleşme yok.');else if(action==='skills')print(skills.filter(function(s){return s.toLocaleLowerCase('tr-TR').includes(query);}).join(' · ')||'Eşleşme yok.');else if(action==='whoami')print((data.identity.displayName||'Muhammet Kırıklı')+'\nYazılım · Sistemler · Tasarım');else print('Komut bulunamadı: '+action+'. help ile komutlara bak.','cos-error');}
       terminalControl={input:input,submit:submit,execute:execute};
       listen(form,'submit',function(event){event.preventDefault();execute(input.value);});
     }
@@ -243,7 +298,7 @@
       const examples=select('Hazır sorgu',[['projects','Projeler'],['skills','Yetenekler'],['join','Birlikte kullanılan araçlar']],actions);
       const queries={projects:'SELECT title, status FROM projects ORDER BY id;',skills:'SELECT name FROM skills ORDER BY name;',join:'SELECT p.title, s.name FROM projects p JOIN project_skills ps ON p.id = ps.project_id JOIN skills s ON s.id = ps.skill_id WHERE s.name = \'React\';'};
       listen(examples,'change',function(){input.value=queries[examples.value];});
-      function execute(){const token=generation,request=++queryId;run.disabled=true;return db.query(input.value).then(function(result){if(destroyed||token!==generation||request!==queryId)return;results(result,output);setStatus('SQLite · '+result.reduce(function(n,r){return n+r.values.length;},0)+' satır','good');}).catch(function(error){if(token!==generation||request!==queryId)return;output.replaceChildren(el('p','cos-error',error.message));setStatus('Sorgu hatası','error');}).finally(function(){if(token===generation&&request===queryId)run.disabled=false;});}
+      function execute(){const token=generation,request=++queryId;run.disabled=true;manualPending();return db.query(input.value).then(function(result){if(destroyed||token!==generation||request!==queryId)return;results(result,output);setStatus('SQLite · '+result.reduce(function(n,r){return n+r.values.length;},0)+' satır','good');}).catch(function(error){if(token!==generation||request!==queryId)return;output.replaceChildren(el('p','cos-error',error.message));setStatus('Sorgu hatası','error');}).finally(function(){if(token===generation&&request===queryId)run.disabled=false;});}
       const run=button('Çalıştır ↵',execute);run.disabled=true;actions.append(run);
       const control={input:input,run:run,examples:examples,ready:false,execute:execute,selectJoin:function(){examples.value='join';input.value=queries.join;},cancel:function(){queryId++;run.disabled=!control.ready;}};sqlControl=control;
       dbReady(function(){control.ready=true;run.disabled=false;execute();});
@@ -252,7 +307,7 @@
       heading('Proje ↔ yetenek','Birçoktan çoğa ilişki. Bir araç birden çok ürüne bağlanabilir.');const pick=select('Bir yetenek seç',skills), graph=el('div','cos-relations');body.append(graph);function paint(){graph.replaceChildren();const source=el('div','cos-relation-source',pick.value);graph.append(source);const matches=projects.filter(function(p){return(p.stack||[]).includes(pick.value);});const targets=el('div','cos-relation-targets');matches.forEach(function(p){targets.append(button(p.title,function(){projectAction(p.id);},'cos-relation-target'));});graph.append(targets);setStatus(matches.length+' proje bağlantısı · gerçek portföy verisi');}listen(pick,'change',paint);if(skills.includes('React'))pick.value='React';paint();
     }
     function transaction() {
-      heading('BEGIN → karar → sonuç','Aynı INSERT; iki farklı son. Gerçek SQLite transaction.');const input=field('Kaydedilecek not','Bir fikir kayda girdi.','text'), controls=row(), output=el('div','cos-query-result');body.append(output);function execute(commit){const token=generation;commitButton.disabled=rollbackButton.disabled=true;db.transaction(input.value.trim()||'İsimsiz not',commit).then(function(result){if(destroyed||token!==generation)return;output.replaceChildren(el('h3','cos-section-label','İşlem içindeyken'));results(result.pending,elResult(output));output.append(el('h3','cos-section-label',commit?'COMMIT sonrası':'ROLLBACK sonrası'));results(result.saved,elResult(output));setStatus(commit?'COMMIT · kayıt saklandı':'ROLLBACK · ekleme geri alındı',commit?'good':'');}).catch(function(error){if(token===generation)output.replaceChildren(el('p','cos-error',error.message));}).finally(function(){if(token===generation)commitButton.disabled=rollbackButton.disabled=false;});}const commitButton=button('COMMIT · kaydet',function(){execute(true);}),rollbackButton=button('ROLLBACK · geri al',function(){execute(false);},'cos-secondary');controls.append(commitButton,rollbackButton);commitButton.disabled=rollbackButton.disabled=true;dbReady(function(){commitButton.disabled=rollbackButton.disabled=false;});
+      heading('BEGIN → karar → sonuç','Aynı INSERT; iki farklı son. Gerçek SQLite transaction.');const input=field('Kaydedilecek not','Bir fikir kayda girdi.','text'), controls=row(), output=el('div','cos-query-result');body.append(output);function execute(commit){const token=generation;commitButton.disabled=rollbackButton.disabled=true;manualPending();db.transaction(input.value.trim()||'İsimsiz not',commit).then(function(result){if(destroyed||token!==generation)return;output.replaceChildren(el('h3','cos-section-label','İşlem içindeyken'));results(result.pending,elResult(output));output.append(el('h3','cos-section-label',commit?'COMMIT sonrası':'ROLLBACK sonrası'));results(result.saved,elResult(output));setStatus(commit?'COMMIT · kayıt saklandı':'ROLLBACK · ekleme geri alındı',commit?'good':'');}).catch(function(error){if(destroyed||token!==generation)return;output.replaceChildren(el('p','cos-error',error.message));setStatus('İşlem tamamlanamadı','error');}).finally(function(){if(token===generation)commitButton.disabled=rollbackButton.disabled=false;});}const commitButton=button('COMMIT · kaydet',function(){execute(true);}),rollbackButton=button('ROLLBACK · geri al',function(){execute(false);},'cos-secondary');controls.append(commitButton,rollbackButton);commitButton.disabled=rollbackButton.disabled=true;dbReady(function(){commitButton.disabled=rollbackButton.disabled=false;});
     }
     function elResult(parent){const node=el('div');parent.append(node);return node;}
     function discussion() {
@@ -338,9 +393,9 @@
       runKey:runKey,openExpanded:openExpanded,
       autoDemo:startTour,
       closeExpanded:function(){if(dialog.open)dialog.close();},
-      setPaused:function(value){paused=!!value;shell.dataset.paused=String(paused);if(paused){cancelTour('paused');if(frame)cancelAnimationFrame(frame);frame=0;}else schedule();},
+      setPaused:function(value){paused=!!value;shell.dataset.paused=String(paused);emitPresentation();if(paused){if(frame)cancelAnimationFrame(frame);frame=0;}else schedule();},
       getState:function(){return{activeKey:active,powered:powered,expanded:dialog.open,paused:paused,demoState:shell.dataset.demoState,demoRunning:demoRunning};},
-      destroy:function(){if(destroyed)return;destroyed=true;cancelTour('destroyed');if(dialog.open){dialog.close();restore();}resetWidget();if(db)db.destroy();expand.removeEventListener('click',openExpanded);appPicker.removeEventListener('change',pickApp);dialog.removeEventListener('close',restore);humanEvents.forEach(function(event){shell.removeEventListener(event,activity,true);});document.removeEventListener('visibilitychange',visibility);shell.remove();dialog.remove();marker.remove();screen.classList.remove('cos-screen-host');}
+      destroy:function(){if(destroyed)return;destroyed=true;cancelTour('destroyed');present(false,'idle',0);if(dialog.open){dialog.close();restore();}resetWidget();if(db)db.destroy();expand.removeEventListener('click',openExpanded);appPicker.removeEventListener('change',pickApp);dialog.removeEventListener('close',restore);humanEvents.forEach(function(event){shell.removeEventListener(event,activity,true);});document.removeEventListener('visibilitychange',visibility);shell.remove();dialog.remove();marker.remove();screen.classList.remove('cos-screen-host');}
     });
   }
   global.ComputerOS=Object.freeze({keys:keys,mount:mount});

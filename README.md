@@ -32,7 +32,7 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 - `index.html`, `style.css`, `direction.css` ve `profile.css`: sayfa yapısı ve görsel dil.
 - `app.js`: gezinme, proje ayrıntıları, hareket kontrolü ve takvim.
 - `kinetic.js`: imleç çekimi, yerel bükülme ve kalıcı biçim vermeyi destekleyen Canvas şerit; dönüş sürer, sıfırlama düğmesi biçimi geri alır.
-- `narrator.js` ve `narrator.css`: birlikte yazan Luciler, EN/TR terminal düşünceleri ve yanlış inişten toparlanma. Balona tıkla veya Enter ile sonraki düşünceyi sıraya al.
+- `narrator.js` ve `narrator.css`: birlikte yazan Luciler, EN/TR terminal düşünceleri ve yanlış inişten toparlanma. Balona tıkla veya Enter ile sonraki cümleyi güvenli sınırda sıraya al.
 - `cursor.js` ve `cursor.css`: beş parmaklı dikişli eldiven, açılan eklem ve elden hedefe uzanan, gerilip geri çekilen siyah simbiyot dokusu.
 - `system-lab.js/css`: yedi yerel akış; düzenlenebilir veri, doğrulama, onay/durdurma, tekrar kayıt koruması ve JSON/işlem izi.
 - `capability-map.js/css`: sekiz yetenek alanını ilgili gerçek proje ayrıntılarına bağlayan harita.
@@ -43,6 +43,7 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 - `ui-icons.js/css`: mobilde emojiye dönüşmeyen SVG yön ve durum işaretleri.
 - `motion-film.js/css`: kendi kısa arka plan filmi, sabit poster ve kelime bütünlüğünü koruyan başlık girişleri.
 - `MOTION-ARASTIRMA.md`: Dribbble, Webflow ve Noctra incelemeleri; açılan canlı örnekler, uygulama kararları ve sınırlar.
+- `ARASTIRMA-2026-10-27.md`: bilgisayar/Luci zamanlaması ve LinuxOfficial'ın masaüstü, mobil, not ve konsol incelemesi.
 - `ARASTIRMA.md`: tasarım kaynakları, ayrı video/site gözlemleri, gözlem sınırları ve özgün uygulama kararları.
 
 Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. Sahne, arka plan filmi ve akışlar kendi kodumuzla çizilir; üretken görsel API'si kullanılmadı.
@@ -92,7 +93,7 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 
 ## Luci’nin piksel sahnesi
 
-52 × 7 matris tek cümle için ortak bir sahnedir. İki kalıcı Luci sırayla yazar ve siler. Tam cümle 2,8 saniye okunur; mevcut yazar başlangıçtan silmeye başladığında diğeri boşalan hücrelere yeni cümleyi yazar. İki uç aynı saatle, üç sütunluk aralıkla ilerler. Hücre sahipliği eski ve yeni yazının çarpışmasını önler. Siyah Luci kimliğini korur; ikinci karakter syntax tonlarıyla değişir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır.
+52 × 7 matris tek cümle için ortak bir sahnedir. İki kalıcı Luci sırayla yazar ve siler. Tam cümle 3,6 saniye okunur; mevcut yazar başlangıçtan silmeye başladıktan sonra diğeri boşalan hücrelere yeni cümleyi yazar. İki uç yoğunluğa göre aynı saatle ilerler: her gerçek basış en az 90 ms, boş sütun 36 ms; güvenli aralık en az üç sütundur. Hücre sahipliği eski ve yeni yazının çarpışmasını önler. Siyah Luci kimliğini korur; ikinci karakter syntax tonlarıyla değişir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır.
 
 96 teknik konu, dönüşümlü EN/TR 192 özgün kısa cümle ve 384 düşünce içerir. Düşünceler en az 5 saniye okunur. Yanlış iniş sırasında iki uç birlikte durur; kırmızı iz, WARN/RECOVER ve küçük panel kırılmasının ardından aynı yerden devam eder. Gerçek etkinlik verileri değişmez. Balona basmak sonraki cümleyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
@@ -100,7 +101,9 @@ Telefon dahil düşünce gövdesi 12 px'tir. Balonlarda gereksiz boşluk azaltı
 
 ## mk.desktop / 32 tuş
 
-Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 4,2, bilgisayar 5,8 saniye görünür. Fare alanın üzerindeyken tur ve ilerleme göstergesi donar; çıkınca kalan süre 320 ms sonra devam eder. Klavye odağı, yazı alanları, basılı tutma ve büyütülmüş ekran da sahneyi korur. Üstteki genel hareket düğmesi tüm sahneleri durdurur.
+Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 4,2 saniye görünür; bilgisayarın 5,8 saniyelik taban süresi, başlangıç ve işlem bitene, ardından sonuç gerçekten okunana kadar uzar. Her otomatik ziyarette tek bölüm tamamlanır: kısa kimlik komutu, SQLite JOIN veya sürüm/şema. Hazır sonuçtan sonra 3,4–3,6 saniye okuma payı vardır. Fare alanın üzerindeyken tur ve ilerleme göstergesi donar; çıkınca kalan süre 320 ms sonra devam eder. Yalnız monitörün üstünden geçmek gösterimi iptal etmez; gerçek kullanıcı girdisi kontrolü alır. Klavye odağı, yazı alanları, basılı tutma ve büyütülmüş ekran da sahneyi korur. Üstteki genel hareket düğmesi tüm sahneleri durdurur.
+
+Terminal girdisi 32 elle yazılmış komuta kadar oturum geçmişi tutar. Yukarı/Aşağı geçmişi gezerken yarım taslak korunur; boş olmayan tek eşleşmeli komut başı Tab ile tamamlanır. Boş veya argümanlı girişte Tab normal odak gezinmesine devam eder. Otomatik gösterinin komutları bu geçmişe eklenmez.
 
 Bilgisayarın 8 × 4 gri tuşu yazısızdır. Hover veya klavye odağında işlev adı görünür; oklarla gezin, Enter/Space ile çalıştır. Terminal, düzenlenebilir arayüz, yerel API, gerçek SQLite sorguları/ilişkileri/transaction, proje akışları, kod farkı, sürümler, testler, kuyruk/cache/yetkiler, motion/renk/piksel araçları ve iki küçük oyun bulunur. **Ekranı büyüt** aynı uygulamanın durumunu korur. Deneyler bu tarayıcıda çalışır; gerçek servis veya hesaplarda işlem yapmaz.
 

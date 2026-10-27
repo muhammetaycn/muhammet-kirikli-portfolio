@@ -48,6 +48,7 @@
     let clock = 0;
     let previousFrame = 0;
     let demoAt = 0;
+    let osPresentation = {busy:false,phase:'idle',readMs:0};
     let wakeAt = null;
     let wakeReady = false;
     let waveUntil = 0;
@@ -160,8 +161,11 @@
     }
 
     function activity(kind) {
+      const pending=Boolean(demoAt);
       touched = true;
       demoAt = 0;
+      scene.dataset.demoPending='false';
+      if(pending)options.onPresentation?.(osPresentation);
       finishWake();
       options.onActivity?.(kind || 'computer');
     }
@@ -295,6 +299,7 @@
       reducedMotion: reduced,
       onThought: setThought,
       onActivity: () => activity('screen'),
+      onPresentation: value => {osPresentation=value;options.onPresentation?.(value);},
       onProject: id => {activity('project'); options.onProject?.(id);},
       onExpanded: expanded => {activity('expand'); scene.classList.toggle('is-expanded', Boolean(expanded)); options.onExpanded?.(expanded);}
     });
@@ -340,7 +345,7 @@
     function tick(now) {
       frame = 0;
       if (!active()) return;
-      clock += Math.min(50, Math.max(0, now - previousFrame));
+      clock += Math.min(1000, Math.max(0, now - previousFrame));
       previousFrame = now;
       scene.dataset.elapsed = String(Math.round(clock));
       if (!wakeReady && wakeAt !== null) {
@@ -356,7 +361,7 @@
         if (clock >= signalUntil) {scene.classList.remove('is-signalling');signalUntil = 0;companion.dataset.attention = 'idle';}
         else if (signalUntil - clock < 650) {companion.dataset.attention = 'screen';companion.style.setProperty('--luci-look', '-4px');}
       }
-      if (demoAt && clock >= demoAt && !touched) {demoAt = 0;os?.autoDemo?.();}
+      if (demoAt && clock >= demoAt && !touched) {demoAt = 0;scene.dataset.demoPending='false';if(!os?.autoDemo?.())options.onPresentation?.(osPresentation);}
       if (typedCount < thoughtText.length && clock - lastType > 37) {
         typedCount = Math.min(thoughtText.length, typedCount + Math.max(1, Math.floor((clock - lastType) / 37)));
         lastType = clock;
@@ -384,11 +389,15 @@
           demoAt = clock + 1800;
         }
       }
+      scene.dataset.demoPending=String(Boolean(demoAt&&!touched));
+      if(demoAt&&!touched)options.onPresentation?.({busy:active(),phase:active()?'opening':'paused',readMs:0});
     }
 
     const api = {
       setVisible(value) {
+        const entering=Boolean(value)&&!visible;
         visible = Boolean(value);
+        if(entering&&!touched){demoStarted=false;demoAt=0;}
         scene.dataset.visible = String(visible);
         sync();
         if (visible) {
