@@ -3,7 +3,7 @@
   const mounted=new WeakMap();
   const DATA=['galleryState','galleryIndex','galleryProject','galleryCount'];
   const EASE='cubic-bezier(.22,.75,.2,1)';
-  const PAINT=['display','position','inset','top','right','bottom','left','box-sizing','width','height','min-width','min-height','max-width','max-height','padding','margin','gap','column-gap','row-gap','align-items','align-self','justify-content','justify-self','flex-direction','flex-wrap','flex-grow','flex-shrink','flex-basis','grid-template-columns','grid-template-rows','grid-column','grid-row','border','border-radius','background','color','font-family','font-size','font-style','font-weight','line-height','letter-spacing','text-align','white-space','transform','transform-origin','opacity','clip-path','overflow','z-index','box-shadow','filter','fill','stroke','stroke-width'];
+  const PAINT=['display','position','inset','top','right','bottom','left','box-sizing','width','height','min-width','min-height','max-width','max-height','padding','margin','gap','column-gap','row-gap','align-items','align-self','justify-content','justify-self','flex-direction','flex-wrap','flex-grow','flex-shrink','flex-basis','grid-template-columns','grid-template-rows','grid-column','grid-row','border','border-radius','background','color','font-family','font-size','font-style','font-weight','line-height','letter-spacing','text-align','white-space','transform','translate','rotate','scale','transform-origin','transform-style','perspective','perspective-origin','backface-visibility','opacity','clip-path','overflow','z-index','box-shadow','filter','fill','stroke','stroke-width','stroke-dasharray','stroke-dashoffset'];
   let cloneSerial=0;
   function element(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;}
   function arrow(direction){
@@ -44,11 +44,12 @@
       let style;try{style=getComputedStyle(source);}catch{return;}
       for(const name of PAINT){const camel=name.replace(/-([a-z])/g,(_,letter)=>letter.toUpperCase()),value=style.getPropertyValue?.(name)||style[camel];if(!value)continue;if(target.style.setProperty)target.style.setProperty(name,value);else target.style[camel]=value;}
       target.style.animation='none';target.style.transition='none';target.style.pointerEvents='none';
+      return style.display==='none';
     }
     function snapshotDrawing(){
       if(!drawing||typeof drawing.cloneNode!=='function')return null;
-      const clone=drawing.cloneNode(true),sources=[drawing,...drawing.querySelectorAll('*')],copies=[clone,...clone.querySelectorAll('*')],ids=new Map(),prefix='gallery-visual-'+(++cloneSerial)+'-';
-      copies.forEach((node,index)=>{paint(sources[index],node);const id=node.getAttribute('id');if(id){ids.set(id,prefix+ids.size);node.setAttribute('id',ids.get(id));}node.removeAttribute('aria-labelledby');node.removeAttribute('aria-describedby');node.removeAttribute('autofocus');node.removeAttribute('contenteditable');node.setAttribute('tabindex','-1');if('disabled'in node&&/^(BUTTON|INPUT|SELECT|TEXTAREA|FIELDSET)$/.test(node.tagName))node.disabled=true;if(node.tagName==='A')node.removeAttribute('href');});
+      const clone=drawing.cloneNode(true),sources=[drawing,...drawing.querySelectorAll('*')],copies=[clone,...clone.querySelectorAll('*')],ids=new Map(),hidden=new Set(),prefix='gallery-visual-'+(++cloneSerial)+'-';
+      copies.forEach((node,index)=>{const source=sources[index];if(hidden.has(source.parentNode)||paint(source,node))hidden.add(source);const id=node.getAttribute('id');if(id){ids.set(id,prefix+ids.size);node.setAttribute('id',ids.get(id));}node.removeAttribute('aria-labelledby');node.removeAttribute('aria-describedby');node.removeAttribute('autofocus');node.removeAttribute('contenteditable');node.setAttribute('tabindex','-1');if('disabled'in node&&/^(BUTTON|INPUT|SELECT|TEXTAREA|FIELDSET)$/.test(node.tagName))node.disabled=true;if(node.tagName==='A')node.removeAttribute('href');});
       // Local SVG paint references must follow their renamed definitions.
       const rewrite=(value,attribute)=>{
         let next=String(value).replace(/url\(\s*(['"]?)[^)'"\s]*#([^)'"\s]+)\1\s*\)/g,(token,quote,id)=>ids.has(id)?'url("#'+ids.get(id)+'")':token);
@@ -68,6 +69,9 @@
       preview.append(host);return host;
     }
     function settle(){if(destroyed)return;generation++;cancelAnimations();clearOutgoing();motionClass();state('idle');snapshot=snapshotDrawing();}
+    // The application paints the new project before show(). Capture the old
+    // settled pose first so pointer depth and CSS animation do not rewind.
+    function prepare(){if(destroyed||animations.size)return false;snapshot=snapshotDrawing();return Boolean(snapshot);}
     function update(){
       const entry=entries[position],project=entry.project;
       preview.dataset.galleryIndex=String(entry.index);preview.dataset.galleryProject=project.id;preview.dataset.galleryCount=String(entries.length);
@@ -96,7 +100,7 @@
       const incomingClip=direction>0?'inset(100% 0 0 0)':'inset(0 0 100% 0)',outgoingClip=direction>0?'inset(0 0 100% 0)':'inset(100% 0 0 0)';
       Promise.all([
         play(layer,[{opacity:inFlight?drawingOpacity:1,transform:inFlight?drawingTransform:'translateY(0) scale(1)',clipPath:inFlight?drawingClip:'inset(0 0 0 0)'},{opacity:.65,transform:'translateY('+(-direction*12)+'%) scale(1.025)',clipPath:outgoingClip}],620),
-        play(drawing,[{opacity:inFlight?drawingOpacity:.78,transform:inFlight?drawingTransform:'translateY('+(direction*12)+'%) scale(1.035)',clipPath:inFlight?drawingClip:incomingClip},{opacity:1,transform:'translateY(0) scale(1)',clipPath:'inset(0 0 0 0)'}],620),
+        play(drawing,[{opacity:inFlight?Math.max(.78,drawingOpacity):.78,transform:inFlight?drawingTransform:'translateY('+(direction*12)+'%) scale(1.035)',clipPath:inFlight?'inset(0 0 0 0)':incomingClip},{opacity:1,transform:'translateY(0) scale(1)',clipPath:'inset(0 0 0 0)'}],620),
         play(caption,[{opacity:inFlight?captionOpacity:0,transform:inFlight?captionTransform:'translateY('+(direction*22)+'px)',clipPath:inFlight?captionClip:incomingClip},{opacity:1,transform:'translateY(0)',clipPath:'inset(0 0 0 0)'}],450,inFlight?0:90)
       ]).then(()=>{if(!destroyed&&token===generation){if(outgoing===layer)clearOutgoing();state('idle');}});
       return true;
@@ -116,12 +120,12 @@
       if(key==='Home')request(-1,0);else if(key==='End')request(1,entries.length-1);else request(key==='ArrowLeft'?-1:1);
     });
     listen(document,'visibilitychange',()=>{if(document.hidden)settle();else motionClass();});listen(window,'resize',()=>{visible=inViewport();settle();});
-    if(typeof IntersectionObserver==='function'){observer=new IntersectionObserver(entries=>{visible=entries.some(entry=>entry.isIntersecting);if(!visible)settle();else motionClass();},{threshold:0});observer.observe(preview);}else listen(window,'scroll',()=>{const nextVisible=inViewport();if(nextVisible===visible)return;visible=nextVisible;if(!visible)settle();else motionClass();},{passive:true});
+    if(typeof IntersectionObserver==='function'){observer=new IntersectionObserver(entries=>{if(destroyed)return;visible=entries.some(entry=>entry.isIntersecting);if(!visible)settle();else motionClass();},{threshold:0});observer.observe(preview);}else listen(window,'scroll',()=>{const nextVisible=inViewport();if(nextVisible===visible)return;visible=nextVisible;if(!visible)settle();else motionClass();},{passive:true});
     const preference=()=>{if(media.matches)settle();else motionClass();};
     if(media.addEventListener)listen(media,'change',preference);else if(media.addListener){media.addListener(preference);cleanups.push(()=>media.removeListener(preference));}
     update();motionClass();state('idle');snapshot=snapshotDrawing();
     const controller={
-      show,settle,
+      show,settle,prepare,
       setPaused(value){if(destroyed)return;paused=Boolean(value);if(paused)settle();else motionClass();},
       destroy(){
         if(destroyed)return;destroyed=true;generation++;cancelAnimations();clearOutgoing();observer?.disconnect();cleanups.splice(0).forEach(remove=>remove());snapshot=null;

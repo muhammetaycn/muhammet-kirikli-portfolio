@@ -328,10 +328,13 @@
     function resize() {
       if (destroyed) return;
       const rect = host.getBoundingClientRect();
+      // The stage's entrance transform must not change the hardware's own scale.
+      const layoutWidth = host.clientWidth || rect.width;
+      const layoutHeight = host.clientHeight || rect.height;
       const mobile = window.matchMedia('(max-width: 760px)').matches;
-      const width = rect.width * (mobile ? .96 : .78);
-      const height = Math.max(360, rect.height - 72);
-      const scale = Math.max(.8, Math.min(1.06, width / 430, height / 620));
+      const width = layoutWidth * (mobile ? .96 : .78);
+      const height = Math.max(360, layoutHeight - 72);
+      const scale = Math.max(mobile ? .64 : .8, Math.min(1.06, width / 430, height / 620));
       world.style.setProperty('--computer-scale', scale.toFixed(3));
       world.style.setProperty('--computer-text-scale', (1 / scale).toFixed(3));
       scene.dataset.scale = scale.toFixed(3);

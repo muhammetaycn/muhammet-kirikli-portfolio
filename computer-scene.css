@@ -85,7 +85,7 @@
 .computer-scene.is-signalling .computer-glass-sheen{animation:computer-glass-response .7s ease-out both}
 .computer-os-loading{height:100%;display:grid;place-items:center;color:#b8b5a7;font:12px Consolas,monospace}
 .computer-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-.computer-scene.is-still .computer-float,.computer-scene.is-still .computer-ground-shadow,.computer-scene.is-still .computer-luci-tail,.computer-scene.is-still .computer-luci-eye,.computer-scene.is-still .computer-companion,.computer-scene.is-still .computer-thought-caret,.computer-scene.is-still .computer-key-cap,.computer-scene.is-still .computer-signal-path,.computer-scene.is-still .computer-power-light,.computer-scene.is-still .computer-glass-sheen{animation:none!important}
+.computer-scene.is-still .computer-float,.computer-scene.is-still .computer-ground-shadow,.computer-scene.is-still .computer-luci-tail,.computer-scene.is-still .computer-luci-eye,.computer-scene.is-still .computer-companion,.computer-scene.is-still .computer-thought-caret,.computer-scene.is-still .computer-key-cap,.computer-scene.is-still .computer-signal-path,.computer-scene.is-still .computer-power-light,.computer-scene.is-still .computer-glass-sheen{animation-play-state:paused!important}
 .computer-scene.is-still .computer-object,.computer-scene.is-still .computer-key-cap,.computer-scene.is-still .computer-wake,.computer-scene.is-still .computer-wake *{transition:none!important}
 .computer-scene.is-still .computer-object{transform:none}
 .computer-scene.is-expanded .computer-glass-sheen{opacity:.45}

@@ -11,11 +11,12 @@
     let presentationBusy=false, presentationPhase='idle', readRemaining=0, reading=false;
     let ribbonPaused, computerPaused;
     const durations=[4200,5800], releaseDelay=320, disposers=[];
-    inside=Boolean(window.matchMedia?.('(hover: hover)').matches&&art.matches?.(':hover'));
+    function pointerInside(){return Boolean(window.matchMedia?.('(hover: hover)').matches&&art.matches?.(':hover'));}
+    inside=pointerInside();
     function listen(node,type,fn,options) {node.addEventListener(type,fn,options);disposers.push(()=>node.removeEventListener(type,fn,options));}
     function capture() {
       const now=performance.now();
-      const delta=Math.max(0,Math.min(250,now-last));
+      const delta=Math.max(0,Math.min(1000,now-last));
       if(clockRunning)elapsed+=delta;
       if(reading)readRemaining=Math.max(0,readRemaining-delta);
       last=now;return now;
@@ -76,12 +77,12 @@
     listen(window,'pointerup',()=>{if(held){capture();held=false;release();update();}},{passive:true});
     listen(window,'pointercancel',()=>{capture();held=false;release();update();},{passive:true});
     listen(window,'blur',()=>{capture();pageActive=false;held=false;inside=false;update();});
-    listen(window,'focus',()=>{capture();pageActive=true;release();update();});
+    listen(window,'focus',()=>{capture();pageActive=true;inside=pointerInside();release();update();});
     listen(window,'keydown',event=>{if(event.key==='Tab')keyboardMode=true;});
     listen(art,'keydown',()=>{capture();keyboardMode=true;focused=true;update();});
     listen(art,'focusin',event=>{capture();focused=keyboardMode||editing(event.target);update();});
     listen(art,'focusout',event=>{capture();focused=Boolean(event.relatedTarget&&art.contains(event.relatedTarget)&&(keyboardMode||editing(event.relatedTarget)));if(!focused)release();update();});
-    listen(document,'visibilitychange',()=>{capture();update();});
+    listen(document,'visibilitychange',()=>{capture();if(!document.hidden)inside=pointerInside();update();});
     const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{capture();visible=entries[0].isIntersecting;update();},{threshold:.1}):null;
     observer?.observe(art);
     select(0);

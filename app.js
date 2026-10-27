@@ -25,12 +25,14 @@
   let requestedCaseIndex=0;
   const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
+  let scrollFrame = 0;
   const cleanups = [];
   if(window.UIIcons){const uiIcons=window.UIIcons.mount();cleanups.push(()=>uiIcons.destroy());}
   function element(tag, className, text) { const e = document.createElement(tag); if (className) e.className = className; if (text !== undefined) e.textContent = text; return e; }
   function toast(text) { $('#toast').textContent = text; $('#toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.remove('visible'), 2600); }
 
   function selectProject(index) {
+    if(index!==selected)projectGallery?.prepare();
     selected = index;
     const project = projects[index];
     document.querySelectorAll('.project-row').forEach(row => row.classList.toggle('is-active', row.dataset.project === project.id));
@@ -212,6 +214,7 @@
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
+    if(!moving)document.body.classList.add('intro-settled');
     $('#motion-toggle').setAttribute('aria-pressed', String(moving));
     $('#motion-toggle').setAttribute('aria-label', moving ? 'Hareketi durdur' : 'Hareketi aç');
     $('#motion-toggle span').textContent = moving ? 'Ⅱ' : '▷';
@@ -220,6 +223,7 @@
     const svg = $('#lab-stage');
     if (!moving && svg.pauseAnimations) svg.pauseAnimations();
     if (moving && svg.unpauseAnimations) svg.unpauseAnimations();
+    onScroll();
   }
   $('#motion-toggle').addEventListener('click', () => { userPaused = moving; moving = !userPaused && !media.matches; applyMotion(); });
   media.addEventListener('change', e => { computerScene?.setReducedMotion(e.matches); moving = !e.matches && !userPaused; applyMotion(); });
@@ -234,17 +238,19 @@
     document.body.classList.add('js-ready');
     cleanups.push(() => reveal.disconnect());
   }
-  let scrollFrame = 0;
   function paintScroll() {
     scrollFrame = 0;
     const range = document.documentElement.scrollHeight - innerHeight;
-    $('#page-progress').style.transform = `scaleX(${range > 0 ? scrollY / range : 0})`;
-    if (moving && innerWidth > 760) $('.hero-art').style.transform = `translateY(${Math.min(65, scrollY * .12)}px)`;
-    else $('.hero-art').style.transform = '';
+    $('#page-progress').style.transform = `scaleX(${Math.max(0, Math.min(1, range > 0 ? scrollY / range : 0))})`;
+    if (innerWidth <= 760 || media.matches) $('.hero-art').style.transform = '';
+    else if (moving) $('.hero-art').style.transform = `translateY(${Math.max(0, Math.min(65, scrollY * .12))}px)`;
   }
   function onScroll() { if (!scrollFrame) scrollFrame = requestAnimationFrame(paintScroll); }
   addEventListener('scroll', onScroll, {passive: true});
-  paintScroll();
+  addEventListener('resize', onScroll, {passive: true});
+  cleanups.push(()=>removeEventListener('resize',onScroll));
+  if(typeof ResizeObserver==='function'){const scrollObserver=new ResizeObserver(onScroll);scrollObserver.observe(document.documentElement);cleanups.push(()=>scrollObserver.disconnect());}
+  onScroll();
 
   async function renderRhythm() {
     const DAY = 86400000;
@@ -255,7 +261,7 @@
     let daily = new Map(), events = new Map(), buildLog = false;
     const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json?v=20261027d');
+      const response = await fetch('data/activity.json?v=20261027g');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
       personalDock?.setBuildLog(json);

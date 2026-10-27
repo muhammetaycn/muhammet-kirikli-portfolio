@@ -32,6 +32,7 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | Son videolara göre daha bütünlüklü sunum | ZIP içindeki dört MP4'ten 36 zamanlı kare; açık/koyu bölüm ayrımı, projeye özgü kompozisyonlar, daha büyük gövde metni; yöntem ve sınırlar [video araştırmasında](MOTION-VIDEO-2026-10-27.md) |
 | Menüde bütünlük ve açık gezinme | Canlı günlük dahil beş gerçek bölüm bağlantısı, kısa maskeli giriş/kapanış, Escape ve bölüm geçişinde odak çalmayan kapanış |
 | Ekran görüntüsündeki siteyi doğru referansla eşleme | Açık: kesin URL henüz çözülmedi. YVL doğru referans değil; bu sitenin incelendiği veya eşleştirmenin tamamlandığı iddia edilmiyor |
+| Motion hatalarını giderme ve yeni kaynak araştırması | Hızlı seçimde boşluk, çıkış pozunun sıçraması, pause/resume sıfırlanması, geciken döngü, sabit hover dönüşü ve dar ekran bilgisayar sınırları düzeltildi; yeni canlı gözlemler [hareket kaydında](MOTION-AUDIT-2026-10-27.md) |
 | Açık kaynak, GitHub üzerinden site | MIT kod lisansı, main dalından GitHub Pages yayını |
 
 Günlükte gösterilen ölçüm kaynak commitleridir. AI kullanım saati veya harici hesap analitiği ölçülmez. Yerel uygulama ve akış deneyleri bu tarayıcı oturumunda çalışır; projelerin geliştirme/prototip durumları korunur.

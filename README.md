@@ -124,3 +124,8 @@ Proje detayları ve sistem akışlarındaki uygulama düğmeleri, ilgili deneyi 
 Bilgisayar görünümünde 1,2 saniyelik uyanıştan sonra ziyaret başına tek uygulama bölümü tamamlanır. İç imleç gerçek uygulama düğmesinin merkezine gider; Terminal kimlik komutu, SQLite gerçek JOIN veya Sürümler ilişki şeması sırayla gösterilir. Gerçek kullanıcı girdisi turu durdurur; yalnız fareyle alanın üzerine gelmek mevcut turu dondurur. Geç kalan otomatik sorgu sonucu kullanıcının ekranını veya yazısını değiştiremez. Sahne görünmezken düşünce ve fizik süreleri ilerlemez.
 
 Bu sürümün istek karşılaştırması [ISTEK-DURUMU.md](ISTEK-DURUMU.md) içindedir.
+
+
+## Hareket sürekliliği
+
+Hızlı proje seçimleri yarım maskede boşluk bırakmaz; çıkış görseli o anki konumunu ve SVG rota ilerlemesini korur. Proje görseli hassas fareyle en çok 10/7 px tepki verir, kontroller sabit kalır. CSS animasyonları duraklatmada başa dönmez. Açılışın zaman hesabı geciken karelerde uzamaz; pencereye dönüş sabit hover kilidini yeniler. Kaydırma, görünüm ve içerik yüksekliği değişiklikleri tek karede birleştirilir. Dar ekranda bilgisayarın tam sınırları korunur. Yeni canlı kaynak gözlemleri ve test kapsamı [hareket araştırmasında](MOTION-AUDIT-2026-10-27.md) kayıtlıdır.
