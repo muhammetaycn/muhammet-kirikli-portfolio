@@ -21,7 +21,7 @@
     {
       "id": "idolog",
       "title": "IDOLOG — Sosyal platform",
-      "short": "İçerik, etkileşim ve topluluk akışlarını ortak bir ürün mimarisinde buluşturan sosyal platform.",
+      "short": "İçerik akışı, oturum ve moderasyon. Next.js ile FastAPI arasında geliştirdiğim sosyal ürün.",
       "category": "Full-stack ürün",
       "status": "Geliştirme",
       "stack": [
@@ -33,9 +33,9 @@
         "SQLite",
         "SQLAlchemy"
       ],
-      "summary": "IDOLOG üzerinde ürün stratejisini, kullanıcı akışlarını, marka dilini ve full-stack geliştirmeyi birlikte ele alıyorum.",
-      "problem": "Bir sosyal platformda arayüz, oturum, içerik ve moderasyon ayrı düşünüldüğünde kullanıcı deneyimiyle veri akışı birbirinden kopuyor.",
-      "solution": "Next.js arayüzünü Python/FastAPI servisleriyle birleştiriyor; içerik akışlarını, bildirimleri ve moderasyonu aynı ürün düzeninde geliştiriyorum.",
+      "summary": "IDOLOG; ürün kararlarını, arayüzü ve servisleri birlikte geliştirdiğim sosyal platform.",
+      "problem": "İçerik akışına oturum, moderasyon ve bildirim eklendiğinde her karar hem arayüzü hem servisi etkiliyor.",
+      "solution": "Arayüz Next.js; servisler Python/FastAPI. Oturum, içerik ve moderasyonu aynı veri modeli ve kullanıcı akışı üzerinden geliştiriyorum.",
       "features": [
         "Ürün stratejisi, kullanıcı akışları ve marka / arayüz tasarımı",
         "Güvenli oturum, içerik moderasyonu ve bildirim akışları",
@@ -58,7 +58,7 @@
       "id": "textile",
       "number": "02",
       "title": "TekstilOS — ERP ve üretim takibi",
-      "short": "Siparişten üretim takibine uzanan işleri modüler ekranlarda modelleyen prototip.",
+      "short": "Ürün satırları, tutar ve üretim durumu aynı panoda. React/TypeScript ile arayüz prototipi.",
       "category": "Operasyon arayüzü",
       "status": "Prototip",
       "year": "2026",
@@ -70,9 +70,9 @@
         "Radix UI",
         "Recharts"
       ],
-      "summary": "Tekstil üretimindeki sipariş, stok, kalite ve bakım alanlarını ortak bir arayüz mimarisiyle ele alıyorum.",
-      "problem": "Üretimle ilgili farklı işlerin ayrı ekran dilleriyle yönetilmesi, aynı siparişi takip etmeyi zorlaştırıyor.",
-      "solution": "Modüler bir arayüzde sipariş formunu, ürün satırlarını ve durum takibini bir araya getirerek akışları prototipliyorum.",
+      "summary": "TekstilOS, sipariş ve üretim işlerini ekranda denediğim bir prototip.",
+      "problem": "Siparişin ürün satırları, tutarı ve üretim durumu birlikte izlenmeli; stok ve kalite ekranları da aynı dili konuşmalı.",
+      "solution": "Sipariş oluşturma, detay ve durum güncellemelerini React/TypeScript ile çalışan bir arayüz prototipinde deniyorum.",
       "features": [
         "Ürün satırları ve tutar hesabıyla sipariş oluşturma / düzenleme",
         "Sipariş detayını açma ve durumunu güncelleme",
@@ -93,7 +93,7 @@
     {
       "id": "aciktinmi",
       "title": "Acıktınmı — Sosyal yemek haritası",
-      "short": "Yemek ve mekân keşfini sosyal harita, yerel öneriler ve işletme araçlarıyla birleştiren Android prototipi.",
+      "short": "Haritada mekân keşfi, yerel öneriler ve işletme panelleri. Kotlin ile Android prototipi.",
       "category": "Android / harita",
       "status": "Prototip",
       "stack": [
@@ -105,9 +105,9 @@
         "Moshi",
         "Firebase Authentication"
       ],
-      "summary": "Bir mekânı haritada bulmaktan kullanıcı ve işletme akışlarına kadar yemek keşfinin farklı parçalarını tek mobil üründe topluyorum.",
-      "problem": "Mekân keşfi, sosyal öneriler ve işletme bilgileri farklı yüzeylere dağıldığında yerel bir deneyimi takip etmek zorlaşıyor.",
-      "solution": "Kotlin ve Jetpack Compose ile sosyal haritayı, mekân detaylarını ve rol bazlı panelleri ortak bir Android deneyiminde prototipliyorum.",
+      "summary": "Acıktınmı, yakındaki mekânı haritada bulmaktan işletme tarafına uzanan bir Android çalışması.",
+      "problem": "Haritadaki nokta tek başına yetmiyor: mekân ayrıntısı, yerel öneri ve kullanıcı/işletme rolleri birbirine bağlanmalı.",
+      "solution": "Kotlin ve Jetpack Compose arayüzü; Room ile yerel veri, Retrofit/OkHttp ile servis katmanı, Firebase ile kimlik doğrulama.",
       "features": [
         "Sosyal harita, keşif akışı, mekân detayları ve yerel öneriler",
         "Kullanıcı, işletme ve yönetici panelleri; işletme başvurusu ve Askıda Yemek akışları",
@@ -129,7 +129,7 @@
     {
       "id": "portfolio",
       "title": "Motion portföyü",
-      "short": "Bükülebilen bir yüzey, 32 tuşlu bir bilgisayar ve içinde çalışan terminal, SQLite, motion araçları ve küçük deneyler.",
+      "short": "Şeridi bük, bir tuşa bas, komut çalıştır. Arayüz ile hareketi denediğim açık kaynak çalışma alanı.",
       "category": "Creative development",
       "status": "Geliştirme",
       "year": "2026",
@@ -142,9 +142,9 @@
         "requestAnimationFrame",
         "SQLite / WebAssembly"
       ],
-      "summary": "Bu portföyde yaptığım işleri yalnızca metinle sıralamak yerine, etkileşime girebileceğin küçük sistemlerle anlatıyorum.",
-      "problem": "Projeler ve yetenekler düz bir listeye dönüştüğünde nasıl düşündüğümü ve farklı katmanları nasıl birleştirdiğimi göstermek zorlaşıyor.",
-      "solution": "Bükülebilir Canvas yüzeyini, 32 etkileşim açan pofuduk bir bilgisayarı ve hücrelere birlikte yazan anlatıcıları aynı akışta birleştiriyorum. Küçük sistemler tarayıcıda çalışıyor; SQLite deneyi gerçek bellek veritabanı kullanıyor.",
+      "summary": "Bu portföyün kendisi de bir proje: şekil verilebilen yüzey, 32 tuşlu bilgisayar, tarayıcıda çalışan uygulamalar ve Luci matrisi.",
+      "problem": "Aynı sayfada 3B hissi, klavye uygulamaları ve karakter animasyonu var. Etkileşimler birbirini kesmeden, okunur ve durdurulabilir kalmalı.",
+      "solution": "Canvas şeridi, CSS bilgisayarı ve SVG karakterleri ortak hareket kontrolüne bağladım; SQLite, terminal ve küçük deneyler tarayıcı içinde çalışıyor.",
       "features": [
         "Üç biçim arasında dönüşen, dönmeye devam ederken tutup bükülebilen etkileşimli yüzey",
         "32 boş tuş: terminal, SQLite sorguları, transaction, uygulama akışları, motion araçları ve mini oyunlar",
@@ -167,7 +167,7 @@
       "id": "event",
       "number": "05",
       "title": "Canlı Etkinlik Sistemi",
-      "short": "QR ile katılımı sahnedeki canlı deneyime bağlayan etkinlik akışı.",
+      "short": "Telefondaki fotoğraf, yönetim onayından sonra sahnede. QR katılımı ve canlı soru araçları.",
       "category": "Canlı deneyim",
       "status": "Geliştirme",
       "year": "2026",
@@ -179,9 +179,9 @@
         "Supabase",
         "Sharp"
       ],
-      "summary": "Telefondan paylaşılan fotoğrafları, canlı soruları ve sahne yönetimini aynı etkinlik deneyiminde buluşturuyorum.",
-      "problem": "Katılımcının telefonu, fotoğraf galerisi ve salondaki ekran birbirinden kopuk kalınca etkinliğin akışı da bölünüyor.",
-      "solution": "QR ile erişimi; fotoğraf yükleme, yönetim onayı ve canlı sahne katmanlarıyla birleştiren bir akış geliştiriyorum.",
+      "summary": "Katılımcının telefonuyla salondaki ekran arasında fotoğraf, soru ve sahne yönetimi geliştiriyorum.",
+      "problem": "Yüklenen fotoğraf sahneye ulaşmadan önce onaylanmalı; canlı soru ve duyurular da salondaki deneyimle eşleşmeli.",
+      "solution": "QR/kod katılımı, fotoğraf yükleme ve yönetim onayından sonra sahne galerisi. Canlı soru, duyuru ve karaoke için ayrı yönetim adımları.",
       "features": [
         "QR veya kodla katılım erişimi ve fotoğraf yükleme",
         "Fotoğraf onayı, galeri ve beğeni akışı",
@@ -202,7 +202,7 @@
     {
       "id": "gorgez",
       "title": "GÖRGEZ — Doğa ve rota keşfi",
-      "short": "Doğal yerleri konum, kategori ve rota üzerinden keşfetmek için mobil arayüz ve veri toplama altyapısı.",
+      "short": "Doğa rotaları için veri toplama, koordinat kontrolü ve mobil harita. Python ile React Native arasında bir keşif ürünü.",
       "category": "Mobil / veri sistemi",
       "status": "Prototip",
       "stack": [
@@ -215,9 +215,9 @@
         "Playwright",
         "BeautifulSoup"
       ],
-      "summary": "Doğal yerleri keşfetmek için mobil haritayı; kaynak tarama, koordinat doğrulama ve veri temizleme akışlarıyla birleştiriyorum.",
-      "problem": "Farklı gezi kaynaklarındaki yer kayıtları, fotoğraflar ve koordinatlar aynı kalitede olmadığı için haritada güvenilir bir keşif akışı kurmak zorlaşıyor.",
-      "solution": "Python tabanlı ajanlarla toplanan kayıtları temizleyip sınıflandırıyor; API ve Expo / React Native arayüzü üzerinden harita keşfine bağlıyorum.",
+      "summary": "GÖRGEZ üzerinde doğal yerlerin kaynak verisinden mobil haritadaki görünümüne kadar çalışıyorum.",
+      "problem": "Yer adı, koordinat ve fotoğraf farklı gezi kaynaklarından geliyor. Haritaya girmeden önce kayıtlar temizlenip doğrulanmalı.",
+      "solution": "Python ajanlarıyla kaynak tarama ve koordinat doğrulama; API üzerinden Expo/React Native haritasına giden sınıflandırılmış kayıtlar.",
       "features": [
         "Yer, kategori, fotoğraf ve tarama kayıtları için API katmanı",
         "Wikipedia, harita ve gezi kaynakları için Playwright / BeautifulSoup tarama ajanları",
@@ -240,7 +240,7 @@
       "id": "content",
       "number": "07",
       "title": "IDOLOG — İçerik otomasyonu",
-      "short": "Araştırma notunu taslağa, taslağı takip edilebilir bir yayın planına dönüştüren çalışma alanı.",
+      "short": "Araştırma notu, taslak ve tarihli yayın kuyruğu. IDOLOG için içerik çalışma alanı.",
       "category": "İş akışı otomasyonu",
       "status": "Geliştirme",
       "year": "2026",
@@ -252,9 +252,9 @@
         "node-cron",
         "Tailwind CSS"
       ],
-      "summary": "Araştırma, taslak ve zamanlama adımlarını tek panelden takip edilebilen bir içerik akışında topluyorum.",
-      "problem": "Araştırma notlarıyla paylaşım planı ayrı kaldığında hangi fikrin taslak, hangisinin sırada olduğunu takip etmek güçleşiyor.",
-      "solution": "Konu özetinden taslak oluşturmayı, tarihli gönderi kaydını ve kuyruk durumunu aynı çalışma alanına bağlıyorum.",
+      "summary": "Bir konu notunun taslağa ve tarihli gönderiye dönüşmesini takip eden içerik otomasyonu.",
+      "problem": "Bir araştırma notunun taslak mı, hazır mı, sırada mı olduğunu ve yayın tarihini görünür tutmak gerekiyor.",
+      "solution": "Konu özeti, taslak, tarihli gönderi kaydı ve kuyruk durumu aynı çalışma alanında takip ediliyor.",
       "features": [
         "Araştırma konusu özetinden içerik taslağı oluşturma",
         "Platform ve tarih seçerek gönderi zamanlama",
@@ -275,7 +275,7 @@
     {
       "id": "paulukizlar",
       "title": "Paulukızlar — Öğrenci platformu",
-      "short": "PAÜ ve Denizli öğrencileri için ilan, rehber, soru-cevap ve kampüs yaşamını bir araya getiren web platformu.",
+      "short": "PAÜ ve Denizli öğrencileri için ilan, rehber, soru-cevap ve mesajlaşma üzerine web ürünü.",
       "category": "Web / topluluk ürünü",
       "status": "Geliştirme",
       "stack": [
@@ -286,9 +286,9 @@
         "Supabase",
         "Zod"
       ],
-      "summary": "Öğrencilerin ilanlardan mekân keşfine, sorulardan mesajlaşmaya uzanan ihtiyaçlarını ortak bir ürün akışında ele alıyorum.",
-      "problem": "Kampüs bilgisi, ilanlar ve öğrenci soruları farklı kanallara dağıldığında içerik bulmak ve sahipliğini takip etmek zorlaşıyor.",
-      "solution": "İçerik hiyerarşisini ve kullanıcı rollerini ilişkisel veri modeliyle birleştiriyor; moderasyon ve sahiplik kontrolleriyle destekliyorum.",
+      "summary": "Paulukızlar; kampüs bilgisini, öğrenci ilanlarını ve soru-cevap alanını bir web ürününde ele aldığım çalışma.",
+      "problem": "İlanın sahibi, sorunun konusu ve içeriğin görünürlüğü aynı sistemde takip edilebilmeli.",
+      "solution": "İlan, rehber, soru-cevap ve mesajlaşmayı ilişkisel veri, kullanıcı rolleri ve moderasyon kontrolleriyle geliştiriyorum.",
       "features": [
         "İlan, rehber, soru-cevap, kampüs / mekân keşfi ve mesajlaşma akışları",
         "Magic link oturumu; rol, sahiplik ve satır düzeyinde erişim kuralları",
@@ -310,7 +310,7 @@
     {
       "id": "dm",
       "title": "DM Operatörü",
-      "short": "Yorum ve özel mesaj sorularını bağlam, hedef doğrulama ve gönderim kontrolleriyle işleyen otomasyon denemesi.",
+      "short": "Yanıt metninden önce hedefi ve bağlamı kontrol eden yorum/DM otomasyonu denemesi.",
       "category": "AI / süreç otomasyonu",
       "status": "Prototip",
       "stack": [
@@ -320,9 +320,9 @@
         "AI görev akışı",
         "Denetim kayıtları"
       ],
-      "summary": "Instagram yorum ve mesaj sorularını işlerken yalnızca yanıt üretimini değil, kime ve hangi bağlamla yanıt verildiğini de kontrol eden bir sistem deniyorum.",
-      "problem": "Mesaj otomasyonunda yanlış hedef, eksik bağlam ve tekrar gönderim; üretilen yanıtın kendisi kadar önemli hatalar oluşturabiliyor.",
-      "solution": "Yeni iletiyi izinli kullanıcı ve bağlam kontrollerinden geçiriyor; AI görev sonucunu ayrıştırıp hedefi yeniden doğrulayan bir durum makinesi kuruyorum.",
+      "summary": "Instagram yorum ve mesaj sorularında, yanıtın içeriğini ve hedefini birlikte kontrol eden bir otomasyon deniyorum.",
+      "problem": "Otomatik yanıtta doğru metin yeterli değil. Yanlış hedef ve tekrar gönderim, kullanıcıya doğrudan yansıyor.",
+      "solution": "Yeni iletiyi izin ve bağlam kontrolünden geçiriyorum. AI çıktısı ayrıştırılıyor; hedef yeniden doğrulanmadan gönderim adımı ilerlemiyor.",
       "features": [
         "İzinli kullanıcı doğrulaması, yorum / DM sınıflaması ve bağlam toplama",
         "ChatGPT proje oturumuna görev aktarımı ve tamamlanmış yanıtı ayıklama",
@@ -345,7 +345,7 @@
       "id": "community",
       "number": "10",
       "title": "Topluluk Botu",
-      "short": "Üye etkileşimlerini, etiket rollerini ve günlük sunucu işlerini aynı botta birleştiren yapı.",
+      "short": "Etiket değiştiğinde rolü güncelleyen; komut, sayaç ve yardım panellerini yöneten topluluk botu.",
       "category": "Topluluk araçları",
       "status": "Geliştirme",
       "year": "2026",
@@ -356,9 +356,9 @@
         "@discordjs/voice",
         "Sharp"
       ],
-      "summary": "Üyeler için anlaşılır komutlar, yöneticiler için düzenli paneller ve etiket durumuna göre rol akışları geliştiriyorum.",
-      "problem": "Etiket rolleri, yardım komutları ve yönetim işleri ayrı ayrı ele alındığında sunucu deneyimini tutarlı tutmak zorlaşıyor.",
-      "solution": "Discord etkileşimlerini ortak bir yönlendirme katmanında topluyor; sayaç, yardım ve rol eşleme akışlarını buradan yönetiyorum.",
+      "summary": "Üye etkileşimleri ve günlük yönetim işleri için komutlar, paneller ve etiket–rol eşleşmeleri geliştiriyorum.",
+      "problem": "Etiket değişimi, rol eşleşmesi ve yönetim komutları aynı üyeyi etkiliyor; kuralların nerede uygulandığı açık olmalı.",
+      "solution": "Komutları ortak bir yönlendirme katmanında topluyor; etiket–rol eşleşmesini, sayaçları ve yardım panellerini aynı botta yönetiyorum.",
       "features": [
         "Slash komutlarıyla etiket sayacı ve özellik rehberi",
         "Etiket durumuna göre yapılandırılabilir rol ekleme / geri alma",

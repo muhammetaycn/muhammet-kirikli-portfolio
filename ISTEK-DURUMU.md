@@ -12,15 +12,15 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | Bilgisayarın içinde imleçle uygulama açılması | Gerçek düğme konumlarını izleyen, kesilebilir Terminal → SQLite → sürüm/şema turu |
 | SQL, kodlar, sistemler, küçük oyunlar | Gerçek SQLite JOIN/transaction, düzenlenebilir yerel uygulamalar, sürümler, motion araçları ve iki oyun |
 | Tek cümle, önden silme ve arkadan eşli yazma | Ortak 52 × 7 alanda iki kalıcı Luci; yoğunluğa göre ortak saat, en az 90 ms basış, başlangıçtan silme önce, en az üç sütun aralık, çarpışmasız hücre sahipliği |
-| Siyah Luci, farklı syntax renkleri, EN/TR | Siyah karakter korunur; ikinci yazar renk değiştirir; eşleşen EN/TR düşünceleri |
-| Tekrarlamayan geniş yazı çeşitliliği | 96 teknik konu, 192 sahne, 384 özgün düşünce; konu çifti döngü içinde tekrarlanmaz |
-| Okunur düşünceler ve cümle bütünlüğü | Düşünce en az 5 sn, tamamlanan cümle 3,6 sn; güvenli tek seferlik sıra isteği, duraklatılmışken hareketsiz elle ilerleme; 12 px düşünceler |
+| Siyah Luci, farklı syntax renkleri, EN/TR | Siyah karakter korunur; ikinci yazar renk değiştirir; dil her sahnede değişir, aynı konunun çevirisi en az 47 sahne sonra gelir |
+| Tekrarlamayan geniş yazı çeşitliliği | 96 teknik konu, 192 cümle, 384 düşünce; karışan sıra, sabit olmayan açılış ve oturumdaki son konuyu hatırlama; sonlu bankada anlık tekrar önleme |
+| Okunur düşünceler ve cümle bütünlüğü | Düşünce en az 5 sn, tamamlanan cümle 3,6 sn; düşünceler masaüstünde 14 px, mobilde 13 px; matris altında 18/16 px normal yazı karşılığı son tamamlanan cümleyi korur |
 | Yanlış kare, kırmızı iz, WARN ve panel kırılması | Yanlış iniş, üç kırmızı iz, küçük tek sıçrama/kırılma ve toparlanma |
 | İşlem görünmeden masaüstünün değişmesi | Her ziyarette tek tamamlanan bölüm; başlangıç ve asenkron iş koruması; sonuç hazır olunca 3,4–3,6 sn okuma; gizli/duraklatılmış süre hesaba katılmaz |
 | Küçük beş parmaklı dikişli eldiven | Yaklaşık %30 küçültülmüş el, açılan işaret parmağı eklemi, basma esnemesi ve gerçek tıklama hizası |
 | Elden çıkan, yaklaşınca kalınlaşan simbiyot | Üç eldiven kökü, üç ana gövde/altı dal, zarlar, kenar tepkisi, gerilme/kopma/yeniden tutunma |
 | Kullanıcı dostu sistemler | Yedi somut iş, girdinin yanındaki eylem, adlandırılmış onay ve sonuç; JSON/iz kapalı Teknik ayrıntılar içinde |
-| Hafif arka plan motion ve metin girişleri | Kendi 7,2 sn / 54 KB şerit filmi, siyah maskeler, SVG poster ve beş başlıkta kelime bütünlüğünü koruyan giriş |
+| Hafif arka plan motion ve metin girişleri | Kendi 7,2 sn / 54 KB şerit filmi yalnız açılışta; SVG poster; kelime maskesi yalnız çalışmalar başlığında, sakin okuma bölümleri |
 | Mobilde emoji görünen okları düzeltme | İlk yükleme ve dinamik içerik için SVG işaretler; kod/terminal/metin alanları korunur |
 | Yeni referanslarda ayrıntılı araştırma | Dribbble çalışmaları, Kaelorian canlı sitesi, Webflow Rexton/Prosma canlı önizlemeleri ve Noctra; kapsam ve sınırlar MOTION-ARASTIRMA.md içinde |
 | LinuxOfficial yapısından öğrenme | Masaüstü/dar ekran, dil değişimi, açılır not, çalışan konsol, geçmiş/tamamlama ve kapanış incelendi; ayrıntılar [27 Ekim araştırmasında](ARASTIRMA-2026-10-27.md) |
@@ -28,11 +28,12 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | Profili destekleyen gerçek üretim izi | Bu deponun tarihli GitHub commitleri ve açılabilir değişiklik kayıtları |
 | Videodaki kompakt kişisel alan ve alt Dock | Normal bölüm bağlantıları, küçük profil dialogu, doğru ad/kimlik, gerçek proje ve yetenek sayıları, İstanbul saati ve kaynak depoya bağlı geliştirme kartı |
 | Proje keşfinde hareket ve sahne devamlılığı | Ek Awwwards/Brandon Yasin galeri incelemesinden uyarlanan, kendi çizimlerini büyüten proje dialogu; kesilebilir açılış, proje değiştirme ve kapanış |
-| Projelere fare, dokunma ve klavyeyle ulaşma | 44 px önceki/sonraki kontrolleri, 01/04 sayacı, konum göstergesi, birlikte değişen çizim/açıklama ve kısa ekranlarda Dock boşluğu |
+| Projelere fare, dokunma ve klavyeyle ulaşma | Büyük ortak sahne, dört özgün ürün arayüzü, 44 px önceki/sonraki kontrolleri, 01/04 sayacı; kesilebilir 620 ms görsel ve 450 ms açıklama geçişi; mobilde alt alta akış |
+| Son videolara göre daha bütünlüklü sunum | ZIP içindeki dört MP4'ten 36 zamanlı kare; açık/koyu bölüm ayrımı, projeye özgü kompozisyonlar, daha büyük gövde metni; yöntem ve sınırlar [video araştırmasında](MOTION-VIDEO-2026-10-27.md) |
 | Menüde bütünlük ve açık gezinme | Canlı günlük dahil beş gerçek bölüm bağlantısı, kısa maskeli giriş/kapanış, Escape ve bölüm geçişinde odak çalmayan kapanış |
 | Ekran görüntüsündeki siteyi doğru referansla eşleme | Açık: kesin URL henüz çözülmedi. YVL doğru referans değil; bu sitenin incelendiği veya eşleştirmenin tamamlandığı iddia edilmiyor |
 | Açık kaynak, GitHub üzerinden site | MIT kod lisansı, main dalından GitHub Pages yayını |
 
 Günlükte gösterilen ölçüm kaynak commitleridir. AI kullanım saati veya harici hesap analitiği ölçülmez. Yerel uygulama ve akış deneyleri bu tarayıcı oturumunda çalışır; projelerin geliştirme/prototip durumları korunur.
 
-Video, 50,7 saniyelik yerel kaydın 21 zaman noktasından incelendi. Awwwards ve Brandon Yasin ayrıca tarayıcıda görsel olarak gözlendi; ekran görüntüsündeki çözülememiş kaynakla aynı site kabul edilmedi. Kaynak ayrımları ve zamanlı gözlemler [ARASTIRMA.md](ARASTIRMA.md) içindedir. Müzik geçmişi, rastgele geri sayım, kopya hesap istatistiği veya kalıcı ortak ziyaretçi defteri tamamlanmış özellik olarak sunulmaz.
+Önceki video, 50,7 saniyelik yerel kaydın 21 zaman noktasından incelendi. Son ZIP içindeki dört ayrı MP4 ise her biri dokuz kareyle değerlendirildi; bu, kaynak sitelerin tamamının canlı denendiği anlamına gelmez. Awwwards ve Brandon Yasin ayrıca tarayıcıda görsel olarak gözlendi; ekran görüntüsündeki çözülememiş kaynakla aynı site kabul edilmedi. Kaynak ayrımları ve zamanlı gözlemler [ARASTIRMA.md](ARASTIRMA.md) içindedir. Müzik geçmişi, rastgele geri sayım, kopya hesap istatistiği veya kalıcı ortak ziyaretçi defteri tamamlanmış özellik olarak sunulmaz.

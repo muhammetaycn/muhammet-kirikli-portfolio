@@ -178,38 +178,47 @@
   function createTopicOrder(previous=-1,intro=false,random=Math.random) {
     const order=Array.from({length:TOPICS.length},(_,index)=>index);
     for(let index=order.length-1;index>0;index--){const other=Math.floor(random()*(index+1));[order[index],order[other]]=[order[other],order[index]];}
-    // Every topic appears once per cycle; its EN/TR pair is never separated.
-    const first=intro?order.indexOf(0):order[0]===previous?1:0;
+    // Every topic appears once per half-cycle. There is no fixed opening topic.
+    const first=order[0]===previous?1:0;
     [order[0],order[first]]=[order[first],order[0]];
     return order;
   }
+  function createSceneOrder(previous=-1,random=Math.random) {
+    const topics=createTopicOrder(previous,false,random),half=topics.length;
+    // An odd rotation preserves alternating EN/TR while putting a topic's
+    // translation at least47 scenes away rather than immediately after it.
+    const rotation=Math.floor(half/2)+1;
+    return topics.concat(topics.slice(rotation),topics.slice(0,rotation)).map((topic,index)=>({topic,language:index%2}));
+  }
+  function previousTopic(){try{const value=window.sessionStorage?.getItem('mk-log-last-topic');return value===null||value===undefined?-1:Number(value);}catch{return -1;}}
+  function rememberTopic(topic){try{window.sessionStorage?.setItem('mk-log-last-topic',String(topic));}catch{/* Storage can be unavailable in private or local previews. */}}
   // A short statement occupies one line. Spaces have their own two-column
   // rhythm; the narrow I leaves room for readable phrases on the 52-cell grid.
   const PHRASES = [
-    ['USE AN INDEX','INDEKS KULLAN'],['CHECK FOR NULL','BOSLUGU KORU'],['QUEUE THE JOB','ISI SIRAYA AL'],['KEEP IT FRESH','TAZE TUT'],
-    ['CHECK ACCESS','IZNI DOGRULA'],['CHECK INPUT','GIRDIYI SINA'],['KEEP ONE STATE','TEK DURUM TUT'],['RETRY GENTLY','YAVASCA DENE'],
-    ['TEST THE PATCH','YAMAYI SINA'],['BUILD THEN SHIP','DERLE YAYINLA'],['PARSE THE PATH','YOLU AYRISTIR'],['CATCH ERRORS','HATAYI YAKALA'],
-    ['FILTER ROWS','SATIRI SUZ'],['KEEP THE KEY','ANAHTARI TUT'],['DEFINE A TYPE','TURU BELIRLE'],['READ THE DIFF','FARKI OKU'],
-    ['LOCK BRIEFLY','KISA KILITLE'],['AWAIT THE JOB','ISI BEKLE'],['STREAM CHUNKS','PARCALA AKIT'],['RESET SAFELY','GUVENLE DON'],
-    ['PARSE FIRST','ONCE AYRISTIR'],['CHECK THE TYPE','TURU SINA'],['BOUND THE LIST','LISTEYI SINIRLA'],['WAIT THEN TRY','BEKLE VE DENE'],
-    ['UPDATE A ROW','SATIRI YENILE'],['CHECK THE PIPE','KANALI SINA'],['VERIFY ORIGIN','KOKENI SINA'],['PAINT A FRAME','KAREYI BOYA'],
-    ['ABORT THE JOB','ISI IPTAL ET'],['TRACE THE BUG','HATAYI IZLE'],['WARN WITH CARE','ANLAMLI UYAR'],['ASSERT A RULE','KURALI SINA'],
-    ['RESPECT TTL','SUREYI KORU'],['ORDER BYTES','BAYTI SIRALA'],['VERIFY TRUST','GUVENI SINA'],['MATCH THE TAG','ETIKETI ESLE'],
-    ['CONTROL FLOW','AKISI YONET'],['PARSE THE URL','ADRESI AYRISTIR'],['PARSE THE JSON','JSON AYRISTIR'],['CHECK STATUS','DURUMU SINA'],
-    ['CLEAN UP WORK','ISI TEMIZLE'],['BOUND THE WAIT','SUREYI SINIRLA'],['SPREAD RETRIES','TEKRARI DAGIT'],['READ THE HEAD','BASLIGI OKU'],
-    ['READ A RANGE','ARALIGI OKU'],['DEDUP THE JOB','TEKRARI ELE'],['VERIFY PROXY','VEKILI DOGRULA'],['HANDLE CLOSE','KOPUSU YONET'],
-    ['INDEX THE JOIN','JOINI INDEKSLE'],['CHECK A KEY','ANAHTARI SINA'],['BEGIN THEN END','BASLAT BITIR'],['KEEP IT UNIQUE','TEKIL TUT'],
-    ['UPSERT THE ROW','ESLE VE YAZ'],['READ WITH WAL','WAL ILE OKU'],['SAVE SNAPSHOT','GORUNUMU TUT'],['READ THE PLAN','PLANI OKU'],
-    ['STAGE ALTER','SEMAYI HAZIRLA'],['PAGE BY KEY','ANAHTARLA GEZ'],['COUNT THE ROWS','SATIRI SAY'],['KEEP THE RULE','KURALI KORU'],['STORE IN UTC','UTC ILE SAKLA'],
-    ['COUNT IN CENTS','KURUSLA OLC'],['TEST A BACKUP','YEDEGI SINA'],['ROLL IT BACK','ISLEMI GERI AL'],['PATCH THE DOM','DOMU GUNCELLE'],
-    ['FOLLOW EVENTS','OLAYI TAKIP ET'],['RETURN FOCUS','ODAGI GERI VER'],['NAME THE ICON','SIMGEYE AD VER'],['LABEL INPUTS','GIRDIYE AD VER'],
-    ['LAY OUT WELL','DUZENI KUR'],['CLAMP THE SIZE','BOYUTU SINIRLA'],['PAINT ON TIME','ZAMANINDA BOYA'],['READ THEN EDIT','OKU SONRA YAZ'],
-    ['RESERVE SPACE','ALANI AYIR'],['SCALE PIXELS','PIKSELI OLC'],['ALIGN THE TIP','UCU HIZALA'],['CHOOSE A PIVOT','MERKEZI SEC'],
-    ['DAMP A SPRING','YAYI SONUMLE'],['REDUCE MOTION','HAREKETI AZALT'],['CHECK A GLYPH','GLIFI SINA'],['ACK THE RESULT','SONUCU ONAYLA'],
-    ['ORDER EVENTS','OLAYI SIRALA'],['EXPIRE LEASES','IZNI SONLANDIR'],['WAIT FOR A BEAT','NABZI BEKLE'],['PROBE REPAIR','DONUSU YOKLA'],
-    ['CARRY A TRACE','IZI TASI'],['MEASURE A RATE','HIZI OLC'],['USE MONO TIME','TEK YONLU OLC'],['FREE THE HEAP','YIGINI BOSALT'],
-    ['CHECK A RANGE','ARALIGI SINA'],['WAIT FOR DRAIN','TAMPON BOSALT'],['POST A MESSAGE','ILETI GONDER'],['SWAP AT ONCE','ATOMIK DEGISTIR'],
-    ['RELEASE LOCKS','KILIDI BIRAK'],['BREAK A CYCLE','DONGUYU KIR'],['CHECK IF READY','HAZIRLIGI SINA']
+    ["QUERY PLAN","SORGU PLANI"],["NULL VALUE","BOŞ DEĞER"],["JOB QUEUED","İŞ KUYRUKTA"],["CACHE HIT","BELLEKTE VAR"],
+    ["ACCESS TOKEN","ERİŞİM JETONU"],["INPUT VALID","GİRDİ GEÇERLİ"],["STATE CHANGED","DURUM DEĞİŞTİ"],["RETRY LATER","SONRA DENE"],
+    ["TESTS PASSED","TESTLER GEÇTİ"],["BUILD READY","DERLEME HAZIR"],["ROUTE PARAM","ROTA VERİSİ"],["ERROR CAUGHT","HATA YAKALANDI"],
+    ["FILTERED ROWS","SATIR SEÇİLDİ"],["PRIMARY KEY","KAYIT ANAHTARI"],["FIELD TYPE","ALAN TÜRÜ"],["GIT DIFF","KOD FARKI"],
+    ["LOCK TAKEN","KİLİT ALINDI"],["TASK AWAITED","İŞ BEKLENDİ"],["CHUNK STREAM","PARÇA AKIŞI"],["ECONN RESET","BAĞLANTI KOPTU"],
+    ["TEXT PARSED","METİN AYRIŞTI"],["TYPE ERROR","TÜR HATASI"],["PAGE LIMIT","SAYFA SINIRI"],["HTTP 429","İSTEK SINIRI"],
+    ["ROW UPDATED","SATIR GÜNCEL"],["EPIPE WRITE","KANAL KAPALI"],["CORS ORIGIN","KÖKEN İZNİ"],["FRAME READY","KARE HAZIR"],
+    ["FETCH ABORT","İSTEK İPTAL"],["TRACE FOUND","İZ BULUNDU"],["WARN ACTIVE","UYARI VAR"],["ASSERT FAIL","KOŞUL HATASI"],
+    ["TTL EXPIRED","SÜRE DOLDU"],["BYTE ORDER","BAYT SIRASI"],["TLS HANDSHAKE","TLS EL SIKIŞMA"],["ETAG MATCH","ETİKET EŞLEŞTİ"],
+    ["FLOW CONTROL","AKIŞ KONTROLÜ"],["URL PARSED","ADRES AYRIŞTI"],["JSON PARSED","JSON AYRIŞTI"],["HTTP STATUS","HTTP DURUMU"],
+    ["CLEANUP DONE","TEMİZLİK BİTTİ"],["TIMEOUT HIT","ZAMAN AŞILDI"],["BACKOFF WAIT","TEKRAR ARALIĞI"],["HEADER READ","BAŞLIK OKUNDU"],
+    ["RANGE READ","ARALIK OKUNDU"],["DEDUP HIT","TEKRAR ELENDİ"],["PROXY CHECK","VEKİL KONTROL"],["SOCKET CLOSED","SOKET KAPANDI"],
+    ["JOIN INDEX","JOIN İNDEKSİ"],["FOREIGN KEY","DIŞ ANAHTAR"],["TXN START","İŞLEM BAŞLADI"],["UNIQUE KEY","TEKİL ANAHTAR"],
+    ["UPSERT DONE","KAYIT EŞLEŞTİ"],["WAL ACTIVE","WAL AÇIK"],["SNAPSHOT OK","KOPYA HAZIR"],["EXPLAIN PLAN","SORGU İZİ"],
+    ["ALTER TABLE","ŞEMA DEĞİŞTİ"],["KEYSET PAGE","ANAHTAR SAYFA"],["ROW COUNT","SATIR SAYISI"],["RULE CHECK","KURAL KONTROL"],
+    ["UTC STORED","UTC KAYDI"],["CENT VALUE","KURUŞ DEĞERİ"],["BACKUP TEST","YEDEK SINAVI"],["ROLLBACK OK","GERİ ALINDI"],
+    ["DOM PATCH","DOM YAMASI"],["EVENT FIRED","OLAY GELDİ"],["FOCUS BACK","ODAK DÖNDÜ"],["ARIA LABEL","SİMGE ADI"],
+    ["FORM LABEL","GİRDİ ADI"],["GRID LAYOUT","IZGARA DÜZEN"],["CLAMP SIZE","BOYUT SINIRI"],["PAINT BUDGET","KARE SÜRESİ"],
+    ["READ PHASE","OKUMA EVRESİ"],["SPACE SAVED","ALAN AYRILDI"],["DPR SCALE","PİKSEL ÖLÇEĞİ"],["CURSOR TIP","İMLEÇ UCU"],
+    ["PIVOT POINT","DÖNÜŞ NOKTASI"],["SPRING DAMP","YAY SÖNÜMÜ"],["MOTION PAUSE","HAREKET DURDU"],["GLYPH CHECK","GLİF KONTROLÜ"],
+    ["RESULT ACK","SONUÇ ONAYI"],["EVENT ORDER","OLAY SIRASI"],["LEASE END","İZİN BİTTİ"],["HEARTBEAT OK","NABIZ VAR"],
+    ["REPAIR PATH","ONARIM YOLU"],["TRACE CONTEXT","İZ BAĞLAMI"],["RATE WINDOW","HIZ ARALIĞI"],["MONO CLOCK","TEK YÖN SAAT"],
+    ["HEAP FREED","BELLEK BOŞ"],["RANGE ERROR","ARALIK HATASI"],["BUFFER DRAIN","TAMPON BOŞ"],["MESSAGE SENT","İLETİ GİTTİ"],
+    ["ATOMIC SWAP","ATOMİK TAKAS"],["LOCK RELEASE","KİLİT AÇILDI"],["DEAD LOCK","KİLİT DÖNGÜSÜ"],["HEALTH READY","SERVİS HAZIR"]
   ];
   const HOLD_MS=3600, MIN_HOLD_MS=2200, HOP_MS=90, EMPTY_COLUMN_MS=36, LEAD_COLUMNS=3, ENTRY_MS=620, INK_FADE_MS=78;
   function compileSentence(value, round=0) {
@@ -250,7 +259,7 @@
     };
   }
   const SCENES=TOPICS.flatMap((topic,index)=>[0,1].map(language=>({
-    lang:language?'TR':'EN',sentence:PHRASES[index%PHRASES.length][language],thoughts:topic[language?3:1],topic:index
+    lang:language?'TR':'EN',sentence:PHRASES[index][language],displaySentence:PHRASES[index][language],thoughts:topic[language?3:1],topic:index
   })));
   function mount(options) {
     const {panel,grid,scroll}=options||{};
@@ -261,15 +270,17 @@
     const tethers=vector('svg',{class:'narrator-tethers','aria-hidden':'true'}),fracture=element('span','narrator-fracture');fracture.setAttribute('aria-hidden','true');root.append(tethers,fracture);
     const helper=element('span','narrator-sr','Tek cümle, iki Luci. İlk yazar cümleyi başlangıçtan silerken diğeri boşalan hücrelere yazar. En az üç sütunluk güvenli aralık korunur; hizalama değişse de önce eski cümle silinmeye başlar. Her cümle tamamlanınca okunur; siyah Luci kimliğini korur. Geçici izler gerçek GitHub kayıtlarını değiştirmez.');
     const announcement=element('span','narrator-sr');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.append(helper,announcement);panel.append(root);
+    const readable=element('p','narrator-readable'),readableLabel=element('span','narrator-readable-label'),readableCopy=element('span','narrator-readable-copy');readable.setAttribute('aria-hidden','true');readable.append(readableLabel,readableCopy);root.append(readable);
     const media=window.matchMedia('(prefers-reduced-motion: reduce)'),cleanups=[],owners=new Map(),errorInk=[];
     let reduced=Boolean(options.reducedMotion)||media.matches,paused=false,visible=false,destroyed=false;
     let frame=0,layoutFrame=0,previous=0,time=0,dirty=true,points=[],roundIndex=0,cycle=1,serial=1,phase='draw',phaseBorn=0,holdBorn=null;
-    let topicOrder=createTopicOrder(-1,true),current=null,incoming=null,writerSide=0,eraseSide=0,eraseFront=-1,writeFront=-1,error=null,errorCount=0,panelFaultUntil=0,collisions=0,relayClock=null,queued=false;
+    let sceneOrder=createSceneOrder(previousTopic()),current=null,incoming=null,writerSide=0,eraseSide=0,eraseFront=-1,writeFront=-1,error=null,errorCount=0,panelFaultUntil=0,collisions=0,relayClock=null,queued=false;
     let box={width:820,size:42,pitch:14,gridTop:200};
     const data=(name,value)=>{const next=String(value);if(root.dataset[name]!==next)root.dataset[name]=next;};
     function listen(target,type,fn,settings){target.addEventListener(type,fn,settings);cleanups.push(()=>target.removeEventListener(type,fn,settings));}
-    function entryAt(index){return SCENES[topicOrder[Math.floor(index/2)]*2+index%2];}
-    function advanceIndex(){roundIndex=(roundIndex+1)%SCENES.length;if(!roundIndex){topicOrder=createTopicOrder(topicOrder.at(-1));data('cycle',++cycle);}return roundIndex;}
+    function entryAt(index){const entry=sceneOrder[index];return SCENES[entry.topic*2+entry.language];}
+    function advanceIndex(){roundIndex=(roundIndex+1)%SCENES.length;if(!roundIndex){sceneOrder=createSceneOrder(sceneOrder.at(-1).topic);data('cycle',++cycle);}return roundIndex;}
+    function caption(entry,state){readable.dataset.state=state;readable.setAttribute('lang',entry.lang.toLowerCase());readableLabel.textContent=entry.lang+(state==='hold'?' · TAMAMLANDI':state==='relay'?' · DEVİR':' · YAZILIYOR');readableCopy.textContent=entry.displaySentence;}
     const actors=[0,1].map(side=>{
       const node=element('div','narrator-character');node.setAttribute('aria-hidden','true');node.dataset.zone=side?'right':'left';node.dataset.color=side?SYNTAX[0]:'black';node.style.setProperty('--luci-body',side?SYNTAX[0]:'#050506');
       const drawing=luci(),shadow=element('span','narrator-shadow');node.append(drawing.svg);root.append(shadow,node);
@@ -329,19 +340,19 @@
       while(g.step<g.score.route.length){const point=g.score.route[g.step];if(point.at>front)break;if(owners.has(point.index)&&!g.ink.has(point.index))break;addInk(g,point);actors[g.side].current=point.index;g.step++;}
       actorAtFront(actors[g.side],g.score.route,front);
     }
-    function beginHold(){phase='hold';phaseBorn=time;holdBorn=time;current.step=current.score.route.length;eraseFront=writeFront=current.score.end;current.score.route.forEach(point=>addInk(current,point));actors[current.side].current=current.score.route.at(-1).index;actors.forEach(actor=>{actor.routeOrigin=null;});zones.forEach(zone=>{zone.status.textContent='READ';zone.bubble.dataset.status='read';});announcement.textContent=`${current.entry.lang}. ${current.entry.sentence}.`;}
+    function beginHold(){phase='hold';phaseBorn=time;holdBorn=time;current.step=current.score.route.length;eraseFront=writeFront=current.score.end;current.score.route.forEach(point=>addInk(current,point));actors[current.side].current=current.score.route.at(-1).index;actors.forEach(actor=>{actor.routeOrigin=null;});zones.forEach(zone=>{zone.status.textContent='READ';zone.bubble.dataset.status='read';});caption(current.entry,'hold');announcement.textContent=`${current.entry.lang}. ${current.entry.displaySentence}.`;}
     function reset(instant=false){
       clearGeneration(current);clearGeneration(incoming);owners.clear();errorInk.splice(0).forEach(record=>record.node.remove());error=null;panelFaultUntil=0;panel.classList.remove('narrator-has-warning');root.classList.remove('is-faulting');actors.forEach(actor=>actor.node.classList.remove('is-warning'));
       writerSide=roundIndex%2;eraseSide=1-writerSide;queued=false;delete root.dataset.queued;relayClock=null;actors.forEach(actor=>{actor.routeOrigin=null;});
       if(writerSide===1){const color=SYNTAX[Math.floor(roundIndex/2)%SYNTAX.length];actors[1].color=color;actors[1].node.dataset.color=color;actors[1].node.style.setProperty('--luci-body',color);}
-      current=generation(entryAt(roundIndex),roundIndex,writerSide);incoming=null;phase=instant?'hold':'draw';phaseBorn=time;holdBorn=null;eraseFront=writeFront=-1;
+      current=generation(entryAt(roundIndex),roundIndex,writerSide);rememberTopic(current.entry.topic);incoming=null;phase=instant?'hold':'draw';phaseBorn=time;holdBorn=null;eraseFront=writeFront=-1;caption(current.entry,instant?'hold':'draw');
       zones.forEach(zone=>setThought(zone.side,current.entry,zone.side===writerSide?'WRITE':'READY'));if(instant){thoughts(true);beginHold();}dirty=true;queueMeasure();diagnostics();
     }
     function beginRelay(){
       eraseSide=current.side;writerSide=1-eraseSide;advanceIndex();serial++;
       if(writerSide===1){const color=SYNTAX[Math.floor(roundIndex/2)%SYNTAX.length];actors[1].color=color;actors[1].node.dataset.color=color;actors[1].node.style.setProperty('--luci-body',color);}
-      incoming=generation(entryAt(roundIndex),roundIndex,writerSide);relayClock=createColumnClock(current.score,incoming.score);current.ink.forEach(record=>{record.eraseAt=relayClock.timeAt(record.at);});
-      phase='handoff';phaseBorn=time;eraseFront=writeFront=-1;queued=false;delete root.dataset.queued;
+      incoming=generation(entryAt(roundIndex),roundIndex,writerSide);rememberTopic(incoming.entry.topic);relayClock=createColumnClock(current.score,incoming.score);current.ink.forEach(record=>{record.eraseAt=relayClock.timeAt(record.at);});
+      phase='handoff';phaseBorn=time;eraseFront=writeFront=-1;queued=false;delete root.dataset.queued;caption(current.entry,'relay');
       actors.forEach(actor=>{actor.entryFrom=actor.pose||points[actor.current];});
       const first=points[incoming.score.route[0].index];actors[writerSide].routeOrigin={x:clamp(first.x-box.pitch*2.1,box.size*.6,box.width-box.size*.6),y:first.y+box.pitch*2};
       actors[eraseSide].routeOrigin=null;setThought(eraseSide,current.entry,'ERASE');setThought(writerSide,incoming.entry,'WRITE');
@@ -391,7 +402,7 @@
       diagnostics();
     }
     function diagnostics(){
-      data('writeOffsetColumns',relayClock?.writerOffset??LEAD_COLUMNS);
+      data('writeOffsetColumns',relayClock?.writerOffset??LEAD_COLUMNS);data('topic',(incoming||current).entry.topic);data('readableSentence',readableCopy.textContent);
       data('phase',error?'warn':phase);data('phaseElapsed',Math.round(time-phaseBorn));data('actors',2);data('round',roundIndex+1);data('cycle',cycle);data('lang',(incoming||current).entry.lang);data('message',(incoming||current).entry.sentence);data('oldSentence',current.entry.sentence);data('nextSentence',incoming?.entry.sentence||'');
       data('bankSize',SCENES.length);data('topicCount',TOPICS.length);data('thoughtCount',SCENES.length*2);data('holdMs',HOLD_MS);data('minHoldMs',MIN_HOLD_MS);data('readMs',READ_MS);data('leadColumns',LEAD_COLUMNS);data('hopMs',HOP_MS);data('actualHopMs',(relayClock||current.clock).minHopMs);data('emptyColumnMs',EMPTY_COLUMN_MS);data('drawDurationMs',current.clock.duration);data('relayDurationMs',relayClock?relayClock.duration+INK_FADE_MS:0);data('scoreStart',current.score.start);data('scoreEnd',current.score.end);data('nextScoreStart',incoming?.score.start??'');data('nextScoreEnd',incoming?.score.end??'');data('collisions',collisions);data('errorCount',errorCount);data('error',error?'warn':errorInk.length?'recover':'none');data('eraseFront',eraseFront.toFixed(3));data('writeFront',writeFront.toFixed(3));data('writer',writerSide?'color':'black');data('eraser',eraseSide?'color':'black');data('serial',serial);data('elapsed',Math.round(time));data('holdElapsed',holdBorn===null?0:Math.round(time-holdBorn));data('inkCount',owners.size);data('oldInk',current.ink.size);data('newInk',incoming?.ink.size||0);
       zones.forEach(zone=>{const key=zone.side?'right':'left';data(key+'Body',zone.side?actors[1].color:'#050506');data(key+'Role',zone.bubble.dataset.status);data(key+'Lang',zone.language.textContent);data(key+'ReadMs',zone.fullAt===null?0:Math.round(time-zone.fullAt));data(key+'Thought',zone.text);});
@@ -400,7 +411,7 @@
       dirty=false;const panelRect=panel.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();points=[...grid.querySelectorAll('.rhythm-cell')].map(cell=>{const rect=cell.getBoundingClientRect();return {cell,x:rect.left+rect.width/2-panelRect.left,y:rect.top+rect.height*.65-panelRect.top};});
       box={width:panel.clientWidth,size:actors[0].node.offsetWidth||42,pitch:gridRect.width/52,gridTop:gridRect.top-panelRect.top};const bubbleWidth=Math.min(280,Math.max(100,gridRect.width*.5-8));
       zones.forEach(zone=>{zone.bubble.style.width=bubbleWidth.toFixed(2)+'px';zone.bubbleWidth=bubbleWidth;zone.bubbleHeight=zone.bubble.offsetHeight;const center=gridRect.left-panelRect.left+gridRect.width*(zone.side?.76:.24);zone.bubbleX=clamp(center-bubbleWidth/2,8,Math.max(8,box.width-bubbleWidth-8));zone.bubbleY=Math.max(14,box.gridTop-zone.bubbleHeight-35);zone.bubble.style.transform=`translate3d(${zone.bubbleX.toFixed(2)}px,${zone.bubbleY.toFixed(2)}px,0)`;idle(zone.actor);});
-      data('ready',points.length===364);root.style.setProperty('--narrator-grid-top',box.gridTop.toFixed(2)+'px');
+      data('ready',points.length===364);root.style.setProperty('--narrator-grid-top',box.gridTop.toFixed(2)+'px');root.style.setProperty('--narrator-grid-bottom',(gridRect.bottom-panelRect.top).toFixed(2)+'px');root.style.setProperty('--narrator-grid-left',(gridRect.left-panelRect.left).toFixed(2)+'px');root.style.setProperty('--narrator-grid-width',gridRect.width.toFixed(2)+'px');
     }
     function activeMotion(){return !destroyed&&!paused&&!reduced&&visible&&!document.hidden&&points.length===364;}
     function queueMeasure(){dirty=true;if(!frame&&!layoutFrame&&!destroyed)layoutFrame=requestAnimationFrame(()=>{layoutFrame=0;measure();sync();});}

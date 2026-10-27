@@ -1,0 +1,120 @@
+/* Reading is the quiet layer. Motion belongs to the objects around it. */
+:root{
+  --reading-copy:#c8c0b3;
+  --reading-secondary:#aaa295;
+  --reading-surface:#08090b;
+}
+
+.about-section,.background-section,.rhythm-section{background:var(--reading-surface)}
+.hero-copy>p{font-size:clamp(17px,1.45vw,19px);line-height:1.65;color:var(--reading-copy);letter-spacing:-.015em;max-width:34em}
+.hero .intro-label,.hero-topline,.hero-signature,.hero-fields,.header-note{font-size:10px;line-height:1.6;color:var(--reading-secondary)}
+.hero-fields{gap:12px;flex-wrap:wrap;letter-spacing:.045em}
+.hero-topline{gap:12px}
+.hero-topline>span:last-child{font-size:10px}
+.round-link{font-size:14px}
+.round-link small{font-size:10px;line-height:1.5}
+.art-caption,.art-caption b,.art-hint,.shape-reset span{font-size:10px;line-height:1.6}
+.art-hint{letter-spacing:.025em}
+.hero-footer{font-size:10px;line-height:1.5}
+.project-shortcuts span{font-size:12px}
+
+.section-kicker,.eyebrow{font-size:10px;line-height:1.55;letter-spacing:.065em}
+.section-kicker{color:var(--reading-secondary)}
+.work-heading>p,.lab-heading>p,.rhythm-heading>p{font-size:16px;line-height:1.65;letter-spacing:0}
+.rhythm-heading>p{color:var(--reading-copy)}
+.project-row p,.project-preview.has-project-gallery>.preview-bottom p{font-size:15px;line-height:1.65}
+.project-number,.project-tags span,.preview-top,.preview-status{font-size:10px;line-height:1.5}
+.project-gallery-count,.project-gallery-name{font-size:12px;line-height:1.4}
+.project-archive>summary{font-size:15px;line-height:1.5}
+.project-archive>summary>span,.archive-project small{font-size:10px;line-height:1.5}
+.archive-project>span{font-size:19px;line-height:1.3}
+
+.lab-section>.section-kicker,.lab-section>.eyebrow{color:#59574f}
+.lab-heading>p{color:#47463f}
+#system-lab.has-live-lab .lab-tabs button{font-size:13px;line-height:1.4}
+#system-lab.has-live-lab .lab-description p{font-size:15px;line-height:1.7}
+.lab-field{font-size:14px;line-height:1.5}
+.lab-field input,.lab-field select{font-size:16px;line-height:1.4}
+.lab-flow-caption{font-size:12px;letter-spacing:.6px}
+.lab-flow-number{font-size:13px}
+.lab-flow-name{font-size:21px}
+.demo-footnote{font-size:14px;line-height:1.7;letter-spacing:0}
+.lab-result-card p,.lab-result-card li{font-size:15px;line-height:1.65}
+
+.about-right>p:not(.about-intro){font-size:17px;line-height:1.75;color:var(--reading-copy);max-width:34em}
+.capability-item h3{font-size:18px;line-height:1.3}
+.capability-item p{font-size:15px;line-height:1.7;color:var(--reading-copy)}
+.capability-tools span,.skill-index>span{font-size:11px;line-height:1.5;color:#c1b9aa}
+.all-skills>summary{font-size:12px;line-height:1.5}
+.all-skills>summary>span{font-size:11px}
+.cap-map-heading>span,.cap-map-project small,.cap-map-tech span{font-size:10px;line-height:1.4}
+.cap-map-project b{font-size:15px;line-height:1.25}
+.cap-map-note{font-size:14px;line-height:1.6}
+.background-item small{font-size:11px;line-height:1.5;color:var(--reading-secondary)}
+.background-item h4{font-size:19px;line-height:1.35}
+.background-item p{font-size:15px;line-height:1.75;color:var(--reading-copy)}
+
+.case-heading>p{font-size:18px;line-height:1.7;color:var(--reading-copy)}
+.case-stack span,.case-flow span,.case-note>span{font-size:11px;line-height:1.45}
+.case-flow b{font-size:15px;line-height:1.4}
+.case-columns p,.case-features li{font-size:16px;line-height:1.75}
+.case-note p{font-size:15px;line-height:1.75;color:var(--reading-copy)}
+.next-project>span{font-size:11px;line-height:1.5}
+.contact-link>span,.contact-section footer>span{font-size:11px;line-height:1.5}
+.contact-section footer>a:not(.wordmark),.contact-section footer>.text-button{font-size:12px;line-height:1.5}
+
+/* Two readable terminal bubbles retain their measured relation to the grid. */
+.has-activity-narrator .rhythm-scroll{padding-top:210px;padding-bottom:104px}
+.rhythm-meta{font-size:11px;line-height:1.5;color:#bcb4a6}
+.rhythm-legend,.rhythm-bottom{font-size:10px;line-height:1.6;color:var(--reading-secondary)}
+.narrator-thought{font-size:14px;line-height:1.55;color:#eee8dc;background:#0c1012;border-color:#e7e3db38}
+.narrator-terminal{padding:0 13px 12px}
+.narrator-terminal-bar{height:34px;font-size:10px;line-height:1.4;color:#bdb4a6;letter-spacing:0}
+.narrator-worker,.narrator-language,.narrator-status{font-size:10px;line-height:1.4}
+.narrator-language{color:#bdb4a6}
+.narrator-line{min-height:88px;padding-top:13px;padding-bottom:10px;overflow-wrap:anywhere;letter-spacing:0}
+.narrator-tip{font-size:10px;line-height:1.5;min-height:18px;color:#b6ad9e}
+.narrator-caret{font-size:12px}
+.narrator-readable{position:absolute;left:var(--narrator-grid-left,28px);top:calc(var(--narrator-grid-bottom,320px) + 18px);width:var(--narrator-grid-width,calc(100% - 56px));margin:0;display:flex;align-items:baseline;gap:18px;pointer-events:none;font-family:"Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:0;color:#eee8dc}
+.narrator-readable-label{flex:none;font:10px/1.5 Consolas,"Courier New",monospace;letter-spacing:.05em;color:#b6ad9e}
+.narrator-readable-copy{font-size:18px;line-height:1.45;letter-spacing:-.01em;text-wrap:pretty}
+.narrator-readable[data-state=relay] .narrator-readable-copy{color:#d3cbbb}
+
+@media(max-width:760px){
+  .hero-copy>p{font-size:16px;line-height:1.7;max-width:31em}
+  .hero .intro-label,.hero-topline,.hero-topline>span:last-child,.hero-signature,.hero-fields{font-size:10px}
+  .hero-topline{flex-wrap:wrap;row-gap:4px}
+  .art-caption,.art-caption b,.art-hint,.shape-reset span{font-size:10px}
+  .art-hint{max-width:90%;width:max-content;text-align:center;white-space:normal}
+  .hero-footer{font-size:10px}
+  .section-kicker,.eyebrow{font-size:10px;letter-spacing:.035em}
+  .work-heading>p,.lab-heading>p,.rhythm-heading>p{font-size:15px;line-height:1.65}
+  .project-row p,.project-preview.has-project-gallery>.preview-bottom p{font-size:15px;line-height:1.65}
+  .project-tags span,.project-number,.preview-top,.preview-status{font-size:10px}
+  #system-lab.has-live-lab .lab-tabs button{font-size:14px}
+  #system-lab.has-live-lab .lab-description p{font-size:14px;line-height:1.7}
+  .demo-footnote{font-size:14px;line-height:1.7}
+  .lab-result-card p,.lab-result-card li{font-size:14px}
+  .about-right>p:not(.about-intro){font-size:16px;line-height:1.75}
+  .capability-item h3{font-size:17px}
+  .capability-item p,.background-item p{font-size:14px;line-height:1.75}
+  .background-item h4{font-size:18px}
+  .skill-index>span{font-size:11px}
+  .case-heading>p,.case-columns p,.case-features li{font-size:15px;line-height:1.7}
+  .case-note p{font-size:14px}
+  .case-flow b{font-size:14px;line-height:1.4}
+  .has-activity-narrator .rhythm-scroll{padding-top:280px;padding-bottom:116px}
+  .narrator-thought{font-size:13px;line-height:1.55;max-width:calc(50% - 13px)}
+  .narrator-terminal{padding:0 7px 10px}
+  .narrator-terminal-bar{height:44px;column-gap:4px}
+  .narrator-worker,.narrator-language,.narrator-status{font-size:10px;line-height:1.3}
+  .narrator-line{min-height:144px;padding-top:10px;padding-bottom:10px}
+  .narrator-tip{font-size:10px;min-height:20px;line-height:1.4}
+  .narrator-readable{top:calc(var(--narrator-grid-bottom,380px) + 17px);display:block}
+  .narrator-readable-label{display:block;margin-bottom:6px}
+  .narrator-readable-copy{display:block;font-size:16px;line-height:1.5}
+  .rhythm-meta{font-size:11px;line-height:1.5}
+  .rhythm-legend,.rhythm-bottom{font-size:10px;line-height:1.6}
+}
+
+@media(prefers-reduced-motion:reduce){.narrator-readable{transition:none;animation:none}}

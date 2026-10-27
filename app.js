@@ -19,6 +19,7 @@
   let personalDock;
   let projectMotion;
   let motionFilm;
+  let portfolioStage;
   let menuMotion;
   let projectGallery;
   let requestedCaseIndex=0;
@@ -95,6 +96,7 @@
   }
   function openProject(index,source=document.activeElement) {
     requestedCaseIndex=index;
+    projectGallery?.settle();
     if(projectMotion)projectMotion.open({project:projects[index],render:()=>paintCase(index),source});
     else {paintCase(index);projectDialog.showModal();}
     syncSurfaces();
@@ -189,6 +191,7 @@
   $('#lab-explore').addEventListener('click',()=>{const selected=document.querySelector('[data-lab-project][aria-pressed="true"]')?.dataset.labProject||'fullstack';launchExperience((labExperiences[selected]||labExperiences.fullstack)[0]);});
   if(window.PersonalDock){personalDock=window.PersonalDock.mount({identity:data.identity,projects,skills,onSurfaceChange:syncSurfaces,canMove:()=>moving});cleanups.push(()=>personalDock.destroy());}
   if(window.MotionFilm){motionFilm=window.MotionFilm.mount({canMove:()=>moving});cleanups.push(()=>motionFilm.destroy());}
+  if(window.PortfolioStage){portfolioStage=window.PortfolioStage.mount({canMove:()=>moving});cleanups.push(()=>portfolioStage.destroy());}
   function syncSurfaces() {
     const covered = Boolean(document.querySelector('dialog[open]'));
     document.body.classList.toggle('modal-open',covered);
@@ -203,6 +206,7 @@
     personalDock?.setPaused(!moving);
     projectMotion?.setPaused(!moving);
     motionFilm?.setPaused(!moving);
+    portfolioStage?.setPaused(!moving);
     menuMotion?.setPaused(!moving);
     projectGallery?.setPaused(!moving||covered);
   }

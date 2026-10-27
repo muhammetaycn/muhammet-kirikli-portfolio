@@ -30,6 +30,8 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 ## Dosyalar
 
 - `index.html`, `style.css`, `direction.css` ve `profile.css`: sayfa yapısı ve görsel dil.
+- `portfolio-stage.js/css`: büyük proje sahnesi, dört özgün HTML/SVG ürün arayüzü ve görünürlüğe bağlı hareket.
+- `readability.css`: gövde metni, kontrast, düşünce balonları ve normal yazıyla cümle karşılığı.
 - `app.js`: gezinme, proje ayrıntıları, hareket kontrolü ve takvim.
 - `kinetic.js`: imleç çekimi, yerel bükülme ve kalıcı biçim vermeyi destekleyen Canvas şerit; dönüş sürer, sıfırlama düğmesi biçimi geri alır.
 - `narrator.js` ve `narrator.css`: birlikte yazan Luciler, EN/TR terminal düşünceleri ve yanlış inişten toparlanma. Balona tıkla veya Enter ile sonraki cümleyi güvenli sınırda sıraya al.
@@ -38,10 +40,11 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 - `capability-map.js/css`: sekiz yetenek alanını ilgili gerçek proje ayrıntılarına bağlayan harita.
 - `personal-dock.js/css`: sabit bölüm bağlantıları ve gerçek profil içeriğini kullanan küçük kişisel panel.
 - `project-motion.js/css`: proje önizlemesiyle ayrıntı dialogu arasında görsel devamlılık, kesilebilir proje değişimi ve geri dönüş.
-- `project-gallery.js/css`: dört proje arasında dokunma ve klavyeyle seçim, konum göstergesi ve kesilebilir görsel–açıklama geçişi.
+- `project-gallery.js/css`: dört proje arasında dokunma ve klavyeyle seçim, konum göstergesi, eski sahneyi koruyan maskeli geçiş ve kesilebilir görsel–açıklama hareketi.
 - `menu-motion.js/css`: beş gerçek bölüm bağlantısı, maskeli açılış, kısa kapanış, güncel bölüm ve güvenli odak dönüşü.
 - `ui-icons.js/css`: mobilde emojiye dönüşmeyen SVG yön ve durum işaretleri.
-- `motion-film.js/css`: kendi kısa arka plan filmi, sabit poster ve kelime bütünlüğünü koruyan başlık girişleri.
+- `motion-film.js/css`: yalnız açılışta çalışan kendi kısa arka plan filmi, sabit poster ve çalışmalar başlığının kelime bütünlüğünü koruyan girişi.
+- `MOTION-VIDEO-2026-10-27.md`: son ZIP içindeki dört MP4 için zamanlı gözlemler, yeni proje sahnesi ve okunabilirlik kararları.
 - `MOTION-ARASTIRMA.md`: Dribbble, Webflow ve Noctra incelemeleri; açılan canlı örnekler, uygulama kararları ve sınırlar.
 - `ARASTIRMA-2026-10-27.md`: bilgisayar/Luci zamanlaması ve LinuxOfficial'ın masaüstü, mobil, not ve konsol incelemesi.
 - `ARASTIRMA.md`: tasarım kaynakları, ayrı video/site gözlemleri, gözlem sınırları ve özgün uygulama kararları.
@@ -50,7 +53,9 @@ Hareket kontrolleri ve azaltılmış hareket tercihi, deneyimin parçasıdır. S
 
 ## Arka plan ve ziyaretçi akışı
 
-7,2 saniyelik yerel WebM, kendi parametrik şerit geometrimizden üretilmiştir; 54 KB dosya ve SVG poster kullanır. Görünmezlik, dialog, duraklatma ve azaltılmış hareket durumları oynatımı durdurur. Beş portföy başlığı kelime maskeleriyle bir kez açılır. Kodla üretim için `scripts/render-motion-film.py` kullanılabilir.
+7,2 saniyelik yerel WebM, kendi parametrik şerit geometrimizden üretilmiştir; 54 KB dosya ve SVG poster kullanır. Film yalnız açılış görünürken çalışır; dialog, duraklatma ve azaltılmış hareket durumları da oynatımı durdurur. Çalışmalar başlığı kelime maskesiyle bir kez açılır; diğer başlıklarda aynı maske tekrarlanmaz. Kodla üretim için `scripts/render-motion-film.py` kullanılabilir.
+
+Çalışmalar bölümü sıcak fildişi bir yüzey üzerinde büyük, koyu bir proje sahnesi kullanır. IDOLOG, TekstilOS, Acıktınmı ve portföy için ayrı HTML/SVG arayüzleri çizildi. Seçimde eski görsel çıkarken yenisi 620 ms içinde açılır; açıklama 450 ms geçiş yapar. Okuma alanlarında arka plan hareketi azaltıldı. Ana metinler masaüstünde yaklaşık 15–19 px, telefonda 14–16 px aralığındadır. Son dört videonun kaynak ayrımı ve uygulama kararları [video araştırmasında](MOTION-VIDEO-2026-10-27.md) kayıtlıdır.
 
 Sistemler bölümünde her örnek somut bir işle başlar. Girdi ve ana eylem yan yanadır; Enter da çalışır. Sonuç kartı yazılan başlığı ve gerçek yerel kaydı gösterir. JSON ve işlem izi, kapalı gelen **Teknik ayrıntılar** içinde bulunur. Yeni kaynakların gözlemleri [motion araştırmasında](MOTION-ARASTIRMA.md) kayıtlıdır.
 
@@ -60,7 +65,7 @@ Alttaki kompakt Dock; Başlangıç, Çalışmalar, Sistemler ve Kod günlüğün
 
 Proje ayrıntısında seçilen çalışmanın kodla çizilmiş önizlemesi büyük sahneye taşınır. Açılış, başka projeye geçiş ve kapanış birbirini kesebilir; eski animasyon yeni seçimi değiştiremez. Escape, kapatma kontrolü ve klavye odağı yerel dialog davranışıyla çalışır. Genel duraklatma ve azaltılmış hareket seçimi, bu geçişlerin sabit karşılığını kullanır. Dar ekranlarda Dock'un dış sosyal kısayolları gizlenir; sosyal bağlantılar kişisel panelde bulunur.
 
-Önizlemedeki önceki/sonraki düğmeleri projeleri sırayla açar; Sol/Sağ/Home/End bu kontrollerde aynı seçimi yapar. Sayaç, kısa ad ve dört parçalı konum birlikte değişir. Otomatik proje geçişi yoktur. Tam ekran menü, Canlı günlük dahil beş normal bölüm bağlantısını gösterir; bölüm seçimi odağı menüye veya profil düğmesine geri taşımaz. Kısa masaüstünde önizleme ve Luci başlık aralıkları, alt Dock'un kontrolleri kapatmaması için daralır.
+Önizlemedeki önceki/sonraki düğmeleri projeleri sırayla açar; Sol/Sağ/Home/End bu kontrollerde aynı seçimi yapar. Sayaç, kısa ad ve dört parçalı konum birlikte değişir. Otomatik proje geçişi yoktur. Tam ekran menü, Canlı günlük dahil beş normal bölüm bağlantısını gösterir; bölüm seçimi odağı menüye veya profil düğmesine geri taşımaz. Proje sahnesi sayfa akışı içinde kalır; dar ekranda görsel ve açıklama alt alta geçer. Düşünce balonları metni küçültmek yerine dikey alan kazanır.
 
 Bu uyarlama, videodaki küçük kişisel alan ile ayrıca incelenen proje galerisi örneğinden gelir. Kullanıcının ekran görüntüsündeki sitenin kesin URL'si henüz çözülmedi; o siteyle eşleştirme tamamlanmış sayılmaz. Kaynakların ayrımı [ARASTIRMA.md](ARASTIRMA.md) ve [istek durumu](ISTEK-DURUMU.md) içinde kayıtlıdır.
 
@@ -95,9 +100,9 @@ Kod [MIT lisansıyla](LICENSE) paylaşılır. Yerel fontların lisansları `asse
 
 52 × 7 matris tek cümle için ortak bir sahnedir. İki kalıcı Luci sırayla yazar ve siler. Tam cümle 3,6 saniye okunur; mevcut yazar başlangıçtan silmeye başladıktan sonra diğeri boşalan hücrelere yeni cümleyi yazar. İki uç yoğunluğa göre aynı saatle ilerler: her gerçek basış en az 90 ms, boş sütun 36 ms; güvenli aralık en az üç sütundur. Hücre sahipliği eski ve yeni yazının çarpışmasını önler. Siyah Luci kimliğini korur; ikinci karakter syntax tonlarıyla değişir. Sahne bankası boyunca 364 hücrenin tamamı kullanılır.
 
-96 teknik konu, dönüşümlü EN/TR 192 özgün kısa cümle ve 384 düşünce içerir. Düşünceler en az 5 saniye okunur. Yanlış iniş sırasında iki uç birlikte durur; kırmızı iz, WARN/RECOVER ve küçük panel kırılmasının ardından aynı yerden devam eder. Gerçek etkinlik verileri değişmez. Balona basmak sonraki cümleyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
+96 teknik konu, dönüşümlü EN/TR 192 özgün kısa cümle ve 384 düşünce içerir. Konu sırası karışır; aynı konunun çevirisi en az 47 sahne sonra gelir. Sabit açılış kaldırıldı. Yenilemede hemen aynı konuya dönmemek için yalnız son konu numarası `sessionStorage` içinde tutulur; analitik kaydı değildir. Düşünceler en az 5 saniye okunur. Yanlış iniş sırasında iki uç birlikte durur; kırmızı iz, WARN/RECOVER ve küçük panel kırılmasının ardından aynı yerden devam eder. Gerçek etkinlik verileri değişmez. Balona basmak sonraki cümleyi güvenli kuyruğa alır. Görünmeyen veya duraklatılmış sayfada süre ilerlemez; azaltılmış harekette sabit okunur durum gösterilir.
 
-Telefon dahil düşünce gövdesi 12 px'tir. Balonlarda gereksiz boşluk azaltıldı; uzun teknik terimler dışarı taşmadan satıra bölünür. Yeni cümle için karakterler başlangıca döner, roller yer değiştirir.
+Düşünce gövdesi masaüstünde 14 px, mobilde 13 px'tir; uzun teknik terimler dışarı taşmadan satıra bölünür. Matrisin altında normal yazıyla cümle karşılığı bulunur: masaüstünde 18 px, mobilde 16 px. Son tamamlanan cümle, sıradaki tamamlanana kadar görünür kalır; Türkçe karakterler korunur. Yeni cümle için karakterler başlangıca döner, roller yer değiştirir.
 
 ## mk.desktop / 32 tuş
 
@@ -116,6 +121,6 @@ Bilgisayarın 8 × 4 gri tuşu yazısızdır. Hover veya klavye odağında işle
 
 Proje detayları ve sistem akışlarındaki uygulama düğmeleri, ilgili deneyi aynı bilgisayar ekranında açar. Büyütülen ekran kapatılınca klavye odağı onu açan kontrole döner.
 
-İlk bilgisayar görünümünde 1,2 saniyelik uyanış, ardından tek seferlik bir uygulama turu vardır. İç imleç gerçek uygulama düğmesinin merkezine gider; Terminal'de `projects`, SQLite'ta gerçek JOIN ve Sürümler'de ilişki şeması gösterilir. Fare, klavye veya yazıyla kontrolü almak turu anında durdurur. Geç kalan otomatik sorgu sonucu kullanıcının ekranını veya yazısını değiştiremez. Sahne görünmezken düşünce ve fizik süreleri ilerlemez.
+Bilgisayar görünümünde 1,2 saniyelik uyanıştan sonra ziyaret başına tek uygulama bölümü tamamlanır. İç imleç gerçek uygulama düğmesinin merkezine gider; Terminal kimlik komutu, SQLite gerçek JOIN veya Sürümler ilişki şeması sırayla gösterilir. Gerçek kullanıcı girdisi turu durdurur; yalnız fareyle alanın üzerine gelmek mevcut turu dondurur. Geç kalan otomatik sorgu sonucu kullanıcının ekranını veya yazısını değiştiremez. Sahne görünmezken düşünce ve fizik süreleri ilerlemez.
 
 Bu sürümün istek karşılaştırması [ISTEK-DURUMU.md](ISTEK-DURUMU.md) içindedir.

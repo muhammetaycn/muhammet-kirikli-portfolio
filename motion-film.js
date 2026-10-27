@@ -9,7 +9,7 @@
     layer.append(poster,video);document.body.insertBefore(layer,document.body.firstChild);
     const hadClass=document.body.classList.contains('has-motion-film');document.body.classList.add('has-motion-film');
     const media=window.matchMedia('(prefers-reduced-motion: reduce)'),cleanups=[],headings=[],textEdits=[];
-    const darkSections=[...document.querySelectorAll('.hero,.work-section,.about-section,.background-section,.rhythm-section')],visibleSections=new Set();
+    const darkSections=[...document.querySelectorAll('.hero')],visibleSections=new Set();
     let destroyed=false,paused=false,visible=typeof IntersectionObserver!=='function'||darkSections.length===0,playGeneration=0,playRequested=false,failed=false,loaded=false,headingObserver=null,visibilityObserver=null;
     function listen(node,type,fn){node.addEventListener(type,fn);cleanups.push(()=>node.removeEventListener(type,fn));}
     function eligible(){return !destroyed&&!paused&&!media.matches&&!document.hidden&&visible&&!document.querySelector('dialog[open]')&&Boolean(canMove());}
@@ -36,7 +36,7 @@
         else if(child.nodeType===1&&child.namespaceURI!==SVG&&!child.matches('script,style,[aria-hidden="true"]'))collectText(child,list);
       }
     }
-    const sectionHeadings=new Set(['work-title','lab-heading','about-title','rhythm-title','contact-title']);
+    const sectionHeadings=new Set(['work-title']);
     for(const heading of document.querySelectorAll('main h2[id]')){
       if(!sectionHeadings.has(heading.id)||heading.closest('dialog,[hidden],.cos-screen'))continue;
       const texts=[],entry={node:heading,hadClass:heading.classList.contains('film-heading'),hadRevealed:heading.classList.contains('is-film-revealed'),ready:heading.getAttribute('data-film-ready'),words:heading.getAttribute('data-film-words')};
