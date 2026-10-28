@@ -2,7 +2,7 @@
   "source": "Bu portföyün GitHub geliştirme kayıtları",
   "metric": "repository_commits",
   "repository": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio",
-  "generatedAt": "2026-10-28T12:17:23.354Z",
+  "generatedAt": "2026-10-28T12:26:30.559Z",
   "days": [
     {
       "date": "2026-10-23",
@@ -115,8 +115,13 @@
     },
     {
       "date": "2026-10-28",
-      "count": 1,
+      "count": 2,
       "events": [
+        {
+          "sha": "a979966174057a5942afeea5ce55cedc175994c7",
+          "title": "Keep hero narration and scene controls above the fixed dock",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/a979966174057a5942afeea5ce55cedc175994c7"
+        },
         {
           "sha": "3270976f57a4a93d064f5812525322f936534fdc",
           "title": "Correct glove finger joints and separate computer narration from hardware",
