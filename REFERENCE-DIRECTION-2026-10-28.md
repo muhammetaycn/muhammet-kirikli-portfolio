@@ -27,9 +27,11 @@ Monitörün kimlik şeridi açıkta bırakıldı. Düşünce kutusu klavyenin al
 
 Eldivenin işaret parmağı, sabit uzunlukta üç parçalı bir eklem zinciriyle çiziliyor. Tıklama orta ve uç eklemi avuca doğru kapatıyor; dikiş, kıvrım ve ağın çıktığı nokta aynı zinciri izliyor. 441 pozda parça uzunluğu, eklem yönü ve gerçek imleç ucuyla görsel uç hizası kontrol edildi. Üretimdeki SVG'nin altı pozluk çizimi ayrıca gözle incelendi.
 
-Tarayıcıda 320 × 740 ve 375 × 812 görünümlerinde Yerel API'nin 85 karakterlik tam düşüncesi gösterildi: metin alanının `clientHeight` ve `scrollHeight` değerleri eşitti, yatay sayfa taşması yoktu. Logo, turuncu güç ışığı, klavye ve Luci ayrı kaldı. 375 px görünümde büyütülmüş ekran açıldı, Yerel API seçimi ve yanıtı korundu, ardından küçültüldü. 1280 × 600 kısa masaüstü görünümünde de tam düşünce taşmadı. Bu kontroller gerçek cihaz testinin yerine geçmez.
+Tarayıcıda 320 × 740 ve 375 × 812 görünümlerinde Yerel API'nin 85 karakterlik tam düşüncesi gösterildi: metin alanının `clientHeight` ve `scrollHeight` değerleri eşitti, yatay sayfa taşması yoktu. Logo, turuncu güç ışığı, klavye ve Luci ayrı kaldı. 375 px görünümde büyütülmüş ekran açıldı, Yerel API seçimi ve yanıtı korundu, ardından küçültüldü. 1280 px genişliğindeki masaüstü görünümünde de tam düşünce taşmadı. Bu kontroller gerçek cihaz testinin yerine geçmez.
 
 32 tuş, sahne yaşam döngüsü, ekran sunumu, açılış sahne süreleri ve hareket entegrasyonu kontrolleri geçti. Yeni donanım geometri kontrolü, Luci'nin tam sıçrama sınırını da klavyeye karşı sınar. Impeccable'ın mekanik dedektörü değişen üç kaynakta bulgu üretmedi; bu sonuç görsel veya erişilebilirlik sertifikası değildir. Tasarım rehberlerinin kurulması bu turda sitenin motorunu veya mevcut kimliğini değiştirmedi.
+
+Canlı son kontrolde kısa masaüstü penceresinde sabit alt dock'un düşünce metnini örtebildiği görüldü. 820 px ve daha kısa masaüstü görünümünde yalnız açılışın görsel alanı, başlık ve dock için yer ayıracak biçimde sınırlandı; isim ve tanıtım metninin ölçüsü korunuyor. Etiket ve büyütme kontrolü dalgalanmanın tepesinde kırpılmamak için kendi alanlarında aşağı alındı. Tarayıcıdaki 878 × 668 görünümde tam Yerel API düşüncesi, sahne seçimi ve dock birbirini örtmedi; logo ve güç ışığı görünür kaldı. Mobil yerleşim aynı kuralın dışında kalır.
 
 ## Araştırma sınırları
 

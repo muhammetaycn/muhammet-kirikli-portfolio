@@ -20,5 +20,7 @@
 .hero-art[data-deck-scene=computer]~.hero-footer>span{color:#bbb2a7}
 .motion-paused .hero-stage{transition:none}
 @media(max-width:1100px) and (min-width:761px){.hero-deck-controls{left:22%;right:4%;font-size:7px}.deck-scene-button{padding-inline:4px}}
+/* Reserve the fixed header and dock while the hero copy keeps its own measure. */
+@media(min-width:761px) and (max-height:820px){.hero .hero-art.has-deck{height:min(92%,calc(100svh - 174px));top:0}.computer-object-label{top:12px}.computer-expand{top:10px}}
 @media(max-width:760px){.hero .hero-art.has-deck{height:560px;top:460px}.hero:has(.has-deck){min-height:1110px}.hero-deck-controls{left:7%;right:7%;bottom:2%;font-size:9px;padding-top:10px}.deck-scene-button{padding:10px 8px}.deck-auto{flex-basis:40px;height:40px}.deck-status{font-size:8px}.has-deck .art-hint{bottom:12%;font-size:6px}.has-deck .scene-modes{bottom:18%}.hero-stage{transform-origin:50% 50%}}
 @media(prefers-reduced-motion:reduce){.hero-stage{transition:none;filter:none}}
