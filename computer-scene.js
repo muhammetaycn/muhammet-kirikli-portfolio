@@ -143,8 +143,11 @@
     bubble.setAttribute('aria-hidden', 'true');
 
     keyboard.append(tray, keyboardGrid);
+    const cord=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    cord.setAttribute('class','computer-cord');cord.setAttribute('viewBox','0 0 430 700');cord.setAttribute('aria-hidden','true');
+    cord.innerHTML='<path class="computer-cord-shadow" d="M402 464C484 464 484 550 432 578C360 620 350 694 414 770"/><path class="computer-cord-body" d="M402 464C484 464 484 550 432 578C360 620 350 694 414 770"/><path class="computer-cord-edge" d="M402 464C484 464 484 550 432 578C360 620 350 694 414 770"/>';
     object.append(label, expand, monitor, keyboard, signal, bubble, companion, status);
-    float.append(object);
+    float.append(cord,object);
     world.append(shadow, float);
     scene.append(world);
     host.append(scene);
@@ -333,8 +336,8 @@
       const layoutWidth = host.clientWidth || rect.width;
       const layoutHeight = host.clientHeight || rect.height;
       const mobile = window.matchMedia('(max-width: 760px)').matches;
-      const width = layoutWidth * (mobile ? .96 : .78);
-      const height = Math.max(360, layoutHeight - 72);
+      const width = layoutWidth * .96;
+      const height = Math.max(360, layoutHeight - (mobile ? 72 : 46));
       const scale = Math.max(.5, Math.min(1.06, width / 430, height / SCENE_HEIGHT));
       world.style.setProperty('--computer-scale', scale.toFixed(3));
       world.style.setProperty('--computer-text-scale', (1 / scale).toFixed(3));

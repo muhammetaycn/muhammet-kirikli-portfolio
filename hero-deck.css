@@ -21,27 +21,38 @@
 .motion-paused .hero-stage{transition:none}
 @media(max-width:1100px) and (min-width:761px){.hero-deck-controls{left:22%;right:4%;font-size:7px}.deck-scene-button{padding-inline:4px}}
 @media(min-width:761px){
-  .hero:has(.has-deck){height:clamp(500px,calc(100svh - 94px),790px);min-height:500px;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-rows:54px minmax(0,1fr);column-gap:clamp(20px,2.6vw,50px)}
+  .hero:has(.has-deck){height:clamp(800px,calc(100svh - 94px),980px);min-height:800px;display:grid;grid-template-columns:minmax(0,.74fr) minmax(0,1.26fr);grid-template-rows:44px minmax(0,1fr);column-gap:clamp(16px,2vw,38px)}
   .hero:has(.has-deck) .hero-topline{grid-column:1/-1;grid-row:1;padding-top:20px;align-self:start}
-  .hero:has(.has-deck) .hero-copy{grid-column:1;grid-row:2;align-self:center;width:auto;padding-top:0;margin-top:-48px}
+  .hero:has(.has-deck) .hero-copy{grid-column:1;grid-row:2;align-self:center;width:auto;padding-top:0;margin-top:-130px}
   .hero:has(.has-deck) .intro-label{display:none}
-  .hero:has(.has-deck) h1{font-size:clamp(76px,7.7vw,138px);line-height:.93;letter-spacing:-.065em;margin:0 0 22px;max-width:none}
+  .hero:has(.has-deck) h1{font-size:clamp(66px,6.7vw,120px);line-height:.96;letter-spacing:-.04em;margin:0 0 24px;max-width:none}
   .hero:has(.has-deck) .hero-signature{font-size:13px;line-height:1.5;margin-left:1px;letter-spacing:.01em}
   .hero:has(.has-deck) .hero-copy>p{font-size:clamp(16px,1.4vw,19px);line-height:1.6;max-width:28ch;margin:20px 0 24px}
   .hero:has(.has-deck) .round-link{font-size:15px;gap:13px;max-width:max-content;min-height:44px}
   .hero:has(.has-deck) .round-link small{font:12px/1.5 "Bricolage Grotesque",sans-serif;letter-spacing:0;color:#a6a29b;margin-top:3px}
   .hero .hero-art.has-deck{position:relative;grid-column:2;grid-row:2;align-self:start;width:100%;height:100%;top:auto;right:auto;left:auto}
-  .hero:has(.has-deck) .hero-deck-controls{left:38%}
+  .hero:has(.has-deck) .hero-deck-controls{left:20%;right:7%;font-size:10px;bottom:14px}
+  .hero:has(.has-deck) .deck-scene-button{min-height:44px;padding-inline:10px}
+  .hero:has(.has-deck) .deck-auto{flex-basis:40px;height:40px}
+  .hero:has(.has-deck) .computer-world{left:54%;top:calc(50% - 28px)}
   .hero:has(.has-deck) .hero-footer{display:none}
   .hero:has(.has-deck) .hero-fields{display:none}
   .hero:has(.has-deck) .computer-object-label{top:12px}
   .hero:has(.has-deck) .computer-expand{top:10px}
+  .personal-dock{left:4.6vw;translate:0 0}
 }
-@media(min-width:761px) and (max-width:1100px) and (max-height:820px){
-  .hero .hero-art.has-deck{height:min(100%,calc(100svh - 194px))}
-  .hero:has(.has-deck) h1{font-size:clamp(70px,8.2vw,96px)}
-  .hero:has(.has-deck) .hero-copy{margin-top:-64px}
-  .hero:has(.has-deck) .hero-deck-controls{left:auto;right:0;width:180px;max-width:100%;justify-content:flex-end;gap:2px}
+@media(min-width:761px) and (max-width:1100px){
+  .hero:has(.has-deck){grid-template-columns:minmax(0,.76fr) minmax(0,1.24fr);height:800px}
+  .hero:has(.has-deck) h1{font-size:clamp(54px,6.8vw,74px)}
+  .hero:has(.has-deck) .hero-copy{margin-top:-142px}
+  .hero:has(.has-deck) .hero-copy>p{font-size:16px}
+  .hero:has(.has-deck) .hero-deck-controls{left:10%;right:0;max-width:100%;gap:4px}
+  .hero:has(.has-deck) .computer-world{left:52%}
+}
+@media(min-width:761px) and (max-height:700px){
+  .hero:has(.has-deck) .hero-copy{align-self:start;margin-top:8px}
+  .hero:has(.has-deck) h1{font-size:clamp(54px,6.7vw,76px);margin-bottom:18px}
+  .hero:has(.has-deck) .hero-copy>p{font-size:16px;margin:18px 0 20px}
 }
 @media(max-width:760px){.hero .hero-art.has-deck{height:560px;top:460px}.hero:has(.has-deck){min-height:1110px}.hero-deck-controls{left:7%;right:7%;bottom:2%;font-size:9px;padding-top:10px}.deck-scene-button{padding:10px 8px}.deck-auto{flex-basis:40px;height:40px}.deck-status{font-size:8px}.has-deck .art-hint{bottom:12%;font-size:6px}.has-deck .scene-modes{bottom:18%}.hero-stage{transform-origin:50% 50%}}
 @media(prefers-reduced-motion:reduce){.hero-stage{transition:none;filter:none}}

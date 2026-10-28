@@ -2,7 +2,7 @@
 
 Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmalarını birlikte anlatan kişisel portföydür. Aşağıdaki durumlar bu site kapsamındadır.
 
-28 Ekim ikinci turunda geçmiş istekler [24 başlıkta kaynakla karşılaştırıldı](REQUEST-REVIEW-2026-10-28.md); videolar ve seçilen siteler [ayrı kaynak çalışmasında](REFERENCE-STUDY-2026-10-28.md) yeniden değerlendirildi. Açılışın ortak kompozisyonu, daha erken görünen ürün sahnesi, seçimdeki padding sıçraması, mobil ürün başlığı ve Luci'nin hücreye göre boyutu/düşünce kararlılığı geliştirildi. Bunlar bütün sanatsal hedeflerin tamamlandığı anlamına gelmez. Açılıştan projeye özgün görsel devir ve teknik etiketleri daha uzun anlamlı iş akışlarına bağlama açık geliştirme alanlarıdır. Eski Discord profil/banner kapsamı güncel portföyün tamamlanan özelliği sayılmıyor.
+28 Ekim ikinci turunda geçmiş istekler [24 başlıkta kaynakla karşılaştırıldı](REQUEST-REVIEW-2026-10-28.md); videolar ve seçilen siteler [ayrı kaynak çalışmasında](REFERENCE-STUDY-2026-10-28.md) yeniden değerlendirildi. Açılışın ortak kompozisyonu, daha erken görünen ürün sahnesi, seçimdeki padding sıçraması, mobil ürün başlığı ve Luci'nin hücreye göre boyutu/düşünce kararlılığı geliştirildi. Bunlar bütün sanatsal hedeflerin tamamlandığı anlamına gelmez. Son geri bildirimle bilgisayarın küçülen ölçüsü geri alındı; fildişi kablo dört gerçek proje portuna bağlandı. Üç teknik anlatı dizisi de eklendi. Bunlar görsel devamlılık ve anlamlı akış için ilk somut parçalar; bütün sanatsal hedefin tamamlandığı iddia edilmiyor. Eski Discord profil/banner kapsamı güncel portföyün tamamlanan özelliği sayılmıyor.
 
 | İstek | Karşılığı |
 | --- | --- |

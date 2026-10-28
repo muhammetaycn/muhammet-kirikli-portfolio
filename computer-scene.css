@@ -4,6 +4,11 @@
 .computer-float{position:absolute;inset:0;animation:computer-float 7s ease-in-out infinite;will-change:transform}
 /* Hardware keeps its own 3D depth; sibling labels and thoughts compose in front. */
 .computer-object{position:absolute;inset:0;transform-style:flat;--computer-light-x:50%;--computer-light-y:40%}
+.computer-cord{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.computer-cord path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.computer-cord-shadow{stroke:#000;stroke-width:38;transform:translateY(9px);opacity:.7}
+.computer-cord-body{stroke:#b8aa91;stroke-width:27}
+.computer-cord-edge{stroke:#f0dfbe;stroke-width:1.2;transform:translate(-3px,-9px);opacity:.55}
 .computer-scene.is-pointer-inside .computer-float,.computer-scene:focus-within .computer-float{animation-play-state:paused}
 .computer-scene.is-pointer-inside .computer-ground-shadow,.computer-scene:focus-within .computer-ground-shadow{animation-play-state:paused}
 .computer-object-label{position:absolute;top:0;left:31px;font:8px/1.6 Consolas,monospace;letter-spacing:.1em;color:#8e8980}
@@ -101,5 +106,5 @@
 @keyframes computer-power-response{0%,100%{background:#ff6a35}30%{background:#ffe2ac;box-shadow:0 0 11px #e8b47799}}
 @keyframes computer-glass-response{0%,100%{box-shadow:inset 0 2px 8px #000b,inset 1px 0 0 #ffffff15}35%{box-shadow:inset 0 2px 8px #000b,inset 1px 0 0 #ffffff15,inset 0 -2px 8px #e9a66c22}}
 @media(max-width:1100px) and (min-width:761px){.computer-world{left:60%}}
-@media(max-width:760px){.computer-world{left:50%;top:calc(50% - 15px)}.computer-object-label{font-size:9px;top:-1px}.computer-expand{font-size:10px;min-height:36px;top:-9px}.computer-monitor{transform:rotate(-2deg)}.computer-keyboard{transform:rotate(-2deg)}}
+@media(max-width:760px){.computer-world{left:50%;top:calc(50% - 15px)}.computer-cord{display:none}.computer-object-label{font-size:9px;top:-1px}.computer-expand{font-size:10px;min-height:36px;top:-9px}.computer-monitor{transform:rotate(-2deg)}.computer-keyboard{transform:rotate(-2deg)}}
 @media(prefers-reduced-motion:reduce){.computer-scene *,.computer-scene *:before,.computer-scene *:after{animation:none!important;transition:none!important}.computer-object{transform:none}}

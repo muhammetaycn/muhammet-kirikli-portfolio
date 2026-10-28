@@ -175,13 +175,44 @@
     [['DEAD','LOCK'],['Agree on lock order across the system.','A waiting cycle needs a path to recovery.'],['KILIT','DONGU'],['Sistem boyunca kilit sırasında anlaş.','Bekleme döngüsüne kurtarma yolu bırak.']],
     [['HEALTH','READY'],['Alive and ready are different conditions.','Accept traffic only when dependencies fit.'],['SAGLIK','HAZIR'],['Canlı olmakla hazır olmak farklıdır.','Bağımlılıklar uygunsa trafiği kabul et.']]
   ];
+  // The matrix tells short technical stories. Each stage has its own subject;
+  // alternating language continues the action instead of repeating a translation.
+  const STORIES = [
+    {id:'request',name:['REQUEST','İSTEK'],steps:[
+      [5,['One request arrived. Its shape is valid.','No write yet; permission comes next.'],['İstek geldi; veri biçimi geçerli.','Henüz yazma yok; sırada yetki var.']],
+      [4,['The token permits this action.','Permission passed. Hand the job to the queue.'],['Jeton bu işleme izin veriyor.','Yetki tamam. İşi kuyruğa bırak.']],
+      [2,['The job is queued with one stable key.','The worker can start without blocking the page.'],['İş sabit bir kimlikle kuyrukta.','İşçi başlasın; arayüz beklemesin.']],
+      [19,['ECONNRESET. The response never arrived.','The write may have happened; keep the same key.'],['ECONNRESET. Yanıt geri gelmedi.','Yazma olmuş olabilir; aynı kimliği koru.']],
+      [42,['Backoff first. The retry has a limit.','Retry the same action, not a second new job.'],['Önce bekle. Tekrar sayısı sınırlı.','Yeni iş açma; aynı işlemi yeniden dene.']],
+      [45,['That key already has a stored result.','Return it. Do not perform the write twice.'],['Bu kimliğin sonucu zaten kayıtlı.','Sonucu döndür; yazmayı ikinci kez yapma.']],
+      [80,['The original result reached the caller.','One accepted action, one confirmed outcome.'],['İlk işlemin sonucu çağırana ulaştı.','Tek kabul edilen işlem, tek onaylı sonuç.']]
+    ]},
+    {id:'cache',name:['CACHE','BELLEK'],steps:[
+      [3,['The cached response is still fresh.','Return it now; no network wait is needed.'],['Önbellekteki yanıt hâlâ taze.','Hemen döndür; ağ isteğine gerek yok.']],
+      [32,['The freshness window has expired.','Keep the old body while checking its validator.'],['Yanıtın tazelik süresi doldu.','Doğrularken eski gövdeyi elde tut.']],
+      [35,['Send If-None-Match with the stored ETag.','The server can compare versions, not send it all.'],['Kayıtlı ETag ile If-None-Match gönder.','Sunucu tüm gövde yerine sürümü karşılaştırsın.']],
+      [39,['304 Not Modified. The body is unchanged.','Refresh its lifetime; reuse the stored response.'],['304 Not Modified. Gövde değişmedi.','Ömrünü yenile; saklanan yanıtı kullan.']]
+    ]},
+    {id:'transaction',name:['SQL','SQL'],steps:[
+      [50,['BEGIN. Two related writes form one unit.','Either both survive, or neither should remain.'],['BEGIN. İki yazma tek işlem birimi.','Ya ikisi kalmalı ya hiçbiri kalmamalı.']],
+      [49,['The referenced parent row exists.','The foreign key keeps this relation intact.'],['Bağlanan üst kayıt mevcut.','Yabancı anahtar bu ilişkiyi koruyor.']],
+      [51,['A duplicate key stopped the second write.','The first change must not be left on its own.'],['Tekil anahtar ikinci yazmayı durdurdu.','İlk değişiklik tek başına kalmamalı.']],
+      [63,['ROLLBACK removed the incomplete changes.','The retry starts from a consistent state.'],['ROLLBACK yarım değişiklikleri geri aldı.','Tekrar denemesi tutarlı durumdan başlar.']],
+      [52,['Retry in a new transaction; UPSERT matched.','The conflict is handled. Both writes are valid.'],['Yeni işlemde UPSERT mevcut kaydı eşledi.','Çakışma çözüldü; iki yazma da geçerli.']],
+      [15,['COMMIT. Both changes are now durable.','The result can be acknowledged after this point.'],['COMMIT. İki değişiklik artık kalıcı.','Bu noktadan sonra sonucu onaylayabilirsin.']]
+    ]}
+  ];
+  const STORY_TOPICS=new Set(STORIES.flatMap(story=>story.steps.map(step=>step[0])));
+  const STORY_STEPS=new Map(STORIES.flatMap(story=>story.steps.map((step,index)=>[step[0],{id:story.id,name:story.name,index:index+1,total:story.steps.length,thoughts:[step[1],step[2]]}])));
+  function shuffled(values,random){const order=[...values];for(let index=order.length-1;index>0;index--){const other=Math.floor(random()*(index+1));[order[index],order[other]]=[order[other],order[index]];}return order;}
   function createTopicOrder(previous=-1,intro=false,random=Math.random) {
-    const order=Array.from({length:TOPICS.length},(_,index)=>index);
-    for(let index=order.length-1;index>0;index--){const other=Math.floor(random()*(index+1));[order[index],order[other]]=[order[other],order[index]];}
-    // Every topic appears once per half-cycle. There is no fixed opening topic.
-    const first=order[0]===previous?1:0;
-    [order[0],order[first]]=[order[first],order[0]];
-    return order;
+    const stories=shuffled(STORIES,random),loose=shuffled(Array.from({length:TOPICS.length},(_,index)=>index).filter(topic=>!STORY_TOPICS.has(topic)),random),order=[];
+    if(stories[0].steps[0][0]===previous)[stories[0],stories[1]]=[stories[1],stories[0]];
+    // Keep each chain intact, with three unrelated subjects between chains.
+    // All chains finish before the language rotation boundary at49, so the
+    // second half also preserves causality and >=47-scene translation spacing.
+    stories.forEach(story=>{order.push(...story.steps.map(step=>step[0]),...loose.splice(0,3));});
+    return order.concat(loose);
   }
   function createSceneOrder(previous=-1,random=Math.random) {
     const topics=createTopicOrder(previous,false,random),half=topics.length;
@@ -198,7 +229,7 @@
     ["QUERY PLAN","SORGU PLANI"],["NULL VALUE","BOŞ DEĞER"],["JOB QUEUED","İŞ KUYRUKTA"],["CACHE HIT","BELLEKTE VAR"],
     ["ACCESS TOKEN","ERİŞİM JETONU"],["INPUT VALID","GİRDİ GEÇERLİ"],["STATE CHANGED","DURUM DEĞİŞTİ"],["RETRY LATER","SONRA DENE"],
     ["TESTS PASSED","TESTLER GEÇTİ"],["BUILD READY","DERLEME HAZIR"],["ROUTE PARAM","ROTA VERİSİ"],["ERROR CAUGHT","HATA YAKALANDI"],
-    ["FILTERED ROWS","SATIR SEÇİLDİ"],["PRIMARY KEY","KAYIT ANAHTARI"],["FIELD TYPE","ALAN TÜRÜ"],["GIT DIFF","KOD FARKI"],
+    ["FILTERED ROWS","SATIR SEÇİLDİ"],["PRIMARY KEY","KAYIT ANAHTARI"],["FIELD TYPE","ALAN TÜRÜ"],["TXN COMMIT","İŞLEM KAYDI"],
     ["LOCK TAKEN","KİLİT ALINDI"],["TASK AWAITED","İŞ BEKLENDİ"],["CHUNK STREAM","PARÇA AKIŞI"],["ECONN RESET","BAĞLANTI KOPTU"],
     ["TEXT PARSED","METİN AYRIŞTI"],["TYPE ERROR","TÜR HATASI"],["PAGE LIMIT","SAYFA SINIRI"],["HTTP 429","İSTEK SINIRI"],
     ["ROW UPDATED","SATIR GÜNCEL"],["EPIPE WRITE","KANAL KAPALI"],["CORS ORIGIN","KÖKEN İZNİ"],["FRAME READY","KARE HAZIR"],
@@ -259,7 +290,7 @@
     };
   }
   const SCENES=TOPICS.flatMap((topic,index)=>[0,1].map(language=>({
-    lang:language?'TR':'EN',sentence:PHRASES[index][language],displaySentence:PHRASES[index][language],thoughts:topic[language?3:1],topic:index
+    lang:language?'TR':'EN',sentence:PHRASES[index][language],displaySentence:PHRASES[index][language],thoughts:STORY_STEPS.get(index)?.thoughts[language]||topic[language?3:1],topic:index,story:STORY_STEPS.get(index)||null
   })));
   function mount(options) {
     const {panel,grid,scroll}=options||{};
@@ -280,7 +311,7 @@
     function listen(target,type,fn,settings){target.addEventListener(type,fn,settings);cleanups.push(()=>target.removeEventListener(type,fn,settings));}
     function entryAt(index){const entry=sceneOrder[index];return SCENES[entry.topic*2+entry.language];}
     function advanceIndex(){roundIndex=(roundIndex+1)%SCENES.length;if(!roundIndex){sceneOrder=createSceneOrder(sceneOrder.at(-1).topic);data('cycle',++cycle);}return roundIndex;}
-    function caption(entry,state){readable.dataset.state=state;readable.setAttribute('lang',entry.lang.toLowerCase());readableLabel.textContent=entry.lang+(state==='hold'?' · TAMAMLANDI':state==='relay'?' · DEVİR':' · YAZILIYOR');readableCopy.textContent=entry.displaySentence;}
+    function caption(entry,state){readable.dataset.state=state;readable.setAttribute('lang',entry.lang.toLowerCase());const chapter=entry.story?' · '+entry.story.name[entry.lang==='TR'?1:0]+' '+entry.story.index+'/'+entry.story.total:'';readableLabel.textContent=entry.lang+chapter+(state==='hold'?' · TAMAMLANDI':state==='relay'?' · DEVİR':' · YAZILIYOR');readableCopy.textContent=entry.displaySentence;}
     const actors=[0,1].map(side=>{
       const node=element('div','narrator-character');node.setAttribute('aria-hidden','true');node.dataset.zone=side?'right':'left';node.dataset.color=side?SYNTAX[0]:'black';node.style.setProperty('--luci-body',side?SYNTAX[0]:'#050506');
       const drawing=luci(),shadow=element('span','narrator-shadow');node.append(drawing.svg);root.append(shadow,node);
@@ -354,7 +385,10 @@
       incoming=generation(entryAt(roundIndex),roundIndex,writerSide);rememberTopic(incoming.entry.topic);relayClock=createColumnClock(current.score,incoming.score);current.ink.forEach(record=>{record.eraseAt=relayClock.timeAt(record.at);});
       phase='handoff';phaseBorn=time;eraseFront=writeFront=-1;queued=false;delete root.dataset.queued;caption(current.entry,'relay');
       actors.forEach(actor=>{actor.entryFrom=actor.pose||points[actor.current];});
-      const first=points[incoming.score.route[0].index];actors[writerSide].routeOrigin={x:clamp(first.x-box.pitch*2.1,box.size*.6,box.width-box.size*.6),y:first.y+box.pitch*2};
+      const first=points[incoming.score.route[0].index],eraseFirst=points[current.score.route[0].index],separation=Math.max(box.pitch*2.1,box.size*1.2);
+      // Two phrases can begin on different glyph rows. Park outside both first
+      // landings, so the handoff stays distinct before the shared clock starts.
+      actors[writerSide].routeOrigin={x:clamp(first.x-box.pitch*2.1,box.size*.6,box.width-box.size*.6),y:Math.max(first.y,eraseFirst.y)+separation};
       actors[eraseSide].routeOrigin=null;setThought(eraseSide,current.entry,'ERASE');setThought(writerSide,incoming.entry,'WRITE');
     }
     function errorPath(){
@@ -402,6 +436,7 @@
       diagnostics();
     }
     function diagnostics(){
+      const story=(incoming||current).entry.story;data('story',story?.id||'');data('storyStep',story?.index||0);data('storySteps',story?.total||0);
       data('writeOffsetColumns',relayClock?.writerOffset??LEAD_COLUMNS);data('topic',(incoming||current).entry.topic);data('readableSentence',readableCopy.textContent);
       data('phase',error?'warn':phase);data('phaseElapsed',Math.round(time-phaseBorn));data('actors',2);data('round',roundIndex+1);data('cycle',cycle);data('lang',(incoming||current).entry.lang);data('message',(incoming||current).entry.sentence);data('oldSentence',current.entry.sentence);data('nextSentence',incoming?.entry.sentence||'');
       data('bankSize',SCENES.length);data('topicCount',TOPICS.length);data('thoughtCount',SCENES.length*2);data('holdMs',HOLD_MS);data('minHoldMs',MIN_HOLD_MS);data('readMs',READ_MS);data('leadColumns',LEAD_COLUMNS);data('hopMs',HOP_MS);data('actualHopMs',(relayClock||current.clock).minHopMs);data('emptyColumnMs',EMPTY_COLUMN_MS);data('drawDurationMs',current.clock.duration);data('relayDurationMs',relayClock?relayClock.duration+INK_FADE_MS:0);data('scoreStart',current.score.start);data('scoreEnd',current.score.end);data('nextScoreStart',incoming?.score.start??'');data('nextScoreEnd',incoming?.score.end??'');data('collisions',collisions);data('errorCount',errorCount);data('error',error?'warn':errorInk.length?'recover':'none');data('eraseFront',eraseFront.toFixed(3));data('writeFront',writeFront.toFixed(3));data('writer',writerSide?'color':'black');data('eraser',eraseSide?'color':'black');data('serial',serial);data('elapsed',Math.round(time));data('holdElapsed',holdBorn===null?0:Math.round(time-holdBorn));data('inkCount',owners.size);data('oldInk',current.ink.size);data('newInk',incoming?.ink.size||0);

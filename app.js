@@ -22,6 +22,7 @@
   let portfolioStage;
   let menuMotion;
   let projectGallery;
+  let projectConduit;
   let requestedCaseIndex=0;
   const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
@@ -44,6 +45,8 @@
     $('.project-preview').dataset.project = project.visual || project.id;
     $('#preview-open').setAttribute('aria-label', project.title + ' detaylarını aç');
     projectGallery?.show(index);
+    projectConduit?.setSelected(index);
+    document.querySelectorAll('.project-conduit [data-open-project]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.openProject)===index)));
   }
   const featured = projects.filter(project => project.featured !== false);
   $('#archive-count').textContent = String(projects.length - featured.length).padStart(2,'0');
@@ -112,7 +115,16 @@
     syncSurfaces();
   }
   $('#case-demo').addEventListener('click',()=>launchExperience(projectExperiences[projects[caseIndex].id]??3));
-  document.querySelectorAll('[data-open-project]').forEach(button => button.addEventListener('click', () => openProject(Number(button.dataset.openProject),button)));
+  document.querySelectorAll('[data-open-project]').forEach(button => button.addEventListener('click', () => {
+    const index=Number(button.dataset.openProject);
+    if(button.closest('.project-conduit')){
+      selectProject(index);
+      location.hash='work';
+      $('#work-title').focus({preventScroll:true});
+      return;
+    }
+    openProject(index,button);
+  }));
   $('#case-close').addEventListener('click', () => {if(projectMotion)projectMotion.close();else projectDialog.close();});
   projectDialog.addEventListener('close', () => { document.body.classList.remove('modal-open'); syncSurfaces(); });
   $('#case-next').addEventListener('click', () => {
@@ -194,6 +206,7 @@
   if(window.PersonalDock){personalDock=window.PersonalDock.mount({identity:data.identity,projects,skills,onSurfaceChange:syncSurfaces,canMove:()=>moving});cleanups.push(()=>personalDock.destroy());}
   if(window.MotionFilm){motionFilm=window.MotionFilm.mount({canMove:()=>moving});cleanups.push(()=>motionFilm.destroy());}
   if(window.PortfolioStage){portfolioStage=window.PortfolioStage.mount({canMove:()=>moving});cleanups.push(()=>portfolioStage.destroy());}
+  if(window.ProjectConduit){projectConduit=window.ProjectConduit.mount({root:$('.project-conduit'),canMove:()=>moving});projectConduit.setSelected(selected);cleanups.push(()=>projectConduit.destroy());}
   function syncSurfaces() {
     const covered = Boolean(document.querySelector('dialog[open]'));
     document.body.classList.toggle('modal-open',covered);
@@ -211,6 +224,7 @@
     portfolioStage?.setPaused(!moving);
     menuMotion?.setPaused(!moving);
     projectGallery?.setPaused(!moving||covered);
+    projectConduit?.setPaused(!moving||covered);
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
@@ -261,7 +275,7 @@
     let daily = new Map(), events = new Map(), buildLog = false;
     const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json?v=20261028d');
+      const response = await fetch('data/activity.json?v=20261028g');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
       personalDock?.setBuildLog(json);
