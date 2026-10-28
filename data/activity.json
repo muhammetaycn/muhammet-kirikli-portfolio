@@ -2,7 +2,7 @@
   "source": "Bu portföyün GitHub geliştirme kayıtları",
   "metric": "repository_commits",
   "repository": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio",
-  "generatedAt": "2026-10-28T12:26:30.559Z",
+  "generatedAt": "2026-10-28T17:44:44.197Z",
   "days": [
     {
       "date": "2026-10-23",
@@ -115,8 +115,13 @@
     },
     {
       "date": "2026-10-28",
-      "count": 2,
+      "count": 3,
       "events": [
+        {
+          "sha": "cc81692d7984b4d9404a96c2de8551a511b8b388",
+          "title": "Rebalance portfolio scenes and improve Luci mobile watchability",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/cc81692d7984b4d9404a96c2de8551a511b8b388"
+        },
         {
           "sha": "a979966174057a5942afeea5ce55cedc175994c7",
           "title": "Keep hero narration and scene controls above the fixed dock",
