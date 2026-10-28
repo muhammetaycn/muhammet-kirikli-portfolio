@@ -275,7 +275,7 @@
     let daily = new Map(), events = new Map(), buildLog = false;
     const repository='https://github.com/muhammetaycn/muhammet-kirikli-portfolio';
     try {
-      const response = await fetch('data/activity.json?v=20261028g');
+      const response = await fetch('data/activity.json?v=20261028h');
       if (!response.ok) throw new Error('Activity unavailable');
       const json = await response.json();
       personalDock?.setBuildLog(json);

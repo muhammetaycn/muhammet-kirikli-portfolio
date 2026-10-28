@@ -31,7 +31,8 @@
   .hero:has(.has-deck) .round-link{font-size:15px;gap:13px;max-width:max-content;min-height:44px}
   .hero:has(.has-deck) .round-link small{font:12px/1.5 "Bricolage Grotesque",sans-serif;letter-spacing:0;color:#a6a29b;margin-top:3px}
   .hero .hero-art.has-deck{position:relative;grid-column:2;grid-row:2;align-self:start;width:100%;height:100%;top:auto;right:auto;left:auto}
-  .hero:has(.has-deck) .hero-deck-controls{left:20%;right:7%;font-size:10px;bottom:14px}
+  .hero:has(.has-deck) .hero-deck-controls{left:20%;right:auto;width:max-content;max-width:90%;font-size:10px;bottom:14px;border-top:0}
+  .hero:has(.has-deck) .deck-progress{width:88px;right:auto}
   .hero:has(.has-deck) .deck-scene-button{min-height:44px;padding-inline:10px}
   .hero:has(.has-deck) .deck-auto{flex-basis:40px;height:40px}
   .hero:has(.has-deck) .computer-world{left:54%;top:calc(50% - 28px)}
@@ -46,7 +47,7 @@
   .hero:has(.has-deck) h1{font-size:clamp(54px,6.8vw,74px)}
   .hero:has(.has-deck) .hero-copy{margin-top:-142px}
   .hero:has(.has-deck) .hero-copy>p{font-size:16px}
-  .hero:has(.has-deck) .hero-deck-controls{left:10%;right:0;max-width:100%;gap:4px}
+  .hero:has(.has-deck) .hero-deck-controls{left:10%;right:auto;max-width:90%;gap:4px}
   .hero:has(.has-deck) .computer-world{left:52%}
 }
 @media(min-width:761px) and (max-height:700px){
