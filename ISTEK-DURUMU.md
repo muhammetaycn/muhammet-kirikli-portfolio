@@ -2,6 +2,8 @@
 
 Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmalarını birlikte anlatan kişisel portföydür. Aşağıdaki durumlar bu site kapsamındadır.
 
+28 Ekim ikinci turunda geçmiş istekler [24 başlıkta kaynakla karşılaştırıldı](REQUEST-REVIEW-2026-10-28.md); videolar ve seçilen siteler [ayrı kaynak çalışmasında](REFERENCE-STUDY-2026-10-28.md) yeniden değerlendirildi. Açılışın ortak kompozisyonu, daha erken görünen ürün sahnesi, seçimdeki padding sıçraması, mobil ürün başlığı ve Luci'nin hücreye göre boyutu/düşünce kararlılığı geliştirildi. Bunlar bütün sanatsal hedeflerin tamamlandığı anlamına gelmez. Açılıştan projeye özgün görsel devir ve teknik etiketleri daha uzun anlamlı iş akışlarına bağlama açık geliştirme alanlarıdır. Eski Discord profil/banner kapsamı güncel portföyün tamamlanan özelliği sayılmıyor.
+
 | İstek | Karşılığı |
 | --- | --- |
 | Ad, LinkedIn, tüm yetenek alanları | Tam ad, 65 yetenek, eğitim ve deneyim; yazılım ve tekstil birlikte, alanlardan gerçek projelere bağlantılar |
@@ -13,7 +15,7 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | SQL, kodlar, sistemler, küçük oyunlar | Gerçek SQLite JOIN/transaction, düzenlenebilir yerel uygulamalar, sürümler, motion araçları ve iki oyun |
 | Tek cümle, önden silme ve arkadan eşli yazma | Ortak 52 × 7 alanda iki kalıcı Luci; yoğunluğa göre ortak saat, en az 90 ms basış, başlangıçtan silme önce, en az üç sütun aralık, çarpışmasız hücre sahipliği |
 | Siyah Luci, farklı syntax renkleri, EN/TR | Siyah karakter korunur; ikinci yazar renk değiştirir; dil her sahnede değişir, aynı konunun çevirisi en az 47 sahne sonra gelir |
-| Tekrarlamayan geniş yazı çeşitliliği | 96 teknik konu, 192 cümle, 384 düşünce; karışan sıra, sabit olmayan açılış ve oturumdaki son konuyu hatırlama; sonlu bankada anlık tekrar önleme |
+| Tekrarlamayan geniş yazı çeşitliliği | 96 teknik konu, 192 kısa ifade, 384 düşünce; karışan sıra, sabit olmayan açılış ve oturumdaki son konuyu hatırlama; sonlu bankada anlık tekrar önleme |
 | Okunur düşünceler ve cümle bütünlüğü | Düşünce en az 5 sn, tamamlanan cümle 3,6 sn; düşünceler masaüstünde 14 px, mobilde 13 px; matris altında 18/16 px normal yazı karşılığı son tamamlanan cümleyi korur |
 | Yanlış kare, kırmızı iz, WARN ve panel kırılması | Yanlış iniş, üç kırmızı iz, küçük tek sıçrama/kırılma ve toparlanma |
 | İşlem görünmeden masaüstünün değişmesi | Her ziyarette tek tamamlanan bölüm; başlangıç ve asenkron iş koruması; sonuç hazır olunca 3,4–3,6 sn okuma; gizli/duraklatılmış süre hesaba katılmaz |
@@ -30,7 +32,7 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | Videodaki kompakt kişisel alan ve alt Dock | Normal bölüm bağlantıları, küçük profil dialogu, doğru ad/kimlik, gerçek proje ve yetenek sayıları, İstanbul saati ve kaynak depoya bağlı geliştirme kartı |
 | Proje keşfinde hareket ve sahne devamlılığı | Ek Awwwards/Brandon Yasin galeri incelemesinden uyarlanan, kendi çizimlerini büyüten proje dialogu; kesilebilir açılış, proje değiştirme ve kapanış |
 | Projelere fare, dokunma ve klavyeyle ulaşma | Büyük ortak sahne, dört özgün ürün arayüzü, 44 px önceki/sonraki kontrolleri, 01/04 sayacı; kesilebilir 620 ms görsel ve 450 ms açıklama geçişi; mobilde alt alta akış |
-| Son videolara göre daha bütünlüklü sunum | ZIP içindeki dört MP4'ten 36 zamanlı kare; açık/koyu bölüm ayrımı, projeye özgü kompozisyonlar, daha büyük gövde metni; yöntem ve sınırlar [video araştırmasında](MOTION-VIDEO-2026-10-27.md) |
+| Son videolara göre daha bütünlüklü sunum | İlk incelemede ZIP içindeki dört MP4'ten 36 zamanlı kare; açık/koyu bölüm ayrımı, projeye özgü kompozisyonlar, daha büyük gövde metni. Ek 20 ayrıntı karesi ve yeni kararlar [28 Ekim çalışmasında](REFERENCE-STUDY-2026-10-28.md); önceki yöntem ve sınırlar [video araştırmasında](MOTION-VIDEO-2026-10-27.md) |
 | Menüde bütünlük ve açık gezinme | Canlı günlük dahil beş gerçek bölüm bağlantısı, kısa maskeli giriş/kapanış, Escape ve bölüm geçişinde odak çalmayan kapanış |
 | Ekran görüntüsündeki siteyi doğru referansla eşleme | Açık: kesin URL henüz çözülmedi. YVL doğru referans değil; bu sitenin incelendiği veya eşleştirmenin tamamlandığı iddia edilmiyor |
 | Motion hatalarını giderme ve yeni kaynak araştırması | Hızlı seçimde boşluk, çıkış pozunun sıçraması, pause/resume sıfırlanması, geciken döngü, sabit hover dönüşü ve dar ekran bilgisayar sınırları düzeltildi; yeni canlı gözlemler [hareket kaydında](MOTION-AUDIT-2026-10-27.md) |

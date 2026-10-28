@@ -290,15 +290,15 @@
       const bubble=element('button','narrator-thought');bubble.type='button';bubble.dataset.zone=side?'right':'left';
       const terminal=element('span','narrator-terminal');terminal.setAttribute('aria-hidden','true');
       const bar=element('span','narrator-terminal-bar'),led=element('i','narrator-led'),label=element('span','narrator-worker'),language=element('span','narrator-language'),status=element('span','narrator-status','READY');bar.append(led,label,language,status);
-      const line=element('span','narrator-line'),copy=element('span','narrator-copy'),caret=element('span','narrator-caret','▍');line.append(copy,caret);
+      const line=element('span','narrator-line'),reserve=element('span','narrator-copy-reserve'),live=element('span','narrator-live-line'),copy=element('span','narrator-copy'),caret=element('span','narrator-caret','▍');live.append(copy,caret);line.append(reserve,live);
       const tip=element('span','narrator-tip','sonraki cümle');terminal.append(bar,line,tip);bubble.append(terminal);
       const tether=vector('path',{});tethers.append(tether);root.append(bubble);
-      const zone={side,actor,bubble,copy,label,language,status,tip,tether,text:'',textBorn:0,fullAt:null,bubbleX:0,bubbleY:0,bubbleWidth:250,bubbleHeight:110};
+      const zone={side,actor,bubble,copy,reserve,label,language,status,tip,tether,text:'',textBorn:0,fullAt:null,bubbleX:0,bubbleY:0,bubbleWidth:250,bubbleHeight:110};
       listen(bubble,'click',()=>{if(reduced||paused){advanceIndex();serial++;reset(true);return;}queued=true;data('queued',true);zones.forEach(item=>{item.tip.textContent='okununca sırada';item.bubble.dataset.queued='true';});});return zone;
     });
     function setThought(side,entry,role){
       const zone=zones[side],text=entry.thoughts[side],same=zone.text===text&&zone.language.textContent===entry.lang;
-      if(!same){zone.text=text;zone.textBorn=time;zone.fullAt=null;zone.copy.textContent='';zone.bubble.classList.add('is-typing');}
+      if(!same){zone.text=text;zone.textBorn=time;zone.fullAt=null;zone.reserve.textContent=text+'\u00a0▍';zone.copy.textContent='';zone.bubble.classList.add('is-typing');}
       zone.language.textContent=entry.lang;zone.label.textContent=side?'luci.color':'luci.black';zone.status.textContent=role;
       zone.bubble.dataset.status=role.toLowerCase();zone.bubble.dataset.lang=entry.lang;zone.bubble.setAttribute('lang',entry.lang.toLowerCase());zone.bubble.style.setProperty('--narrator-accent',actors[side].color);zone.tip.textContent='sonraki cümle';delete zone.bubble.dataset.queued;
       zone.bubble.setAttribute('aria-label',`Düşünce: ${text} Sonraki cümle: hareket durduysa hemen göster; hareketliyse okununca sıraya al.`);
@@ -409,7 +409,8 @@
     }
     function measure(){
       dirty=false;const panelRect=panel.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();points=[...grid.querySelectorAll('.rhythm-cell')].map(cell=>{const rect=cell.getBoundingClientRect();return {cell,x:rect.left+rect.width/2-panelRect.left,y:rect.top+rect.height*.65-panelRect.top};});
-      box={width:panel.clientWidth,size:actors[0].node.offsetWidth||42,pitch:gridRect.width/52,gridTop:gridRect.top-panelRect.top};const bubbleWidth=Math.min(280,Math.max(100,gridRect.width*.5-8));
+      const pitch=gridRect.width/52,size=clamp(pitch*3.8,24,42);root.style.setProperty('--narrator-actor-size',size.toFixed(2)+'px');
+      box={width:panel.clientWidth,size,pitch,gridTop:gridRect.top-panelRect.top};const bubbleWidth=Math.min(280,Math.max(100,gridRect.width*.5-8));
       zones.forEach(zone=>{zone.bubble.style.width=bubbleWidth.toFixed(2)+'px';zone.bubbleWidth=bubbleWidth;zone.bubbleHeight=zone.bubble.offsetHeight;const center=gridRect.left-panelRect.left+gridRect.width*(zone.side?.76:.24);zone.bubbleX=clamp(center-bubbleWidth/2,8,Math.max(8,box.width-bubbleWidth-8));zone.bubbleY=Math.max(14,box.gridTop-zone.bubbleHeight-35);zone.bubble.style.transform=`translate3d(${zone.bubbleX.toFixed(2)}px,${zone.bubbleY.toFixed(2)}px,0)`;idle(zone.actor);});
       data('ready',points.length===364);root.style.setProperty('--narrator-grid-top',box.gridTop.toFixed(2)+'px');root.style.setProperty('--narrator-grid-bottom',(gridRect.bottom-panelRect.top).toFixed(2)+'px');root.style.setProperty('--narrator-grid-left',(gridRect.left-panelRect.left).toFixed(2)+'px');root.style.setProperty('--narrator-grid-width',gridRect.width.toFixed(2)+'px');
     }

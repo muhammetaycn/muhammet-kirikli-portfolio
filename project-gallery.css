@@ -1,7 +1,8 @@
 .project-preview.has-project-gallery{isolation:isolate;overflow:clip}
 .has-project-gallery #preview-index{display:none}
-.has-project-gallery>.preview-drawing{will-change:transform,opacity,clip-path;transform-origin:50% 50%}
-.has-project-gallery>.preview-bottom{position:relative;z-index:4;will-change:transform,opacity,clip-path}
+.has-project-gallery>.preview-drawing{will-change:auto;transform-origin:50% 50%}
+.has-project-gallery>.preview-bottom{position:relative;z-index:4;will-change:auto}
+.has-project-gallery[data-gallery-state=changing]>.preview-drawing,.has-project-gallery[data-gallery-state=changing]>.preview-bottom{will-change:transform,opacity,clip-path}
 .project-gallery-outgoing{position:absolute;z-index:3;overflow:hidden;pointer-events:none!important;user-select:none;contain:layout paint;transform-origin:50% 50%;will-change:transform,opacity,clip-path}
 .project-gallery-outgoing>.project-gallery-frozen{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;opacity:1!important;transform:none!important;clip-path:none!important}
 .project-gallery-outgoing *,.project-gallery-outgoing *:before,.project-gallery-outgoing *:after{pointer-events:none!important;animation:none!important;transition:none!important}
