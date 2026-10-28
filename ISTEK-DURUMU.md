@@ -1,4 +1,4 @@
-# Portföy isteklerinin durumu — 27 Ekim 2026
+# Portföy isteklerinin durumu — 28 Ekim 2026
 
 Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmalarını birlikte anlatan kişisel portföydür. Aşağıdaki durumlar bu site kapsamındadır.
 
@@ -17,7 +17,8 @@ Güncel yön, Muhammet Kırıklı'nın yazılım, sistem ve tasarım çalışmal
 | Okunur düşünceler ve cümle bütünlüğü | Düşünce en az 5 sn, tamamlanan cümle 3,6 sn; düşünceler masaüstünde 14 px, mobilde 13 px; matris altında 18/16 px normal yazı karşılığı son tamamlanan cümleyi korur |
 | Yanlış kare, kırmızı iz, WARN ve panel kırılması | Yanlış iniş, üç kırmızı iz, küçük tek sıçrama/kırılma ve toparlanma |
 | İşlem görünmeden masaüstünün değişmesi | Her ziyarette tek tamamlanan bölüm; başlangıç ve asenkron iş koruması; sonuç hazır olunca 3,4–3,6 sn okuma; gizli/duraklatılmış süre hesaba katılmaz |
-| Küçük beş parmaklı dikişli eldiven | Yaklaşık %30 küçültülmüş el, açılan işaret parmağı eklemi, basma esnemesi ve gerçek tıklama hizası |
+| Küçük beş parmaklı dikişli eldiven | Yaklaşık %30 küçültülmüş el; sabit parça uzunlukları, iki eklemden avuca doğru kapanan işaret parmağı, aynı geometriyi izleyen dikiş/ağ kökü ve gerçek tıklama hizası |
+| Luci'nin monitör logosunu ve güç ışığını kapatması | Karakter ve düşünce paneli klavyenin altındaki ayrı alanda; monitör alt şeridi açık, uygulama adı panel başlığına alındı |
 | Elden çıkan, yaklaşınca kalınlaşan simbiyot | Üç eldiven kökü, üç ana gövde/altı dal, zarlar, kenar tepkisi, gerilme/kopma/yeniden tutunma |
 | Kullanıcı dostu sistemler | Yedi somut iş, girdinin yanındaki eylem, adlandırılmış onay ve sonuç; JSON/iz kapalı Teknik ayrıntılar içinde |
 | Hafif arka plan motion ve metin girişleri | Kendi 7,2 sn / 54 KB şerit filmi yalnız açılışta; SVG poster; kelime maskesi yalnız çalışmalar başlığında, sakin okuma bölümleri |

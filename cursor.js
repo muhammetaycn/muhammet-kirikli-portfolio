@@ -13,6 +13,39 @@
     Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value));
     return node;
   }
+  function indexFingerPose(extension, pressure) {
+    const open=smooth(clamp(extension,0,1)),push=smooth(clamp(pressure,0,1));
+    // The knuckle stays planted. PIP and DIP flex toward the palm, never backwards.
+    const angles=[-90,mix(58*(1-open),78,push),mix(34*(1-open),52,push)];
+    const lengths=[25,18,14],joints=[{x:36,y:63}],directions=[],normals=[];
+    let angle=angles[0];
+    for(let i=0;i<3;i++){
+      if(i)angle+=angles[i];
+      const radians=angle*Math.PI/180,t={x:Math.cos(radians),y:Math.sin(radians)},p=joints[i];
+      directions.push(t);normals.push({x:-t.y,y:t.x});joints.push({x:p.x+t.x*lengths[i],y:p.y+t.y*lengths[i]});
+    }
+    const radius=[8.2,7.2,6.3,6],tip=joints[3],t=directions[2],n=normals[2],cap={x:tip.x-t.x*radius[3],y:tip.y-t.y*radius[3]};
+    function offset(i,side,inset=0){
+      const r=radius[i]-inset;
+      if(i===0)return{x:joints[0].x+normals[0].x*r*side,y:joints[0].y+normals[0].y*r*side};
+      if(i===3)return{x:cap.x+n.x*r*side,y:cap.y+n.y*r*side};
+      const a=normals[i-1],b=normals[i],length=Math.hypot(a.x+b.x,a.y+b.y),m={x:(a.x+b.x)/length,y:(a.y+b.y)/length},scale=r/(m.x*a.x+m.y*a.y);
+      return{x:joints[i].x+m.x*scale*side,y:joints[i].y+m.y*scale*side};
+    }
+    const point=p=>`${Number(p.x.toFixed(4))} ${Number(p.y.toFixed(4))}`;
+    const lerp=(a,b,k)=>({x:mix(a.x,b.x,k),y:mix(a.y,b.y,k)});
+    function sidePath(points){return `L${point(lerp(points[0],points[1],.82))}Q${point(points[1])} ${point(lerp(points[1],points[2],.22))}L${point(lerp(points[1],points[2],.78))}Q${point(points[2])} ${point(lerp(points[2],points[3],.22))}L${point(points[3])}`;}
+    const a=[0,1,2,3].map(i=>offset(i,1)),b=[0,1,2,3].map(i=>offset(i,-1)),k=.5522847498*radius[3];
+    const silhouette=`M${point(a[0])}${sidePath(a)}C${point({x:a[3].x+t.x*k,y:a[3].y+t.y*k})} ${point({x:tip.x+n.x*k,y:tip.y+n.y*k})} ${point(tip)}C${point({x:tip.x-n.x*k,y:tip.y-n.y*k})} ${point({x:b[3].x+t.x*k,y:b[3].y+t.y*k})} ${point(b[3])}${sidePath([...b].reverse())}Q36 69 ${point(a[0])}Z`;
+    const folds=[1,2].map(i=>{
+      const j=joints[i],a=normals[i-1],b=normals[i],length=Math.hypot(a.x+b.x,a.y+b.y),cross={x:(a.x+b.x)/length,y:(a.y+b.y)/length},r=radius[i]*.68,along=directions[i];
+      return `M${point({x:j.x-cross.x*r,y:j.y-cross.y*r})}Q${point({x:j.x+along.x*2.5,y:j.y+along.y*2.5})} ${point({x:j.x+cross.x*r,y:j.y+cross.y*r})}`;
+    }).join('');
+    const stitch=[3,2,1,0].map(i=>offset(i,-1,1.6));
+    const seam=`M${point(stitch[0])}${sidePath(stitch)}`;
+    const highlight=`M${point({x:tip.x-t.x*2-n.x*2,y:tip.y-t.y*2-n.y*2})}Q${point({x:tip.x-t.x*.5,y:tip.y-t.y*.5})} ${point({x:tip.x-t.x*2+n.x*2,y:tip.y-t.y*2+n.y*2})}`;
+    return {joints,angles,lengths,tip,silhouette,folds,seam,highlight,origin:{x:joints[1].x-directions[0].x*9+normals[0].x*2.5,y:joints[1].y-directions[0].y*9+normals[0].y*2.5}};
+  }
   function mount({ reducedMotion = false } = {}) {
     const fine = matchMedia('(hover: hover) and (pointer: fine)');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -126,24 +159,25 @@
       const boundary=left.concat(right.reverse());return boundary.map((p,i)=>(i?'L':'M')+number(p.x)+' '+number(p.y)).join('')+'Z';
     }
     function paintGlove(amount,x,y,angle){
-      const base=smooth(clamp(amount*1.3,0,1)),distal=smooth(clamp((amount-.12)/.88,0,1)),tipX=mix(53,35,distal),tipY=mix(26,5,base),jointX=mix(35,36,base),jointY=mix(39,31,base);
-      index.setAttribute('d',`M30 65C27 55 27 45 ${jointX-7} ${jointY}C${jointX-7} ${jointY-8} ${tipX-9} ${tipY-2} ${tipX} ${tipY}C${tipX+8} ${tipY+1} ${tipX+10} ${tipY+9} ${tipX+5} ${tipY+14}L${jointX+10} ${jointY+7}C${jointX+10} 53 47 59 47 66Z`);
-      fold.setAttribute('d',`M${jointX-3} ${jointY+7}Q${jointX+4} ${jointY+mix(9,5,amount)} ${jointX+9} ${jointY+9}M${tipX-5} ${tipY+14}Q${tipX+1} ${tipY+18} ${tipX+6} ${tipY+15}`);
-      seam.setAttribute('d',`M${tipX+4} ${tipY+4}C${tipX+12} ${tipY+15} ${jointX+5} ${jointY} ${jointX+6} ${jointY+13}L40 60`);highlight.setAttribute('d',`M${tipX-5} ${tipY+4}Q${tipX-1} ${tipY+1} ${tipX+3} ${tipY+5}`);
-      const scaleX=Number((GLOVE_SCALE*(1+press*.035)).toFixed(4)),scaleY=Number((GLOVE_SCALE*(1-press*.08)).toFixed(4)),rotation=Number(angle.toFixed(4)),radians=rotation*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
+      const finger=indexFingerPose(amount,press),{x:tipX,y:tipY}=finger.tip;
+      index.setAttribute('d',finger.silhouette);fold.setAttribute('d',finger.folds);seam.setAttribute('d',finger.seam);highlight.setAttribute('d',finger.highlight);
+      // Cotton compresses slightly, but a click is the two finger hinges flexing.
+      const scaleX=Number((GLOVE_SCALE*(1+press*.012)).toFixed(4)),scaleY=Number((GLOVE_SCALE*(1-press*.018)).toFixed(4)),rotation=Number(angle.toFixed(4)),radians=rotation*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
       const paintedX=number(x),paintedY=number(y),localX=Number(tipX.toFixed(4)),localY=Number(tipY.toFixed(4));
       // SVG CSS viewport == viewBox: a single scale keeps the painted tip exact.
       glove.style.transform=`translate(${paintedX}px,${paintedY}px) rotate(${rotation}deg) scale(${scaleX},${scaleY}) translate(${-localX}px,${-localY}px)`;
       glove.dataset.tipX=String(localX);glove.dataset.tipY=String(localY);glove.dataset.scaleX=String(scaleX);glove.dataset.scaleY=String(scaleY);
+      glove.dataset.indexPip=finger.angles[1].toFixed(3);glove.dataset.indexDip=finger.angles[2].toFixed(3);
       function world(px,py){const dx=(px-localX)*scaleX,dy=(py-localY)*scaleY;return{x:paintedX+dx*cos-dy*sin,y:paintedY+dx*sin+dy*cos};}
       skin.setAttribute('opacity',clamp(amount*.92,0,1).toFixed(3));
       cuff.setAttribute('d',`M35 103Q45 ${97+Math.sin(lastTime*.002)*2} 51 103Q63 97 81 101L81 112Q60 119 36 112Z`);
-      veins[0].setAttribute('d',`M58 107C35 95 53 75 ${jointX+3} ${jointY+10}Q${jointX-1} ${jointY} ${tipX} ${tipY+9}`);
+      const [mcp,pip,dip]=finger.joints;
+      veins[0].setAttribute('d',`M58 107C35 95 44 77 ${mcp.x} ${mcp.y}L${finger.origin.x} ${finger.origin.y}Q${pip.x} ${pip.y} ${dip.x} ${dip.y}L${tipX} ${tipY}`);
       veins[1].setAttribute('d','M57 108C42 89 32 77 19 66M40 88Q36 67 32 62');
       veins[2].setAttribute('d','M65 106C80 95 72 80 74 64M68 91Q57 76 58 62');
       veins.forEach((vein,i)=>vein.setAttribute('stroke-width',(1.2+amount*(i?1.3:2.1)).toFixed(2)));
       root.dataset.extension=amount.toFixed(2);root.dataset.pointerX=x.toFixed(2);root.dataset.pointerY=y.toFixed(2);
-      return{origins:[world(jointX+3,jointY+10),world(20,67),world(62,108)],world};
+      return{origins:[world(finger.origin.x,finger.origin.y),world(20,67),world(62,108)],world};
     }
     function paintConnection(c,time,dt,active){
       const retiring=c.released!==null,life=retiring?clamp((time-c.released)/RELEASE_MS,0,1):0;

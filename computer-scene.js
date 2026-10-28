@@ -2,6 +2,7 @@
   'use strict';
 
   const mounted = new WeakMap();
+  const SCENE_HEIGHT = 700;
   const idleThoughts = [
     'Bu bir resim değil. Tuşların her biri başka bir kapı.',
     'Bir fikir önce terminalde görünür. Sonra çalışan bir sisteme dönüşür.',
@@ -114,14 +115,14 @@
     keyboardGrid.setAttribute('aria-label', '32 tuş, 32 deneyim. Ok tuşlarıyla gezin, Enter ile açın.');
     const hint = node('div', 'computer-key-hint');
     const hintNumber = node('span', 'computer-key-number', '32');
-    const hintText = node('span', 'computer-key-description', 'Tuşlardan birini seç. İçeride bir şeyler başlasın.');
+    const hintText = node('span', 'computer-key-description', 'deneyim');
     hint.append(hintNumber, hintText);
     const status = node('span', 'computer-sr-only');
     status.setAttribute('role', 'status');
     status.setAttribute('aria-live', 'polite');
     const signal = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     signal.setAttribute('class', 'computer-signal');
-    signal.setAttribute('viewBox', '0 0 430 620');
+    signal.setAttribute('viewBox', `0 0 430 ${SCENE_HEIGHT}`);
     signal.setAttribute('aria-hidden', 'true');
     const signalPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     signalPath.setAttribute('class', 'computer-signal-path');
@@ -132,8 +133,8 @@
     companion.setAttribute('aria-hidden', 'true');
     companion.append(luci());
     const bubble = node('div', 'computer-thought');
-    const bubbleTop = node('span', 'computer-thought-header', 'luci@mk ~');
-    bubbleTop.append(node('i'));
+    const bubbleTop = node('div', 'computer-thought-header');
+    bubbleTop.append(node('span', 'computer-thought-identity', 'luci@mk ~'), hint, node('i'));
     const bubbleLine = node('p', 'computer-thought-line');
     const thought = node('span', '', thoughtText);
     const caret = node('i', 'computer-thought-caret');
@@ -142,7 +143,7 @@
     bubble.setAttribute('aria-hidden', 'true');
 
     keyboard.append(tray, keyboardGrid);
-    object.append(label, expand, monitor, keyboard, signal, bubble, companion, hint, status);
+    object.append(label, expand, monitor, keyboard, signal, bubble, companion, status);
     float.append(object);
     world.append(shadow, float);
     scene.append(world);
@@ -191,7 +192,7 @@
     function showHint(index) {
       const definition = definitions[index] || {};
       hintNumber.textContent = String(index + 1).padStart(2, '0');
-      hintText.textContent = definition.hint ? `${definition.name} · ${definition.hint}` : definition.name;
+      hintText.textContent = definition.name || 'Deneyim';
       hint.classList.add('is-key-selected');
       companion.classList.add('is-looking');
       const column = index % 8;
@@ -334,7 +335,7 @@
       const mobile = window.matchMedia('(max-width: 760px)').matches;
       const width = layoutWidth * (mobile ? .96 : .78);
       const height = Math.max(360, layoutHeight - 72);
-      const scale = Math.max(mobile ? .64 : .8, Math.min(1.06, width / 430, height / 620));
+      const scale = Math.max(.5, Math.min(1.06, width / 430, height / SCENE_HEIGHT));
       world.style.setProperty('--computer-scale', scale.toFixed(3));
       world.style.setProperty('--computer-text-scale', (1 / scale).toFixed(3));
       scene.dataset.scale = scale.toFixed(3);

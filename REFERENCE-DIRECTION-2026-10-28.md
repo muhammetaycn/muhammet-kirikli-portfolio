@@ -1,0 +1,36 @@
+# Kimlik, bilgi ve hareket alanları — 28 Ekim 2026
+
+Bu tur, kullanıcının daha önce verdiği Awwwards Elements ve Dribbble arama kaynaklarından seçilen iki yeni canlı örneği inceler. Önceki [hareket araştırması](MOTION-AUDIT-2026-10-27.md) ve [dört video kaydı](MOTION-VIDEO-2026-10-27.md) korunur. Tarih değiştiği için yeni gözlemler ayrı dosyadadır. Binlerce kaynağın tamamının incelendiği veya araştırmanın arka planda kesintisiz sürdüğü iddia edilmez.
+
+## İzlenen kaynak zincirleri
+
+| Kaynak | Gerçekten görülen durum | Çıkarım ve sınır |
+| --- | --- | --- |
+| [Awwwards Elements](https://www.awwwards.com/elements/) → [Ilnaz Khasanshin TV kaydı](https://www.awwwards.com/inspiration/tv-ilnaz-khasanshin-portfolio), [CRT etkileşimi](https://www.awwwards.com/inspiration/crt-screen-effect-knock-the-tv-ilnaz-khasanshin-portfolio), [ayrı uygunluk etiketi](https://www.awwwards.com/inspiration/open-to-work-sticker-ilnaz-khasanshin-portfolio) → [ntch.design](https://ntch.design/) | Canlı sayfa açıldı. Ortadaki tanıtım, eğri TV ekranı içinde; yardım işareti sol üstte, uygunluk etiketi sağ altta ayrı kaldı. Yardım açıldığında orta bilgi yüzeyi değişti; iki dış işaret yerlerini korudu. Klavye ve hareket açıklaması DOM durumunda okunabildi. Yardım kapatıldı. | Katalogdaki CRT ve hover sınıflandırmaları, bütün efektlerin çalıştırıldığı anlamına gelmez. Semantik proje bağlantısı denemesi görünür bir proje geçişi üretmedi; bu yol başarıyla sınanmış sayılmadı. Alınan karar, kimlik/durum ile açıklamanın aynı alan için yarışmaması. Referansın çizimi, karakteri, sarı/yeşil paleti veya TV tasarımı kopyalanmadı. |
+| [Awwwards sahne değiştirme kaydı](https://www.awwwards.com/inspiration/scene-switch-grace-ai-studio) → [Grace özellik sayfası](https://gracefashion.ai/features) | Canlı ürün bölümünde açıklama soldaki açılır listede, görsel sağdaki ayrılmış yüzeyde durdu. Detay görünümü Enter ile açıldı: `aria-expanded` değeri değişti ve yeni detay görselinin açıklaması DOM'a geldi. Daha sonraki gözlemlerde başka bir seçenek, ardından başlangıç seçeneği kendiliğinden etkinleşti. Son durumda mavi giysi görselinin yüklenmesi ve sağ yüzeyde görünmesi doğrulandı. | Bu, gerçek üretim işlemi değildir; ürün tanıtımının çalışma biçimidir. Geçişlerin tam süresi veya motoru ölçülmedi. Alınan karar, açıklama ile görselin kendi alanlarını koruması. Otomatik seçimin kullanıcının önceki seçimini değiştirebilmesi bizim projede örnek alınmayacak; elle seçilen çalışma ve uygulama öncelikli kalmalı. Ürün üretim, güvenlik ve ticari iddiaları portföye aktarılmadı. |
+| [Dribbble portfolio-animation araması](https://dribbble.com/search/portfolio-animation) → [Mikan kişisel portföy animasyon kaydı](https://dribbble.com/shots/26995447-Personal-Portfolio-Website-Animations) | Birincil çalışma sayfası okundu. Yazar, kimlik, seçili işler ve tipografik hiyerarşiyi ana yapı olarak anlatıyor; ekran sunumları aynı çalışma başlığı altında toplanıyor. | Bu turda kaydın videosu oynatılmadı veya bir canlı uygulaması sınanmadı. Bu nedenle süre, giriş efekti, responsive davranış ve performans hakkında gözlem iddiası yoktur. Kullanılabilir çıkarım, hareket sayısını artırmak yerine kimliğin ve işlerin okunma sırasını açık tutmak. Yazarın metni veya düzeni kopyalanmadı. |
+
+[Noctra](https://getnoctra.com/) kaynak metni de yeniden okundu: işlem hazırlığı, kurulum kontrolü ve oturum durumu ayrı adlandırılmış. Bu turda bu işlemler çalıştırılmadı; önceki canlı gözlemler eski araştırma kaydında kalır. [Webflow kategorisinin](https://webflow.com/templates/category/portfolio-and-agency-websites) metin çıktısı ilk yüklemede sonuçsuz görünüyordu. Önceki turda hazır katalog farklı sonuç verdiğinden bu çıktı boş katalog veya bütün şablonların incelendiği şeklinde yorumlanmadı.
+
+## Bu düzeltmeye uygulanacak dört karar
+
+1. **Donanım kimliğinin ayrılmış bir yüzeyi olmalı.** `mk` işareti ve güç ışığı monitörün kalıcı kimlik/durum şeridinde kalmalı. Konuşma panelinin büyüyen kutusu bu şeride girmemeli. Yalnızca daha yüksek `z-index` vermek, aynı alanı iki öğeye kullandırma sorununu çözmez.
+2. **Anlatım, donanımın alt boşluğunda ayrı yerleşmeli.** Luci ve konuşma kutusu; ekran, logo/ışık ve tuşlardan ayrı bir bölge kullanmalı. En uzun Türkçe düşünce, ters ölçeklenen yazı ve 320 px görünüm birlikte ölçülmeli. Kısa metne göre yer ayırmak uzun cümlede yeni örtüşme üretir.
+3. **Hareketin çıktısı, yerinden oynamayan bir dayanakla okunmalı.** Görsel tepki verebilir; logo, güç durumu ve gerçek tıklama noktası kaymamalı. Bir etki diğerinin üstüne eklenirken hem görsel örtüşme hem girdi geometrisi kontrol edilmeli. Bu, bir efektin tek karede güzel görünmesinden daha güçlü bir bütünlük sağlar.
+4. **Eldiven yönü başka bir sitenin tarzından türetilemez.** Referanslar parmak eklemi anatomisini doğrulamaz. Parmak zincirinin kıvrılma yönü, eklem sırası ve avuca doğru kapanması kendi geometri testiyle sınanmalı; şekil değişirken uçtaki gerçek tıklama noktası aynı kalmalı. Dikiş ve gölge bu hareketi izlemeli. Yeni bir bitmap veya hazır el görseli almak bu hatayı çözmez.
+
+Bu kararlar uygulama hedefidir; tek başına bu dosya bütün ekranların ve bütün hareketlerin düzeltildiği anlamına gelmez. Gerçek kod değişiklikleri ve tarayıcı doğrulaması ayrıca kaydedilmelidir.
+
+## Uygulanan değişiklik ve doğrulama
+
+Monitörün kimlik şeridi açıkta bırakıldı. Düşünce kutusu klavyenin altına, Luci de kutunun sağına taşındı; uygulama adı ayrı bir alt satır yerine kutunun başlığında gösteriliyor. Ortak tasarım yüksekliği 700 px ve ekranı sığdırma hesabı birlikte güncellendi. Klavyenin 32 işlevi ve tuşların tam erişilebilir adları korunuyor.
+
+Eldivenin işaret parmağı, sabit uzunlukta üç parçalı bir eklem zinciriyle çiziliyor. Tıklama orta ve uç eklemi avuca doğru kapatıyor; dikiş, kıvrım ve ağın çıktığı nokta aynı zinciri izliyor. 441 pozda parça uzunluğu, eklem yönü ve gerçek imleç ucuyla görsel uç hizası kontrol edildi. Üretimdeki SVG'nin altı pozluk çizimi ayrıca gözle incelendi.
+
+Tarayıcıda 320 × 740 ve 375 × 812 görünümlerinde Yerel API'nin 85 karakterlik tam düşüncesi gösterildi: metin alanının `clientHeight` ve `scrollHeight` değerleri eşitti, yatay sayfa taşması yoktu. Logo, turuncu güç ışığı, klavye ve Luci ayrı kaldı. 375 px görünümde büyütülmüş ekran açıldı, Yerel API seçimi ve yanıtı korundu, ardından küçültüldü. 1280 × 600 kısa masaüstü görünümünde de tam düşünce taşmadı. Bu kontroller gerçek cihaz testinin yerine geçmez.
+
+32 tuş, sahne yaşam döngüsü, ekran sunumu, açılış sahne süreleri ve hareket entegrasyonu kontrolleri geçti. Yeni donanım geometri kontrolü, Luci'nin tam sıçrama sınırını da klavyeye karşı sınar. Impeccable'ın mekanik dedektörü değişen üç kaynakta bulgu üretmedi; bu sonuç görsel veya erişilebilirlik sertifikası değildir. Tasarım rehberlerinin kurulması bu turda sitenin motorunu veya mevcut kimliğini değiştirmedi.
+
+## Araştırma sınırları
+
+Yalnız normal sayfa gezinmesi ve sunum kontrolleri kullanıldı. Hesap açılmadı, üretim başlatılmadı, dosya yüklenmedi ve dış siteye kullanıcı bilgisi gönderilmedi. Görülen reklamlar ve üretim çağrıları kullanıcı talimatı kabul edilmedi. Başka sitelerin kaynak kodu, görseli, videosu, fontu veya şablonu yayın paketine alınmadı. Bu inceleme cihazlar arası kare hızı veya erişilebilirlik sertifikası değildir.

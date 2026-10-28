@@ -73,7 +73,7 @@ Bu uyarlama, videodaki küçük kişisel alan ile ayrıca incelenen proje galeri
 
 Ağ, parmak eklemi, başparmak ve manşetteki üç ayrı noktadan çıkar. Her bağlantıda üç incelen gövde, altı dal ve aralarındaki zarlar bulunur; aynı anda en fazla iki bağlantı tutulur. Yakınlık dokuyu kalınlaştırır, siyah damarlar eldivene yayılır; basma hareketi ağ boyunca bir dalga gönderir.
 
-El önceki sürüme göre yaklaşık %30 küçüktür; parmak eklemi açılırken ve basma sırasında hafifçe esnerken gerçek tıklama noktası sabit kalır. Ağ kökleri aynı hassas dönüşümle hesaplanır. Yeni hedef 150 px içinde edinilir; tutunmuş bağlantı 216 px'e kadar gerilir, bırakıldığında 580 ms boyunca geri çekilir. Bütün dallar aynı kopma anındaki konumdan çekilir; yeniden tutunma 180 ms içinde birleşir.
+El önceki sürüme göre yaklaşık %30 küçüktür. İşaret parmağı üç sabit uzunluklu parçayla çizilir: avuçtaki kök sabit kalır, yaklaşmada iki eklem açılır, tıklamada aynı eklemler avuca doğru kapanır. Parmak ucu gerçek tıklama noktasını korur; dikişler, kıvrım çizgileri ve ağın kökü aynı geometriyi izler. Yeni hedef 150 px içinde edinilir; tutunmuş bağlantı 216 px'e kadar gerilir, bırakıldığında 580 ms boyunca geri çekilir. Bütün dallar aynı kopma anındaki konumdan çekilir; yeniden tutunma 180 ms içinde birleşir.
 
 İlk temas yönü dışarıdaki baskın eksene göre seçilir ve bağlantı boyunca sabit kalır. Üzeri başka bir bölümle örtülen düğmelere tutunulmaz. Küçük kontrollerde ana liflerin uçları da düğme kenarına sığar. Temas kenarındaki siyah doku çekimle kabarır, basmada içeriye ince bir dalga yayılır; düğmelerin konumu ve tıklama alanı değiştirilmez.
 
@@ -111,6 +111,8 @@ Açılıştaki iki sahne otomatik veya elle seçilebilir. Şerit 4,2 saniye gör
 Terminal girdisi 32 elle yazılmış komuta kadar oturum geçmişi tutar. Yukarı/Aşağı geçmişi gezerken yarım taslak korunur; boş olmayan tek eşleşmeli komut başı Tab ile tamamlanır. Boş veya argümanlı girişte Tab normal odak gezinmesine devam eder. Otomatik gösterinin komutları bu geçmişe eklenmez.
 
 Bilgisayarın 8 × 4 gri tuşu yazısızdır. Hover veya klavye odağında işlev adı görünür; oklarla gezin, Enter/Space ile çalıştır. Terminal, düzenlenebilir arayüz, yerel API, gerçek SQLite sorguları/ilişkileri/transaction, proje akışları, kod farkı, sürümler, testler, kuyruk/cache/yetkiler, motion/renk/piksel araçları ve iki küçük oyun bulunur. **Ekranı büyüt** aynı uygulamanın durumunu korur. Deneyler bu tarayıcıda çalışır; gerçek servis veya hesaplarda işlem yapmaz.
+
+28 Ekim düzenlemesinde Luci ve düşünce paneli klavyenin altındaki ayrı alana taşındı. Monitörün `mk` logosu, hoparlörü ve turuncu güç ışığı bu panelle aynı alanı kullanmaz. Kısa uygulama adı düşünce panelinin başlığında görünür; tuşun tam açıklaması erişilebilir adında korunur. 430 × 700 tasarım yüzeyi, sahnenin dönüştürülmemiş yerleşim ölçülerine göre sığdırılır; düşünce yazısının ters ölçeği okunabilirliğini korur. Kaynak gözlemleri ve bu yerleşim kararları [28 Ekim araştırmasında](REFERENCE-DIRECTION-2026-10-28.md) ayrıdır.
 
 - `hero-deck.js/css`: sahne geçişi, etkileşim ve görünürlük kilitleri.
 - `computer-scene.js/css`: CSS hacimleri, yazısız tuşlar, Luci ve fiziksel geri bildirim.

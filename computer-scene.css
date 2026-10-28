@@ -1,6 +1,6 @@
 /* Soft hardware. The keys stay blank; their behaviour supplies the labels. */
 .computer-scene{position:absolute;inset:0;isolation:isolate;perspective:1200px;color:#e7e3db;--case-light:#f1ecdf;--case-mid:#c4bdaf;--case-dark:#807a72;--key-ink:#656560;--computer-scale:1}
-.computer-world{position:absolute;left:62%;top:calc(50% - 34px);width:430px;height:620px;transform:translate(-50%,-50%) scale(var(--computer-scale,1));transform-origin:50% 50%}
+.computer-world{position:absolute;left:62%;top:calc(50% - 34px);width:430px;height:700px;transform:translate(-50%,-50%) scale(var(--computer-scale,1));transform-origin:50% 50%}
 .computer-float{position:absolute;inset:0;animation:computer-float 7s ease-in-out infinite;will-change:transform}
 /* Hardware keeps its own 3D depth; sibling labels and thoughts compose in front. */
 .computer-object{position:absolute;inset:0;transform-style:flat;--computer-light-x:50%;--computer-light-y:40%}
@@ -31,13 +31,13 @@
 .computer-wake[data-step=opening] .computer-wake-track i{transform:scaleX(1)}
 .computer-wake[data-step=signal] .computer-wake-mark,.computer-wake[data-step=dormant] .computer-wake-mark{transform:translateY(22px) scaleY(.025);opacity:.5}
 .computer-wake[data-step=signal] .computer-wake-title,.computer-wake[data-step=signal] .computer-wake-message,.computer-wake[data-step=signal] .computer-wake-track{opacity:0}
-.computer-case-brand{position:absolute;left:31px;bottom:22px;display:flex;align-items:start;gap:4px;color:#716a5e;text-shadow:0 1px 0 #fff9}
+.computer-case-brand{position:absolute;left:31px;bottom:22px;display:flex;align-items:start;gap:4px;color:#4b4c42;text-shadow:0 1px 0 #fff9}
 .computer-case-brand b{font:600 26px/.8 "Bricolage Grotesque",sans-serif;letter-spacing:-.1em}
 .computer-case-brand span{font:12px/1 "Segoe UI",sans-serif;color:#9c6a45}
 .computer-speaker{display:flex;gap:3px;position:absolute;left:143px;bottom:25px;align-items:center;height:8px}
 .computer-speaker i{width:3px;height:3px;background:#8c8575;border-radius:50%;box-shadow:inset 0 1px 1px #4a4132a8,0 1px 0 #fff8}
 .computer-speaker i:nth-child(3n){height:5px}
-.computer-power-light{position:absolute;right:47px;bottom:25px;width:12px;height:5px;background:#ff6a35;border-radius:5px;box-shadow:inset 0 1px 1px #ffdf9180,0 0 8px #ff6a35a8,0 0 20px #ff6a3540}
+.computer-power-light{position:absolute;right:42px;bottom:24px;width:16px;height:6px;background:#ff6a35;border-radius:6px;box-shadow:inset 0 1px 1px #ffdf9180,0 0 8px #ff6a35a8,0 0 20px #ff6a3540}
 .computer-stand{position:absolute;left:122px;top:266px;width:135px;height:33px;background:linear-gradient(90deg,#90897b,#d3c9b5 35%,#a99e89 74%,#776e5d);border-radius:8px 8px 21px 20px;box-shadow:inset 0 -7px 7px #60594b77,0 8px 9px #0007;transform:perspective(140px) rotateX(27deg);z-index:0}
 .computer-stand:before{content:"";position:absolute;left:29px;right:29px;top:-7px;height:20px;background:#b9af9a;border-radius:0 0 10px 10px;box-shadow:inset 0 4px 9px #51483799}
 .computer-stand i{position:absolute;inset:auto 10px 4px;height:3px;border-radius:50%;background:#e9dfcc55}
@@ -56,11 +56,11 @@
 .computer-key:hover .computer-key-light,.computer-key:focus-visible .computer-key-light,.computer-key.is-last-key .computer-key-light{opacity:1;transform:scaleX(1)}
 .computer-key.is-pressed .computer-key-cap{transform:translateY(4px) scale(.98);box-shadow:inset 0 2px 4px #71766955,inset -2px -1px 3px #63695b66,0 1px 0 #494e43,0 1px 2px #0005}
 .computer-key.is-rippling:not(.is-pressed) .computer-key-cap{animation:computer-key-wave .38s var(--wave-delay,0ms) cubic-bezier(.2,.7,.2,1)}
-.computer-key-hint{position:absolute;left:20px;right:28px;top:580px;display:flex;gap:10px;align-items:start;min-height:34px;line-height:1.45;transform:rotate(-3deg);pointer-events:none}
-.computer-key-number{font:10px/1.5 Consolas,monospace;color:#e5b78f;min-width:17px}
-.computer-key-description{font:9px/1.55 Consolas,monospace;letter-spacing:-.015em;color:#aaa49b;max-width:340px}
+.computer-key-hint{position:static;display:flex;gap:5px;align-items:baseline;justify-content:flex-end;min-width:0;line-height:1.1;pointer-events:none}
+.computer-key-number{font:calc(9px * var(--computer-text-scale,1))/1.1 Consolas,monospace;color:#e5b78f;flex:none}
+.computer-key-description{font:calc(9px * var(--computer-text-scale,1))/1.1 Consolas,monospace;letter-spacing:-.015em;color:#aaa49b;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .computer-key-hint.is-key-selected .computer-key-description{color:#c8c0b4}
-.computer-companion{position:absolute;left:335px;top:237px;width:89px;height:89px;z-index:5;filter:drop-shadow(2px 4px 3px #0008);transform:rotate(2deg);pointer-events:none}
+.computer-companion{position:absolute;left:339px;top:582px;width:76px;height:76px;z-index:5;filter:drop-shadow(2px 4px 3px #0008);transform:rotate(2deg);pointer-events:none}
 .computer-luci-drawing{display:block;width:100%;height:100%;overflow:visible;fill:#09090b;stroke:#a9a299;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round}
 .computer-luci-tail{transform-box:fill-box;transform-origin:90% 70%;animation:computer-luci-tail 4.7s ease-in-out infinite}
 .computer-luci-eye{transform-box:fill-box;transform-origin:50% 50%;animation:computer-luci-blink 7.2s linear infinite}
@@ -69,12 +69,12 @@
 .computer-companion.is-looking .computer-luci-arm{transform:rotate(-20deg)}
 .computer-companion[data-attention=screen] .computer-luci-arm{transform:rotate(-34deg)}
 .computer-companion.is-excited{animation:computer-luci-hop .48s cubic-bezier(.2,.7,.2,1)}
-.computer-thought{position:absolute;left:38px;top:278px;width:286px;min-height:75px;z-index:5;padding:8px 11px 8px;background:#121416;border:1px solid #8073656b;border-radius:11px 11px 5px 11px;box-shadow:2px 5px 12px #0007;transform:rotate(-3deg);pointer-events:none}
+.computer-thought{position:absolute;left:14px;top:568px;width:320px;min-height:75px;z-index:5;padding:8px 11px;background:#121416;border:1px solid #8073656b;border-radius:11px 11px 5px 11px;box-shadow:2px 5px 12px #0007;pointer-events:none}
 .computer-thought:before,.computer-thought:after{content:"";position:absolute;right:-12px;top:13px;width:5px;height:5px;background:#121416;border:1px solid #80736577;border-radius:50%}
 .computer-thought:after{right:-20px;top:8px;width:3px;height:3px}
-.computer-thought-header{display:flex;justify-content:space-between;align-items:center;font:calc(8px * var(--computer-text-scale,1))/1 Consolas,monospace;letter-spacing:.07em;color:#a8a195;margin-bottom:6px}
+.computer-thought-header{display:grid;grid-template-columns:max-content minmax(0,1fr) 4px;gap:7px;align-items:center;font:calc(9px * var(--computer-text-scale,1))/1.1 Consolas,monospace;letter-spacing:0;color:#a8a195;margin-bottom:6px}
 .computer-thought-header>i{display:block;width:4px;height:4px;background:#ff6a35;border-radius:50%;box-shadow:0 0 4px #ff6a3566}
-.computer-thought-line{margin:0;font:calc(11px * var(--computer-text-scale,1))/1.45 Consolas,monospace;color:#e0d7c6;letter-spacing:-.02em;min-height:42px;overflow-wrap:anywhere}
+.computer-thought-line{margin:0;font:calc(11px * var(--computer-text-scale,1))/1.35 Consolas,monospace;color:#e0d7c6;letter-spacing:-.02em;min-height:42px;overflow-wrap:anywhere}
 .computer-thought-prompt{color:#ff8b57}
 .computer-thought-caret{display:inline-block;width:4px;height:9px;margin-left:2px;background:#ff8b579c;vertical-align:-1px;animation:computer-caret 1.2s steps(1,end) infinite}
 .computer-ground-shadow{position:absolute;left:15%;right:4%;top:560px;height:31px;transform:rotate(-3deg);border-radius:50%;background:radial-gradient(ellipse,#000c,transparent 68%);filter:blur(9px);opacity:.7;animation:computer-shadow 7s ease-in-out infinite;pointer-events:none}
@@ -101,5 +101,5 @@
 @keyframes computer-power-response{0%,100%{background:#ff6a35}30%{background:#ffe2ac;box-shadow:0 0 11px #e8b47799}}
 @keyframes computer-glass-response{0%,100%{box-shadow:inset 0 2px 8px #000b,inset 1px 0 0 #ffffff15}35%{box-shadow:inset 0 2px 8px #000b,inset 1px 0 0 #ffffff15,inset 0 -2px 8px #e9a66c22}}
 @media(max-width:1100px) and (min-width:761px){.computer-world{left:60%}}
-@media(max-width:760px){.computer-world{left:50%;top:calc(50% - 15px)}.computer-object-label{font-size:9px;top:-1px}.computer-expand{font-size:10px;min-height:36px;top:-9px}.computer-key-description{font-size:10px}.computer-key-number{font-size:11px}.computer-thought{min-height:75px;top:278px}.computer-key-hint{top:580px}.computer-monitor{transform:rotate(-2deg)}.computer-keyboard{transform:rotate(-2deg)}}
+@media(max-width:760px){.computer-world{left:50%;top:calc(50% - 15px)}.computer-object-label{font-size:9px;top:-1px}.computer-expand{font-size:10px;min-height:36px;top:-9px}.computer-monitor{transform:rotate(-2deg)}.computer-keyboard{transform:rotate(-2deg)}}
 @media(prefers-reduced-motion:reduce){.computer-scene *,.computer-scene *:before,.computer-scene *:after{animation:none!important;transition:none!important}.computer-object{transform:none}}
