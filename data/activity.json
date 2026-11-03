@@ -2,7 +2,7 @@
   "source": "Bu portföyün GitHub geliştirme kayıtları",
   "metric": "repository_commits",
   "repository": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio",
-  "generatedAt": "2026-11-03T23:22:23.141Z",
+  "generatedAt": "2026-11-03T23:28:45.246Z",
   "days": [
     {
       "date": "2026-10-23",
@@ -146,8 +146,13 @@
     },
     {
       "date": "2026-11-04",
-      "count": 1,
+      "count": 2,
       "events": [
+        {
+          "sha": "d1c2c06fd7348c7f26a11a32828c8103feb04409",
+          "title": "Animate a crowd of scroll cursors and tighten chapter spacing",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/d1c2c06fd7348c7f26a11a32828c8103feb04409"
+        },
         {
           "sha": "ab5b7ed298d6b1a9c09b20eaf62e55bb2c54d355",
           "title": "Connect portfolio chapters with scroll-driven motion and live project demos",
