@@ -31,6 +31,8 @@ Script yalnız bu depodaki gerçek kaynak commitlerini sayar; salt günlük dosy
 
 - `index.html`, `style.css`, `direction.css` ve `profile.css`: sayfa yapısı ve görsel dil.
 - `portfolio-stage.js/css`: büyük proje sahnesi, dört özgün HTML/SVG ürün arayüzü ve görünürlüğe bağlı hareket.
+- `scroll-sequence.js/css`: projelerle laboratuvar arasındaki üç katmanlı sistem kesiti. Kaydırma yönü bakır sinyali ve katmanların açıklığını belirler. Dar ekranlarda bölüm normal akışta kalır.
+- `project-experiments.js/css`: seçili dört projenin önizlemesinde çalışan oturum içi provalar. Girdiler, harita seçimleri ve sonuçlar tarayıcı belleğinde tutulur.
 - `readability.css`: gövde metni, kontrast, düşünce balonları ve normal yazıyla cümle karşılığı.
 - `app.js`: gezinme, proje ayrıntıları, hareket kontrolü ve takvim.
 - `kinetic.js`: imleç çekimi, yerel bükülme ve kalıcı biçim vermeyi destekleyen Canvas şerit; dönüş sürer, sıfırlama düğmesi biçimi geri alır.

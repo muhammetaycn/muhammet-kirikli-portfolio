@@ -32,6 +32,8 @@
   <link rel="stylesheet" href="portfolio-stage.css?v=20261028h">
   <link rel="stylesheet" href="readability.css?v=20261027e">
   <link rel="stylesheet" href="project-conduit.css?v=20261028h">
+  <link rel="stylesheet" href="scroll-sequence.css?v=20261104a">
+  <link rel="stylesheet" href="project-experiments.css?v=20261104a">
   <script defer src="content.js?v=20261027e"></script>
   <script defer src="kinetic.js?v=20261026c"></script>
   <script defer src="system-lab.js?v=20261026b"></script>
@@ -43,14 +45,16 @@
   <script defer src="computer-scene.js?v=20261028h"></script>
   <script defer src="hero-deck.js?v=20261027g"></script>
   <script defer src="personal-dock.js?v=20261026c"></script>
-  <script defer src="project-motion.js?v=20261024u"></script>
+  <script defer src="project-motion.js?v=20261104a"></script>
   <script defer src="ui-icons.js?v=20261026b"></script>
   <script defer src="motion-film.js?v=20261027e"></script>
   <script defer src="menu-motion.js?v=20261026c"></script>
   <script defer src="project-gallery.js?v=20261027g"></script>
   <script defer src="portfolio-stage.js?v=20261027g"></script>
   <script defer src="project-conduit.js?v=20261028h"></script>
-  <script defer src="app.js?v=20261028h"></script>
+  <script defer src="scroll-sequence.js?v=20261104a"></script>
+  <script defer src="project-experiments.js?v=20261104a"></script>
+  <script defer src="app.js?v=20261104a"></script>
 </head>
 <body>
   <a class="skip-link" href="#work">Çalışmalara geç</a>
@@ -98,6 +102,52 @@
       </div><div class="preview-bottom"><h3 id="preview-title">IDOLOG</h3><p id="preview-short">İçerik, oturum ve tartışma üzerine bir sosyal ürün.</p><span class="preview-status" id="preview-status">GELİŞTİRME</span></div><button id="preview-open" class="preview-open" aria-label="Seçili projenin detayını aç"><span>Projeyi incele</span>↗</button></aside></div>
       <details class="project-archive reveal"><summary>Diğer sistemler ve denemeler <span id="archive-count"></span><b>+</b></summary><div id="project-archive-list" class="project-archive-list"></div></details>
       <noscript><p>Projeler: IDOLOG, TekstilOS, Acıktınmı, GÖRGEZ, Paulukızlar, AI otomasyonları, canlı etkinlik sistemi, topluluk botu ve bu portföy. Etkileşimli detayları incelemek için JavaScript’i etkinleştir.</p></noscript>
+    </section>
+
+    <section class="signal-sequence" id="signal" aria-labelledby="signal-title">
+      <div class="signal-stage">
+        <div class="signal-copy">
+          <span class="signal-kicker">Sistem kesiti / 01</span>
+          <h2 id="signal-title">Bir tıklamanın içi.</h2>
+          <p>Bir fikir gönderildiğinde arayüz girdiyi alır, kurallar sıradaki adımı belirler ve sonuç kayda geçer.</p>
+          <a href="#lab">Akışı laboratuvarda dene <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11m-4-4 4 4 4-4"/></svg></a>
+        </div>
+        <figure class="signal-instrument">
+          <svg viewBox="0 0 650 486" role="img" aria-label="Bir işlemin üç katmanı: arayüz, karar ve kayıt">
+            <defs>
+              <linearGradient id="signal-face" x2="80%" y2="100%">
+                <stop stop-color="#303d32"/><stop offset="1" stop-color="#151d18"/>
+              </linearGradient>
+            </defs>
+            <path class="signal-grid" d="M34 31v426m519-426v426M20 56h600M20 243h600M20 430h600"/>
+            <path class="signal-trace" opacity=".45" d="M537 94h44q16 0 16 16v263q0 16-16 16h-44m0-146h60"/>
+            <path class="signal-hot signal-current" pathLength="1" d="M537 94h44q16 0 16 16v263q0 16-16 16h-44"/>
+            <g class="signal-layer signal-input">
+              <path class="signal-edge" d="M59 76 128 48h392l18 17v66l-69 28H77l-18-17Z"/>
+              <path class="signal-plate" d="M59 76 128 48h392l18 17v55l-69 28H77l-18-17Z"/>
+              <text class="signal-index" x="97" y="105">01</text><text class="signal-label" x="135" y="105">ARAYÜZ</text>
+              <path class="signal-trace" d="M237 100h49l15-15h62l16 15h104"/>
+              <circle class="signal-node" cx="483" cy="100" r="4"/>
+              <path class="signal-trace" d="M265 88v24m-12-12h24"/>
+            </g>
+            <g class="signal-layer signal-rules">
+              <path class="signal-edge" d="M59 224 128 196h392l18 17v66l-69 28H77l-18-17Z"/>
+              <path class="signal-plate" d="M59 224 128 196h392l18 17v55l-69 28H77l-18-17Z"/>
+              <text class="signal-index" x="97" y="253">02</text><text class="signal-label" x="135" y="253">KARAR</text>
+              <path class="signal-trace" d="M237 248h64l19-19 19 19-19 19-19-19m38 0h46l15-15h83m-98 15 15 15h83"/>
+              <circle class="signal-node" cx="483" cy="233" r="4"/>
+            </g>
+            <g class="signal-layer signal-store">
+              <path class="signal-edge" d="M59 372 128 344h392l18 17v66l-69 28H77l-18-17Z"/>
+              <path class="signal-plate" d="M59 372 128 344h392l18 17v55l-69 28H77l-18-17Z"/>
+              <text class="signal-index" x="97" y="401">03</text><text class="signal-label" x="135" y="401">KAYIT</text>
+              <path class="signal-trace" d="M237 396h48l15-14h83l15 14h85m-164-5h51m-51 10h51m-51 10h37"/>
+              <circle class="signal-node" cx="483" cy="396" r="4"/>
+            </g>
+          </svg>
+          <figcaption><small>Girdi → Karar → Sonuç</small><span class="signal-meter" aria-hidden="true"></span></figcaption>
+        </figure>
+      </div>
     </section>
 
     <section class="lab-section section-shell" id="lab" aria-labelledby="lab-heading">

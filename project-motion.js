@@ -55,6 +55,7 @@
       figure.replaceChildren();figure.dataset.project=project.visual||project.id;figure.dataset.caseId=project.id;
       if(drawing){
         const clone=drawing.cloneNode(true);clone.removeAttribute('id');clone.removeAttribute('aria-labelledby');clone.removeAttribute('aria-describedby');
+        clone.inert=true;
         clone.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
         clone.querySelectorAll('[aria-labelledby],[aria-describedby]').forEach(node=>{node.removeAttribute('aria-labelledby');node.removeAttribute('aria-describedby');});
         clone.querySelectorAll(FOCUSABLE).forEach(node=>node.setAttribute('tabindex','-1'));
@@ -77,12 +78,12 @@
       if(entry&&dialog.open)apply(entry);
       if(dialog.open)state('open');
     }
-    function open({project,render,source}={}){
+    function open({project,render,source,originSource=source}={}){
       if(destroyed||!project||typeof render!=='function')return false;
       const wasOpen=dialog.open;
       generation++;pending=null;closing=false;closePromise=null;cancelAnimations();
       if(!wasOpen||source&&!dialog.contains(source)){
-        const candidates=[source,preview];origin=candidates.find(node=>rect(node))||null;originRect=rect(origin);
+        const candidates=[originSource,preview];origin=candidates.find(node=>rect(node))||null;originRect=rect(origin);
         opener=focusTarget(source,true)||focusTarget(document.activeElement)||focusTarget(preview,true);
       }
       motionClass();apply({project,render});

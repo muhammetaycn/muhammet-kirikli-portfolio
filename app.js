@@ -23,6 +23,7 @@
   let menuMotion;
   let projectGallery;
   let projectConduit;
+  let projectExperiment;
   let requestedCaseIndex=0;
   const projectExperiences={idolog:8,textile:10,aciktinmi:11,portfolio:24,event:9,gorgez:12,content:13,paulukizlar:3,dm:15,community:14};
   let toastTimer;
@@ -44,6 +45,7 @@
     $('#preview-status').textContent = project.status.toLocaleUpperCase('tr-TR');
     $('.project-preview').dataset.project = project.visual || project.id;
     $('#preview-open').setAttribute('aria-label', project.title + ' detaylarını aç');
+    projectExperiment?.select(index);
     projectGallery?.show(index);
     projectConduit?.setSelected(index);
     document.querySelectorAll('.project-conduit [data-open-project]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.openProject)===index)));
@@ -71,10 +73,19 @@
     const hit = element('button', 'project-hit'); hit.type = 'button'; hit.setAttribute('aria-label', project.title + ' detaylarını aç');
     hit.addEventListener('click', () => openProject(index,hit));
     hit.addEventListener('focus', () => selectProject(index));
-    row.addEventListener('pointerenter', () => selectProject(index));
+    row.addEventListener('pointerenter', () => {
+      if (!$('.project-preview').classList.contains('has-project-experiment')) selectProject(index);
+    });
     row.append(information, arrow, hit); $('#project-list').append(row);
   });
-  $('#preview-open').addEventListener('click', () => openProject(selected,$('.project-preview')));
+  $('#preview-open').addEventListener('click', event => openProject(selected, event.currentTarget));
+  if (window.ProjectExperiments) {
+    projectExperiment = window.ProjectExperiments.mount({
+      preview: $('.project-preview'), projects, canMove: () => moving,
+      onActivate: () => projectGallery?.settle()
+    });
+    cleanups.push(() => projectExperiment.destroy());
+  }
   selectProject(0);
   if(window.ProjectGallery){projectGallery=window.ProjectGallery.mount({preview:$('.project-preview'),projects,onSelect:selectProject,canMove:()=>moving});projectGallery.show(selected);cleanups.push(()=>projectGallery.destroy());}
 
@@ -102,7 +113,8 @@
   function openProject(index,source=document.activeElement) {
     requestedCaseIndex=index;
     projectGallery?.settle();
-    if(projectMotion)projectMotion.open({project:projects[index],render:()=>paintCase(index),source});
+    projectExperiment?.close();
+    if(projectMotion)projectMotion.open({project:projects[index],render:()=>paintCase(index),source,originSource:source?.id==='preview-open'?$('.project-preview'):source});
     else {paintCase(index);projectDialog.showModal();}
     syncSurfaces();
   }
@@ -225,6 +237,7 @@
     menuMotion?.setPaused(!moving);
     projectGallery?.setPaused(!moving||covered);
     projectConduit?.setPaused(!moving||covered);
+    projectExperiment?.setPaused(!moving||covered);
   }
   function applyMotion() {
     document.body.classList.toggle('motion-paused', !moving);
