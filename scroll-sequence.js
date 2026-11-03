@@ -12,8 +12,22 @@
   const context = cursorLayer.getContext('2d');
   const cursorShape = context && typeof Path2D === 'function' && new Path2D('M 1 1 L 2 18 L 6 14 L 9.5 21 L 13 19 L 9 12 L 15 11 Z');
   const colors = ['#fff0d7', '#ffc29c', '#bce9bd', '#aed6ff', '#f5b7cb', '#f4df9d'];
-  const targets = [...document.querySelectorAll('main h1, main h2, .project-preview')];
-  let visibleTarget;
+  const targetSelector = [
+    '#home h1', '.hero-art', '.project-conduit button', '#work h2', '#project-list', '.project-preview',
+    '#signal h2', '.signal-layer', '#lab h2', '.lab-tabs', '.lab-viewport', '#about h2',
+    '#capability-map', '.about-right', '.background-columns > div', '#rhythm h2',
+    '.rhythm-panel', '#contact h2', '.contact-link'
+  ].join(',');
+  const workers = [...document.querySelectorAll(targetSelector)].map((node, index) => ({
+    node, index, color: colors[index % colors.length], progress: -1, rect: null
+  }));
+  const signalWorkerStart = workers.findIndex(({node}) => node.classList.contains('signal-layer'));
+  for (const {node} of workers) {
+    node.classList.add('construction-target');
+    for (const path of node.querySelectorAll(':scope.signal-layer > .signal-trace')) {
+      path.setAttribute('pathLength', '1');
+    }
+  }
   let targetsDirty = true;
   let cursorFrame = 0;
   let lastCursorPaint = -Infinity;
@@ -25,6 +39,7 @@
   let lastProgress = -1;
   let enabled = false;
   sequence.classList.add('has-signal-layout');
+  const clamp = value => Math.max(0, Math.min(1, value));
 
   function paint() {
     frame = 0;
@@ -36,6 +51,7 @@
     if (progress === lastProgress) return;
     sequence.style.setProperty('--signal-progress', progress);
     lastProgress = progress;
+    targetsDirty = true;
   }
 
   function schedule() {
@@ -69,17 +85,7 @@
       cursorLayer.height = Math.round(height * ratio);
       targetsDirty = true;
     }
-    if (targetsDirty) {
-      visibleTarget = undefined;
-      for (const target of targets) {
-        const rect = target.getBoundingClientRect();
-        if (rect.top >= 100 && rect.bottom <= height - 62) {
-          visibleTarget = rect;
-          break;
-        }
-      }
-      targetsDirty = false;
-    }
+    if (targetsDirty) measureWorkers(height, width);
     const time = now / 1000;
     const scroll = scrollY;
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -88,9 +94,14 @@
     context.lineJoin = 'round';
     context.strokeStyle = '#191a17';
     const compact = width < 760;
-    const count = compact ? 21 : 34;
+    const count = workers.length;
     const distance = height + 100;
     for (let i = 0; i < count; i++) {
+      const worker = workers[i];
+      if (worker.rect) {
+        paintConstruction(worker);
+        continue;
+      }
       const phase = i * 2.399963;
       const pace = .42 + (i % 7) * .12;
       const track = (i * 37 % 101) / 101;
@@ -104,7 +115,7 @@
       const size = (.67 + (i % 5) * .14) * (compact ? .85 : 1);
       const rotation = Math.cos(sway) * .24;
       const opacity = edge * (.51 + (i % 4) * .12);
-      const color = colors[i % colors.length];
+      const color = worker.color;
       if (i % 4 === 0 && opacity > .1) {
         for (let trail = 3; trail >= 1; trail--) {
           const age = trail * .075;
@@ -114,30 +125,73 @@
       }
       drawArrow(x, y, size, rotation, color, opacity);
     }
-    if (visibleTarget) paintSelection(visibleTarget, time);
   }
 
-  function paintSelection(rect, time) {
-    const phase = time % 4.2;
-    if (phase > 2) return;
-    const opacity = Math.min(1, phase * 4, (2 - phase) * 4);
-    const left = Math.max(8, rect.left - 6);
-    const top = rect.top - 5;
-    const right = Math.min(cursorWidth - 22, rect.right + 6);
-    const bottom = rect.bottom + 5;
-    const travel = Math.min(1, Math.max(0, (phase - 1.25) / .75));
-    context.save();
-    context.globalAlpha = opacity * .67 * (1 - travel);
-    context.lineWidth = 1;
-    context.strokeStyle = '#78b8f4';
-    context.fillStyle = '#d0e8ff';
-    context.strokeRect(left, top, right - left, bottom - top);
-    for (const x of [left, right]) {
-      context.fillRect(x - 2, top - 2, 4, 4);
-      context.fillRect(x - 2, bottom - 2, 4, 4);
+  function measureWorkers(height, width) {
+    targetsDirty = false;
+    const updates = [];
+    const distanceToEnd = Math.max(0, document.documentElement.scrollHeight - height - scrollY);
+    for (const worker of workers) {
+      const {node, index} = worker;
+      const rect = node.getBoundingClientRect();
+      const delay = (index % 4) * .046;
+      const start = height * (.91 - delay);
+      const span = Math.max(height * .2, Math.min(height * .48, start - rect.top + distanceToEnd));
+      const phase = node.classList.contains('signal-layer')
+        ? (lastProgress - .14 - (index - signalWorkerStart) * .12) / .43
+        : (start - rect.top) / span;
+      const progress = Math.round(clamp((phase - .22) / .60) * 1000) / 1000;
+      if (worker.progress !== progress) updates.push([worker, progress]);
+      const left = Math.max(9, rect.left - 5);
+      const right = Math.min(width - 23, rect.right + 5);
+      const top = Math.max(width <= 760 ? 75 : 96, rect.top - 5);
+      const bottom = Math.min(height - 12, rect.bottom + 5);
+      worker.rect = phase > 0 && phase < 1 && right > left + 12 && bottom > top + 12
+        ? {left, right, top, bottom, phase}
+        : null;
     }
+    for (const [worker, progress] of updates) {
+      worker.progress = progress;
+      worker.node.style.setProperty('--construction-progress', progress);
+    }
+  }
+
+  function paintConstruction({rect, color, index}) {
+    const {left, right, top, bottom, phase} = rect;
+    const opacity = clamp(phase * 8) * clamp((1 - phase) * 6);
+    const draw = clamp((phase - .22) / .60);
+    const approach = clamp(phase / .22);
+    const depart = clamp((phase - .82) / .18);
+    const width = right - left;
+    const height = bottom - top;
+    const lengths = [width, height, width, height];
+    const corners = [[left, top], [right, top], [right, bottom], [left, bottom], [left, top]];
+    let remaining = draw * (width + height) * 2;
+    let x = left;
+    let y = top;
+    context.save();
+    context.globalAlpha = opacity * (1 - depart) * .78;
+    context.lineWidth = 1.4;
+    context.strokeStyle = '#78b8f4';
+    context.fillStyle = color;
+    context.beginPath();
+    context.moveTo(x, y);
+    for (let side = 0; side < lengths.length && remaining > 0; side++) {
+      const fraction = Math.min(1, remaining / lengths[side]);
+      const [fromX, fromY] = corners[side];
+      const [toX, toY] = corners[side + 1];
+      x = fromX + (toX - fromX) * fraction;
+      y = fromY + (toY - fromY) * fraction;
+      context.lineTo(x, y);
+      context.fillRect(fromX - 2, fromY - 2, 4, 4);
+      remaining -= lengths[side];
+    }
+    context.stroke();
     context.restore();
-    drawArrow(right + travel * 36, top + travel * 45, 1, travel * .38, '#aed6ff', opacity);
+    const approachOffset = (1 - approach) ** 2;
+    x += (index % 2 === 0 ? 75 : -65) * approachOffset - depart * 40;
+    y -= 58 * approachOffset - depart * 44;
+    drawArrow(x, y, 1.12, depart * .35, color, opacity);
   }
 
   function stopCursors() {
@@ -179,6 +233,7 @@
 
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', onScroll, { passive: true });
+  if (typeof ResizeObserver === 'function') new ResizeObserver(onScroll).observe(document.querySelector('main'));
   reduced.addEventListener('change', sync);
   document.addEventListener('visibilitychange', sync);
   new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });

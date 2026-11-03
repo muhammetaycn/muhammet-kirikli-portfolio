@@ -132,6 +132,15 @@
 }
 .scroll-cursors.is-moving { opacity: 1; transition-duration: .08s; }
 .surface-covered .scroll-cursors, .motion-paused .scroll-cursors { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  body:not(.motion-paused):has(.scroll-cursors.is-moving) h2.construction-target {
+    opacity: calc(.78 + var(--construction-progress, 1) * .22);
+  }
+  body:not(.motion-paused):has(.scroll-cursors.is-moving) .signal-layer > .signal-trace {
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--construction-progress, 1));
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .scroll-cursors { display: none; }
 }
