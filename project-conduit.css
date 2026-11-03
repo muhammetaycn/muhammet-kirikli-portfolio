@@ -1,5 +1,5 @@
 /* A physical connection between the opening object and its four works. */
-.project-shortcuts.project-conduit.has-conduit{position:relative;isolation:isolate;min-height:244px;padding:172px 4.6vw 22px;gap:0;border:0;background:#08090b;overflow:hidden}
+.project-shortcuts.project-conduit.has-conduit{position:relative;isolation:isolate;min-height:234px;padding:172px 4.6vw 12px;gap:0;border:0;background:#08090b;overflow:hidden}
 .project-conduit .conduit-drawing{position:absolute;inset:0;width:100%;height:100%;z-index:-1;overflow:visible;pointer-events:none}
 .conduit-drawing path{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .conduit-cable-shadow{stroke:#000;stroke-width:38;transform:translateY(9px);opacity:.7}
@@ -23,7 +23,7 @@
 .project-conduit.is-conduit-still button,.project-conduit.is-conduit-still .conduit-route{transition:none}
 .project-conduit.is-conduit-still .conduit-route{stroke-dashoffset:0!important}
 @media(max-width:760px){
-  .project-shortcuts.project-conduit.has-conduit{min-height:290px;padding:143px 6vw 20px;grid-template-columns:1fr 1fr;row-gap:25px}
+  .project-shortcuts.project-conduit.has-conduit{min-height:267px;padding:137px 6vw 12px;grid-template-columns:1fr 1fr;row-gap:20px}
   .conduit-cable{stroke-width:20}
   .conduit-cable-shadow{stroke-width:29;transform:translateY(6px)}
   .conduit-cable-seam{transform:translateY(-6px);opacity:.45}

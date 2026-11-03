@@ -55,5 +55,5 @@
   .hero:has(.has-deck) h1{font-size:clamp(54px,6.7vw,76px);margin-bottom:18px}
   .hero:has(.has-deck) .hero-copy>p{font-size:16px;margin:18px 0 20px}
 }
-@media(max-width:760px){.hero .hero-art.has-deck{height:560px;top:460px}.hero:has(.has-deck){min-height:1110px}.hero-deck-controls{left:7%;right:7%;bottom:2%;font-size:9px;padding-top:10px}.deck-scene-button{padding:10px 8px}.deck-auto{flex-basis:40px;height:40px}.deck-status{font-size:8px}.has-deck .art-hint{bottom:12%;font-size:6px}.has-deck .scene-modes{bottom:18%}.hero-stage{transform-origin:50% 50%}}
+@media(max-width:760px){.hero .hero-art.has-deck{height:560px;top:460px}.hero:has(.has-deck){min-height:1060px}.hero-deck-controls{left:7%;right:7%;bottom:2%;font-size:9px;padding-top:10px}.deck-scene-button{padding:10px 8px}.deck-auto{flex-basis:40px;height:40px}.deck-status{font-size:8px}.has-deck .art-hint{bottom:12%;font-size:6px}.has-deck .scene-modes{bottom:18%}.hero-stage{transform-origin:50% 50%}}
 @media(prefers-reduced-motion:reduce){.hero-stage{transition:none;filter:none}}
