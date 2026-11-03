@@ -2,7 +2,7 @@
   "source": "Bu portföyün GitHub geliştirme kayıtları",
   "metric": "repository_commits",
   "repository": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio",
-  "generatedAt": "2026-10-28T18:12:19.474Z",
+  "generatedAt": "2026-11-03T23:22:23.141Z",
   "days": [
     {
       "date": "2026-10-23",
@@ -141,6 +141,17 @@
           "sha": "3270976f57a4a93d064f5812525322f936534fdc",
           "title": "Correct glove finger joints and separate computer narration from hardware",
           "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/3270976f57a4a93d064f5812525322f936534fdc"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-04",
+      "count": 1,
+      "events": [
+        {
+          "sha": "ab5b7ed298d6b1a9c09b20eaf62e55bb2c54d355",
+          "title": "Connect portfolio chapters with scroll-driven motion and live project demos",
+          "url": "https://github.com/muhammetaycn/muhammet-kirikli-portfolio/commit/ab5b7ed298d6b1a9c09b20eaf62e55bb2c54d355"
         }
       ]
     }
